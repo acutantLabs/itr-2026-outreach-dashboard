@@ -680,7 +680,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 <header>
   <div class="logo">
     <div class="logo-mark">A</div>
-    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.3.0</span></div></div>
+    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.3.1</span></div></div>
   </div>
   <div class="hd"></div>
   <div class="filters" id="filters">
@@ -2381,9 +2381,9 @@ function tagCaretContext(ta){
   const between=val.slice(open+1,pos);
   if(between.indexOf('}')>=0||between.indexOf('{')>=0||between[0]==='/')return null;
   const ci=between.indexOf(':');
-  if(ci<0)return {mode:'field',frag:between,fragStart:open+1,pos};
+  if(ci<0)return {mode:'field',frag:between,open,pos};
   const valuePart=between.slice(ci+1),lastBar=valuePart.lastIndexOf('|');
-  return {mode:'value',key:tagKey(between.slice(0,ci)),frag:valuePart.slice(lastBar+1),fragStart:open+1+ci+1+lastBar+1,pos};
+  return {mode:'value',key:tagKey(between.slice(0,ci)),frag:valuePart.slice(lastBar+1),open,colonAbs:open+1+ci,pos};
 }
 function updateTagSuggest(){
   const ta=$('emBody'),box=$('emTagSuggest');if(!ta||!box)return;
@@ -2406,10 +2406,25 @@ function updateTagSuggest(){
 }
 function applyTagSuggest(v){
   const ta=$('emBody'),ctx=tagSuggestCtx;if(!ctx)return;
-  const lead=ctx.frag.length-ctx.frag.replace(/^\s+/,'').length,s=ctx.fragStart+lead;
-  const insert=v+(ctx.mode==='field'?':':'');
-  ta.value=ta.value.slice(0,s)+insert+ta.value.slice(ctx.pos);
-  const caret=s+insert.length;ta.focus();ta.setSelectionRange(caret,caret);
+  const val=ta.value;
+  // forward edge of the editable region inside this tag (stop at } { or newline)
+  let end=ctx.pos;while(end<val.length&&val[end]!=='}'&&val[end]!=='{'&&val[end]!=='\n')end++;
+  let segStart,segEnd,insert;
+  if(ctx.mode==='field'){
+    segStart=ctx.open+1;
+    let colon=val.indexOf(':',segStart);if(colon<0||colon>end)colon=end;
+    segEnd=colon;insert=v+(val[colon]===':'?'':':'); // replace field name, keep any :value
+  }else{
+    // replace the WHOLE |-segment around the caret (so a selected/partial value
+    // is overwritten, not appended)
+    const valStart=ctx.colonAbs+1,prevBar=val.lastIndexOf('|',ctx.pos-1);
+    segStart=(prevBar>=valStart)?prevBar+1:valStart;
+    const nextBar=val.indexOf('|',ctx.pos);
+    segEnd=(nextBar>=0&&nextBar<end)?nextBar:end;
+    insert=v;
+  }
+  ta.value=val.slice(0,segStart)+insert+val.slice(segEnd);
+  const caret=segStart+insert.length;ta.focus();ta.setSelectionRange(caret,caret);
   syncTagHL();updateTagSuggest();
 }
 $('emTagSuggest').addEventListener('mousedown',e=>{const b=e.target.closest('.ts-chip');if(b){e.preventDefault();applyTagSuggest(b.dataset.v);}});
