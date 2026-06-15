@@ -1,22 +1,23 @@
 """
 Sonia Outreach Dashboard — local dev server.
 
-Serves dashboard.html on http://localhost:62672 so you can test against the live
-SharePoint lists before deploying to Azure. Port 62672 is fixed on purpose: the
-exact page URL is the SPA redirect URI you register in the Entra app, so
-Microsoft sign-in only works on this exact address.
+Serves index.html on http://localhost:62672 so you can test against the live
+SharePoint lists before deploying to Azure. index.html is the single source of
+truth — the same file Azure Static Web Apps serves. Port 62672 is fixed on
+purpose: the exact page URL is the SPA redirect URI you register in the Entra
+app, so Microsoft sign-in only works on this exact address.
 
 Register this EXACT value as a Single-page application redirect URI on the
 Entra app (da86319d-… — same app as the ITR Hub):
 
-    http://localhost:62672/dashboard.html
+    http://localhost:62672/index.html
 
 (Add it under Authentication -> Single-page application, alongside the hub's
 http://localhost:62671/ entry. Do NOT add it under the "Web" platform.)
 
 Usage:
     python serve-dev.py
-    then open http://localhost:62672/dashboard.html
+    then open http://localhost:62672/index.html
     (append ?demo for synthetic data without signing in; Ctrl+C to stop)
 """
 import http.server
@@ -46,16 +47,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 
 def main():
-    if not os.path.exists(os.path.join(DIR, "dashboard.html")):
-        print("  ERROR: dashboard.html not found next to this script.")
+    if not os.path.exists(os.path.join(DIR, "index.html")):
+        print("  ERROR: index.html not found next to this script.")
         sys.exit(1)
     if not os.path.exists(os.path.join(DIR, "msal-browser.min.js")):
         print("  WARNING: msal-browser.min.js not found next to this script — sign-in will fail.")
 
-    print(f"\n  Outreach :  http://localhost:{PORT}/dashboard.html")
+    print(f"\n  Outreach :  http://localhost:{PORT}/index.html")
     print(f"  Folder   :  {DIR}")
-    print(f"  Redirect :  register http://localhost:{PORT}/dashboard.html as a SPA redirect URI")
-    print(f"  Demo     :  http://localhost:{PORT}/dashboard.html?demo  (no sign-in)")
+    print(f"  Redirect :  register http://localhost:{PORT}/index.html as a SPA redirect URI")
+    print(f"  Demo     :  http://localhost:{PORT}/index.html?demo  (no sign-in)")
     print(f"  Ctrl+C to stop\n")
 
     try:

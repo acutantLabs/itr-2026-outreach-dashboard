@@ -85,6 +85,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .tb-btn:hover{border-color:var(--ink);background:#fafafa;}
 .tb-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
 .tb-date{font-family:var(--cond);font-size:.82rem;color:var(--red);font-weight:800;margin-left:5px;letter-spacing:.4px;}
+.tb-floor{font-family:var(--cond);font-size:.68rem;color:var(--mut2);font-weight:700;margin-left:7px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
 
 /* ─── MAIN ───────────────────────────────────────────────── */
 .main{display:flex;flex:1;overflow:hidden;}
@@ -513,6 +514,130 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .em-hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--mut3);font-size:.62rem;}
 .em-err{display:none;background:#FDECEC;border-left:3px solid var(--red);padding:9px 12px;font-size:.8rem;color:var(--red-dk);margin-top:13px;border-radius:0 2px 2px 0;line-height:1.55;}
 .em-err.show{display:block;}
+/* bulk send: confirm */
+.blk-confirm-stats{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.blk-cs{font-family:var(--cond);font-size:.82rem;color:var(--mut);background:#F1F1F1;border:1px solid var(--line);border-radius:2px;padding:5px 11px;letter-spacing:.3px;}
+.blk-cs b{font-weight:800;color:var(--ink);font-size:1.05rem;margin-right:4px;}
+.blk-cs.ok b{color:var(--green);}
+.blk-cs.skip b{color:var(--amber);}
+.blk-note{font-size:.78rem;color:var(--mut);line-height:1.5;background:#FAFAFA;border:1px solid var(--line);border-radius:2px;padding:8px 11px;margin-bottom:4px;}
+.blk-note b{color:var(--ink2);}
+.blk-skiplist{display:flex;flex-direction:column;gap:4px;margin-bottom:4px;max-height:150px;overflow-y:auto;}
+.blk-skip-row{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.78rem;color:var(--mut);padding:4px 9px;background:#FCF6EC;border-left:3px solid var(--amber);border-radius:0 2px 2px 0;}
+.blk-skip-row .r{color:var(--amber);font-family:var(--cond);font-weight:700;font-size:.66rem;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+.blk-prev{font-family:var(--body);font-size:.8rem;color:var(--ink2);white-space:pre-wrap;background:#FAFAFA;border:1px solid var(--line);border-radius:2px;padding:10px 12px;max-height:180px;overflow-y:auto;line-height:1.5;}
+.blk-prev .s{display:block;font-weight:700;color:var(--ink);margin-bottom:6px;}
+/* bulk send: progress */
+.blk-stats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.blk-stat{flex:1;min-width:62px;text-align:center;background:#F7F7F7;border:1px solid var(--line);border-radius:2px;padding:7px 4px;}
+.blk-stat b{display:block;font-family:var(--cond);font-size:1.3rem;font-weight:800;color:var(--ink);line-height:1;}
+.blk-stat span{font-family:var(--cond);font-size:.56rem;font-weight:700;color:var(--mut2);text-transform:uppercase;letter-spacing:.7px;}
+.blk-stat.send b{color:var(--email);}
+.blk-stat.fail b{color:var(--red);}
+.blk-stat.skip b{color:var(--amber);}
+.blk-stat.q b{color:var(--mut);}
+.blk-bar{height:6px;background:#ECECEC;border-radius:3px;overflow:hidden;margin-bottom:8px;}
+.blk-bar-fill{height:100%;width:0;background:var(--green);transition:width .3s var(--ease);}
+.blk-cur{font-size:.8rem;color:var(--mut);margin-bottom:10px;min-height:18px;line-height:1.45;}
+.blk-cur .err{color:var(--red-dk);}
+.blk-cur b{color:var(--ink2);}
+.blk-list{display:flex;flex-direction:column;gap:3px;max-height:300px;overflow-y:auto;}
+.blk-row{display:flex;align-items:center;gap:10px;padding:6px 10px;border:1px solid var(--line);border-radius:2px;background:var(--surface);}
+.blk-row .nm{font-size:.82rem;color:var(--ink2);font-weight:600;flex-shrink:0;max-width:34%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.blk-row .em{font-size:.75rem;color:var(--mut2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+.blk-row .er{font-size:.72rem;color:var(--red-dk);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:38%;}
+.blk-st{font-family:var(--cond);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:2px;flex-shrink:0;}
+.blk-st.queued{background:#EEE;color:var(--mut);}
+.blk-st.sending{background:rgba(37,99,235,.12);color:var(--email);}
+.blk-st.retrying{background:rgba(224,123,0,.14);color:var(--amber);}
+.blk-st.sent{background:rgba(45,106,79,.13);color:var(--green);}
+.blk-st.failed{background:rgba(218,56,50,.12);color:var(--red-dk);}
+.blk-st.skipped{background:#F0EAD6;color:var(--amber);}
+.blk-row.is-sending{border-color:var(--email);}
+.blk-row.is-sent{opacity:.72;}
+.blk-row.is-skipped{opacity:.72;background:#FCFBF7;}
+/* bulk send: minimised widget */
+.blk-mini{display:none;position:fixed;right:18px;bottom:18px;z-index:560;width:252px;background:var(--ink);
+  border-radius:3px;box-shadow:var(--sh3);border-left:3px solid var(--red);overflow:hidden;animation:deskRise .2s var(--ease);}
+.blk-mini.show{display:block;}
+.blk-mini-bar{height:4px;background:#3a3637;}
+.blk-mini-fill{height:100%;width:0;background:var(--green);transition:width .3s var(--ease);}
+.blk-mini-main{display:flex;align-items:center;gap:8px;padding:9px 34px 9px 11px;}
+.blk-mini-count{font-family:var(--cond);font-size:.78rem;color:#fff;white-space:nowrap;}
+.blk-mini-count b{font-weight:800;font-size:.98rem;}
+.blk-mini-status{font-family:var(--cond);font-size:.64rem;color:var(--mut2);text-transform:uppercase;letter-spacing:.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.blk-mini-status.err{color:var(--amber);}
+.blk-mini-open{position:absolute;top:9px;right:8px;width:22px;height:22px;border:1px solid #4a4647;background:transparent;color:#ccc;border-radius:2px;cursor:pointer;font-size:.7rem;line-height:1;}
+.blk-mini-open:hover{border-color:var(--red);color:#fff;background:var(--red);}
+/* conditional-section editor: backdrop highlighter (screen-only) */
+.ta-wrap{position:relative;}
+.ta-wrap textarea{position:relative;z-index:1;background:transparent;}
+.ta-hl{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;color:transparent;
+  white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;
+  border:1px solid transparent;border-radius:2px;padding:9px 11px;
+  font-family:var(--body);font-size:.86rem;line-height:normal;letter-spacing:normal;}
+.ta-hl .hlz{border-radius:2px;}
+/* tags/regions tint ONLY — no padding/weight/size, so the backdrop stays
+   pixel-aligned with the textarea text on top. */
+.hltag{border-radius:2px;box-shadow:inset 0 0 0 1px rgba(34,31,32,.18);}
+.hltag.hlerr{background:rgba(218,56,50,.16);box-shadow:none;text-decoration:underline wavy var(--red);}
+.hltag.hlwarn{background:rgba(224,123,0,.18);box-shadow:none;text-decoration:underline dotted var(--amber);}
+.tag-chips{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 5px;}
+.tag-chip{height:24px;padding:0 8px;border:1px solid var(--line2);border-radius:2px;background:var(--surface);cursor:pointer;
+  font-family:var(--cond);font-size:.62rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--mut);
+  display:flex;align-items:center;gap:5px;transition:all .12s;}
+.tag-chip:hover{border-color:var(--ink);color:var(--ink);}
+.tag-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.tag-status{font-family:var(--body);font-size:.72rem;color:var(--mut2);margin-bottom:4px;min-height:15px;line-height:1.4;}
+.tag-status.ok{color:var(--green);}
+.tag-status.err{color:var(--red-dk);}
+.tag-status.warn{color:var(--amber);}
+/* terminal-style value prompter (shows while caret is inside a tag) */
+.tag-suggest{display:none;flex-wrap:wrap;align-items:center;gap:5px;margin:2px 0 6px;padding:7px 9px;background:#1f1c1d;border-radius:3px;border-left:3px solid var(--red);}
+.tag-suggest .ts-lbl{font-family:var(--cond);font-size:.6rem;font-weight:700;color:var(--mut2);letter-spacing:.6px;text-transform:uppercase;margin-right:2px;}
+.ts-chip{height:22px;padding:0 8px;border:1px solid #3a3637;border-radius:2px;background:#2c2829;color:#ddd;cursor:pointer;font-family:var(--body);font-size:.74rem;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.ts-chip:hover{border-color:var(--red);background:var(--red);color:#fff;}
+.ts-chip .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ts-chip.ts-first{box-shadow:0 0 0 1px rgba(255,255,255,.22);}
+.tag-suggest .ts-hint{font-family:var(--cond);font-size:.56rem;color:var(--mut2);letter-spacing:.5px;text-transform:uppercase;margin-left:auto;}
+/* bulk confirm: section coverage */
+.blk-cov{display:flex;flex-direction:column;gap:4px;margin-bottom:6px;}
+.blk-cov-row{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.78rem;color:var(--ink2);padding:4px 9px;background:#F4F7FB;border-left:3px solid var(--email);border-radius:0 2px 2px 0;}
+.blk-cov-row .n{font-family:var(--cond);font-weight:800;color:var(--email);white-space:nowrap;}
+/* email modal: side-by-side per-recipient preview */
+.em-split{display:flex;min-height:0;flex:1 1 auto;overflow:hidden;}
+.em-split>.comp-bd{flex:1 1 auto;min-width:0;}
+.em-preview{display:none;flex-direction:column;min-height:0;width:46%;flex-shrink:0;border-left:1px solid var(--line);background:#FAFAFA;}
+#emCard.expanded{width:min(1180px,96vw)!important;}
+#emCard.expanded .em-preview{display:flex;}
+#emExpand.dh-btn{color:#ccc;}
+#emExpand.on{background:var(--red);border-color:var(--red);color:#fff;}
+.emp-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--ink);flex-shrink:0;}
+.emp-nav{width:30px;height:30px;border-radius:2px;border:1px solid #4a4647;background:transparent;color:#ccc;cursor:pointer;font-size:1.1rem;line-height:1;flex-shrink:0;}
+.emp-nav:hover:not(:disabled){border-color:#888;color:#fff;}
+.emp-nav:disabled{opacity:.3;cursor:default;}
+.emp-who{flex:1;text-align:center;min-width:0;}
+.emp-name{font-family:var(--cond);font-size:.95rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.emp-idx{font-family:var(--cond);font-size:.58rem;color:var(--mut2);letter-spacing:.8px;text-transform:uppercase;margin-top:1px;}
+.emp-fields{display:flex;flex-wrap:wrap;gap:4px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--surface);flex-shrink:0;}
+.emp-f{font-family:var(--cond);font-size:.58rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:2px;color:#fff;white-space:nowrap;}
+.emp-f.muted{background:#ccc!important;color:#fff;}
+.emp-sections{padding:0 12px;flex-shrink:0;}
+.emp-sec-h{font-family:var(--cond);font-size:.58rem;font-weight:700;color:var(--mut2);letter-spacing:.7px;text-transform:uppercase;margin:9px 0 4px;}
+.emp-sec{display:flex;align-items:center;gap:7px;font-size:.74rem;color:var(--ink2);padding:3px 0;flex-wrap:wrap;}
+.emp-sec .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.emp-sec .lab{font-weight:700;}
+.emp-sec .badge{font-family:var(--cond);font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:1px 6px;border-radius:2px;}
+.emp-sec .badge.in{background:rgba(45,106,79,.14);color:var(--green);}
+.emp-sec .badge.out{background:rgba(136,136,136,.18);color:var(--mut);}
+.emp-sec .why{color:var(--mut2);font-size:.7rem;}
+.emp-scroll{flex:1;overflow-y:auto;padding:14px;border-top:1px solid var(--line);}
+.emp-scroll::-webkit-scrollbar{width:8px;}
+.emp-scroll::-webkit-scrollbar-thumb{background:#cfcfcf;border-radius:4px;}
+.emp-subj{font-family:var(--body);font-weight:700;color:var(--ink);font-size:.92rem;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--line);line-height:1.4;}
+.emp-body{font-family:var(--body);font-size:.86rem;color:var(--ink2);white-space:pre-wrap;line-height:1.55;}
+.emp-cond{border-radius:2px;}
+.emp-empty{color:var(--mut2);font-size:.82rem;font-style:italic;}
 /* timeline polish */
 .tl-today{position:absolute;left:14px;right:6px;height:0;border-top:2px solid var(--red);z-index:1;pointer-events:none;opacity:.85;}
 .tl-today::after{content:'TODAY';position:absolute;right:0;top:-7px;font-family:var(--cond);font-size:.5rem;font-weight:800;
@@ -554,7 +679,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 <header>
   <div class="logo">
     <div class="logo-mark">A</div>
-    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026</div></div>
+    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.2.0</span></div></div>
   </div>
   <div class="hd"></div>
   <div class="filters" id="filters">
@@ -606,7 +731,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   <button class="tb-btn" id="tbExport">↓ Export</button>
   <button class="tb-btn" onclick="markAllRead()">✓✓ Mark All Read</button>
   <div class="tb-sep"></div>
-  <span class="tb-lbl">Date:</span><span class="tb-date" id="tbDate"></span>
+  <span class="tb-lbl">Date:</span><span class="tb-date" id="tbDate"></span><span class="tb-floor" id="tbFloor" title="Communications before this date are hidden (season start)"></span>
 </div>
 
 <div class="main">
@@ -768,19 +893,26 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 
 <!-- OUTLOOK EMAIL MODAL -->
 <div class="comp-ov" id="emOv">
-  <div class="comp" style="width:min(640px,94vw);">
+  <div class="comp" id="emCard" style="width:min(640px,94vw);">
     <div class="comp-head">
       <div><div class="comp-title" id="emTitle"></div><div class="comp-sub" id="emSub"></div></div>
-      <button class="dh-btn close" id="emClose">✕</button>
+      <div style="display:flex;gap:6px;">
+        <button class="dh-btn mark-all" id="emExpand" title="Side-by-side preview">⇆ Preview</button>
+        <button class="dh-btn close" id="emClose">✕</button>
+      </div>
     </div>
     <div class="red-rule"></div>
+    <div class="em-split">
     <div class="comp-bd">
       <div class="cf-lbl">To</div>
       <input type="text" id="emTo" autocomplete="off">
       <div class="cf-lbl">Subject</div>
       <input type="text" id="emSubj" autocomplete="off">
-      <div class="cf-lbl">Message <span class="em-hint">— {name} and {first} are replaced per recipient in bulk sends</span></div>
-      <textarea id="emBody" style="min-height:170px"></textarea>
+      <div class="cf-lbl">Message <span class="em-hint">— {name}/{first} personalised per recipient</span></div>
+      <div class="ta-wrap"><div class="ta-hl" id="emBodyHL" aria-hidden="true"></div><textarea id="emBody" style="min-height:238px" spellcheck="true"></textarea></div>
+      <div class="tag-chips" id="emTagChips"></div>
+      <div class="tag-suggest" id="emTagSuggest"></div>
+      <div class="tag-status" id="emTagStatus"></div>
       <div class="cf-lbl">Log with — next action &amp; follow-up date</div>
       <div class="cf-row">
         <input type="text" id="emNext" placeholder="Next action…">
@@ -802,10 +934,88 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
       </div>
       <div class="em-err" id="emErr"></div>
     </div>
+    <div class="em-preview" id="emPreview">
+      <div class="emp-head">
+        <button class="emp-nav" id="empPrev" title="Previous recipient">‹</button>
+        <div class="emp-who"><div class="emp-name" id="empName">—</div><div class="emp-idx" id="empIdx"></div></div>
+        <button class="emp-nav" id="empNext" title="Next recipient">›</button>
+      </div>
+      <div class="emp-fields" id="empFields"></div>
+      <div class="emp-sections" id="empSections"></div>
+      <div class="emp-scroll">
+        <div class="emp-subj" id="empSubj"></div>
+        <div class="emp-body" id="empBody"></div>
+      </div>
+    </div>
+    </div>
     <div class="comp-ft">
       <div class="comp-open"><button class="co-btn" id="emFallback">Open in Mail App Instead</button></div>
       <button class="comp-save" id="emSend">Send from team mailbox</button>
     </div>
+  </div>
+</div>
+
+<!-- BULK SEND: confirm + live progress -->
+<div class="comp-ov" id="blkOv">
+  <div class="comp" style="width:min(720px,96vw);">
+    <div class="comp-head">
+      <div><div class="comp-title" id="blkTitle">Bulk send</div><div class="comp-sub" id="blkSub"></div></div>
+      <button class="dh-btn close" id="blkClose">✕</button>
+    </div>
+    <div class="red-rule"></div>
+    <div class="comp-bd">
+      <!-- CONFIRM VIEW -->
+      <div id="blkConfirm">
+        <div class="blk-confirm-stats">
+          <span class="blk-cs ok"><b id="blkCEli">0</b>eligible</span>
+          <span class="blk-cs skip"><b id="blkCSkip">0</b>skipped</span>
+          <span class="blk-cs"><b id="blkCSel">0</b>selected</span>
+        </div>
+        <div class="blk-note">One <b>separate</b> email per client · sent sequentially ~1s apart · from <b id="blkFrom"></b>. No BCC, no broadcast — never the logged-in user.</div>
+        <div class="cf-lbl" id="blkSkipLbl" style="display:none;">Skipped — will not be sent</div>
+        <div class="blk-skiplist" id="blkSkipList"></div>
+        <div class="cf-lbl" id="blkCovLbl" style="display:none;">Conditional sections — recipients each applies to</div>
+        <div class="blk-cov" id="blkCovList"></div>
+        <div class="cf-lbl">Message preview <span class="em-hint" id="blkPrevHint">— {name}/{first} personalised per client</span></div>
+        <div class="blk-prev" id="blkPrev"></div>
+      </div>
+      <!-- PROGRESS VIEW -->
+      <div id="blkProgress" style="display:none;">
+        <div class="blk-stats">
+          <div class="blk-stat"><b id="blkSent">0</b><span>sent</span></div>
+          <div class="blk-stat send"><b id="blkSending">0</b><span>sending</span></div>
+          <div class="blk-stat q"><b id="blkQueued">0</b><span>queued</span></div>
+          <div class="blk-stat fail"><b id="blkFailed">0</b><span>failed</span></div>
+          <div class="blk-stat skip"><b id="blkSkipped">0</b><span>skipped</span></div>
+          <div class="blk-stat"><b id="blkTotal">0</b><span>total</span></div>
+        </div>
+        <div class="blk-bar"><div class="blk-bar-fill" id="blkBar"></div></div>
+        <div class="blk-cur" id="blkCur"></div>
+        <div class="blk-list" id="blkList"></div>
+      </div>
+    </div>
+    <div class="comp-ft">
+      <div class="comp-open">
+        <button class="co-btn" id="blkCancel">Cancel</button>
+        <button class="co-btn" id="blkMin2" style="display:none;">▁ Minimize</button>
+        <button class="co-btn" id="blkExport" style="display:none;">⤓ Export log</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="co-btn" id="blkCancelRun" style="display:none;">Stop after current</button>
+        <button class="comp-save" id="blkStart">Send 0 emails</button>
+        <button class="comp-save" id="blkDone" style="display:none;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BULK MINIMIZED WIDGET -->
+<div class="blk-mini" id="blkMini">
+  <div class="blk-mini-bar"><div class="blk-mini-fill" id="blkMiniFill"></div></div>
+  <button class="blk-mini-open" id="blkMiniOpen" title="Restore">▢</button>
+  <div class="blk-mini-main">
+    <span class="blk-mini-count"><b id="blkMiniCount">0/0</b> sent</span>
+    <span class="blk-mini-status" id="blkMiniStatus">Sending…</span>
   </div>
 </div>
 
@@ -903,6 +1113,8 @@ function buildClients(n){
     return{id:`ITR26-${String(i+1).padStart(4,'0')}`,name,status,flagged,flagReason,comms,
       _sp:null,contactName:name,phone:'9'+String(rnd(100000000,999999999)),mail:name.toLowerCase().replace(/ /g,'.')+'@gmail.com',
       coordinator:'Sonia',stakeholder:'AR/Aio/Jathin',
+      entity:pick(['AC','ASI']),applicability:pick(['Salary','House Property','Business Income','Capital Gain','Tax Audit','Trust','NA']),
+      constitution:pick(['Individual','HUF','Firm','Company','Trust']),serviceCategory:pick(['ITR Only','Tax Audit','10B (Trust)','Stat Audit']),
       outreachRequired:status==='needs',outreachReason:flagged?flagReason:'',
       lastContactDate:comms.length?comms[comms.length-1].date:'',lastContactOutcome:'',
       nextActionSummary:status==='pending'?'Awaiting client response':'',
@@ -915,7 +1127,7 @@ function buildClients(n){
 let CLIENTS=[],ALL_DATES=[],CLIENTS_BY_ID={};
 const URGENCY={needs:0,pending:1,idle:2,responded:3};
 function indexClients(){CLIENTS_BY_ID={};CLIENTS.forEach(c=>{CLIENTS_BY_ID[c.id]=c;});}
-function rebuildDates(){indexClients();ALL_DATES=[...new Set(CLIENTS.flatMap(c=>c.comms.map(m=>m.date)))].filter(Boolean).sort();}
+function rebuildDates(){indexClients();ALL_DATES=[...new Set(CLIENTS.flatMap(c=>c.comms.map(m=>m.date)))].filter(d=>d&&(!COMM_FLOOR||d>=COMM_FLOOR)).sort();}
 function clientById(cid){return CLIENTS_BY_ID[cid];}
 
 /* ═══ SHAREPOINT BACKEND ════════════════════════════════════════════
@@ -994,6 +1206,8 @@ async function buildClientsFromSharePoint(){
       // tracker contact + outreach summary (shown on the card even before any log exists)
       contactName:f.ContactName||'',phone:f.PhoneNumber||'',mail:f.MailID||'',
       coordinator:f.Coordinator||'',stakeholder:f.Stakeholder||'',
+      // taggable fields for conditional email sections (mirror hub tracker columns)
+      entity:f.Entity||'',applicability:f.Applicability||'',constitution:f.Constitution||'',serviceCategory:f.ServiceCategory||'',
       outreachRequired:spBool(f.OutreachRequired),outreachReason:f.OutreachReason||'',
       lastContactDate:String(f.LastContactDate||'').split('T')[0],lastContactOutcome:f.LastContactOutcome||'',
       nextActionSummary:f.NextActionSummary||'',nextActionDue:String(f.NextActionDue||'').split('T')[0],
@@ -1006,7 +1220,7 @@ async function buildClientsFromSharePoint(){
     let c=id?byId[id]:null;
     if(!c)c=byName[lc(f.ClientName)];          // fall back to name join when ClientID is blank/mismatched
     if(c)matched++;else{unmatched++;
-      c=byId[f.ClientID||f.ClientName||('log-'+it.id)]={id:f.ClientID||'',name:f.ClientName||'(unknown client)',status:'idle',_sp:null,flagged:false,flagReason:'',comms:[],contactName:'',phone:'',mail:'',outreachRequired:false,outreachReason:'',lastContactDate:'',lastContactOutcome:'',nextActionSummary:'',nextActionDue:'',dueDate:'',dataStatus:'',filingStatus:'',activeIssueCount:0,queueSummary:''};}
+      c=byId[f.ClientID||f.ClientName||('log-'+it.id)]={id:f.ClientID||'',name:f.ClientName||'(unknown client)',status:'idle',_sp:null,flagged:false,flagReason:'',comms:[],contactName:'',phone:'',mail:'',outreachRequired:false,outreachReason:'',lastContactDate:'',lastContactOutcome:'',nextActionSummary:'',nextActionDue:'',dueDate:'',dataStatus:'',filingStatus:'',activeIssueCount:0,queueSummary:'',entity:'',applicability:'',constitution:'',serviceCategory:''};}
     const type=CHANNEL_TYPE[lc(f.Channel)]||'note';
     let dir;
     if(f.Direction)dir=lc(f.Direction).indexOf('in')===0?'in':'out';      // explicit column wins
@@ -1086,7 +1300,7 @@ const readCache={};
 function commKey(m){return m._sp!=null?'sp:'+m._sp:(m._mail?'mail:'+m._mail.id:null);}
 function commRead(m){if(!m)return true;const k=commKey(m);return (k&&k in readCache)?readCache[k]:m.read;}
 function isRead(cid,idx){const c=clientById(cid);return c?commRead(c.comms[idx]):true;}
-function hasUnread(c){return c.comms.some(m=>!commRead(m));}
+function hasUnread(c){return visComms(c).some(m=>!commRead(m));}
 function setRead(cid,idx,val){
   if(!appState.isSonia)return;                 // only Sonia mutates shared read-state
   const c=clientById(cid),m=c&&c.comms[idx];
@@ -1181,6 +1395,11 @@ async function signOut(){
 }
 
 /* ═══ STATE ═════════════════════════════════════════════════════ */
+/* Hard floor: the season started 2026-06-15, so the UI never shows any
+   communication dated before this — anything earlier is treated as out of
+   scope across cards, desk, timeline and counts. Override via localStorage
+   'itr_commFloor' (YYYY-MM-DD); set to '' to disable the floor entirely. */
+const COMM_FLOOR=(localStorage.getItem('itr_commFloor')??'2026-06-15');
 let mode='closed',activeFilter='all',searchQ='',timeCap=null;
 let vinylList=[],vinylIdx=0,vinylDragging=false,vinylStartX=0;
 // Desk state
@@ -1189,7 +1408,7 @@ let deskClient=null,deskComms=[],deskIdx=-1;
 let cmClient=null,cmComms=[],cmIdx=0;
 
 const $=id=>document.getElementById(id);
-function visComms(c){return timeCap?c.comms.filter(m=>m.date<=timeCap):c.comms;}
+function visComms(c){return c.comms.filter(m=>(!COMM_FLOOR||m.date>=COMM_FLOOR)&&(!timeCap||m.date<=timeCap));}
 
 function getFiltered(){
   return CLIENTS.filter(c=>{
@@ -1405,7 +1624,16 @@ function selectSlip(idx){
 }
 // desk controls
 $('dhClose').addEventListener('click',closeDesk);
-$('deskOv').addEventListener('click',e=>{if(e.target===$('deskOv'))closeDesk();});
+/* Dismiss-on-backdrop, drag-safe: a `click` targets the common ancestor of
+   mousedown+mouseup, so a text-selection drag that starts INSIDE the modal and
+   releases on the dim backdrop would otherwise close it. Require the press to
+   have BEGUN on the backdrop itself. */
+function onBackdrop(ov,fn){
+  let downSelf=false;
+  ov.addEventListener('pointerdown',e=>{downSelf=(e.target===ov);});
+  ov.addEventListener('click',e=>{const ok=downSelf&&e.target===ov;downSelf=false;if(ok)fn(e);});
+}
+onBackdrop($('deskOv'),closeDesk);
 $('dhMarkAll').addEventListener('click',()=>{if(!appState.isSonia){toast('Read-state is managed by Sonia');return;}deskClient.comms.forEach((_,i)=>setRead(deskClient.id,i,true));renderDeskFrame();renderDeskRail();selectSlip(deskIdx);updateBadges();toast(`✓ All ${deskClient.comms.length} slips marked read`);});
 $('dhPrev').addEventListener('click',()=>deskNavClient(-1));
 $('dhNext').addEventListener('click',()=>deskNavClient(1));
@@ -1533,7 +1761,7 @@ function closeCommModal(){
 $('cmPrev').addEventListener('click',()=>{if(cmIdx>0){cmIdx--;renderCommModal();}});
 $('cmNext').addEventListener('click',()=>{if(cmIdx<cmComms.length-1){cmIdx++;renderCommModal();}});
 $('cmClose').addEventListener('click',closeCommModal);
-$('cmOv').addEventListener('click',e=>{if(e.target===$('cmOv'))closeCommModal();});
+onBackdrop($('cmOv'),closeCommModal);
 
 /* ═══ MARK ALL ═════════════════════════════════════════════════ */
 function markAllRead(){
@@ -1596,6 +1824,7 @@ function allDatesIdx(){return ALL_DATES.indexOf(timeCap);}
 $('tlUp').addEventListener('click',()=>{const i=allDatesIdx();if(i>0)selectDate(ALL_DATES[i-1]);});
 $('tlDn').addEventListener('click',()=>{const i=allDatesIdx();if(i<ALL_DATES.length-1)selectDate(ALL_DATES[i+1]);else if(i===-1&&ALL_DATES.length)selectDate(ALL_DATES[0]);});
 $('tlReset').addEventListener('click',()=>{timeCap=null;if(deskClient)closeDesk();renderGrid();renderTimeline();toast('ALL TIME');});
+if($('tbFloor')&&COMM_FLOOR)$('tbFloor').textContent='· from '+fmt(COMM_FLOOR);
 
 /* ═══ GALLERY (coverflow) ══════════════════════════════════════ */
 function openVinyl(startId){
@@ -1644,6 +1873,7 @@ $('vinylClose').addEventListener('click',closeVinyl);
 
 /* ═══ KEYBOARD ══════════════════════════════════════════════════ */
 document.addEventListener('keydown',e=>{
+  if($('blkOv').classList.contains('open')){if(e.key==='Escape'&&!bulkRunning)$('blkClose').click();return;}
   if($('emOv').classList.contains('open')){if(e.key==='Escape')closeEmail();return;}
   if($('compOv').classList.contains('open')){if(e.key==='Escape')closeComposer();return;}
   if($('authOv').classList.contains('open'))return;
@@ -1752,7 +1982,113 @@ function targetsOrWarn(){
 const MAIL_SUBJ='ITR FY 2025-26 — documents required';
 const MAIL_BODY=`Dear {first},\n\nHope you are doing well. As part of this year's ITR filing (FY 2025-26), we need your documents to proceed with your return.\n\nPlease share them at your earliest convenience.\n\nWarm regards,\nSonia\nAcutant · ITR Filing Team`;
 const WA_TPL=c=>`Hello ${firstNameOf(c)}, this is Sonia from Acutant. A gentle reminder regarding your ITR FY 2025-26 documents — please share them at your earliest. Thank you!`;
-function personalize(s,c){return String(s).replace(/\{name\}/g,c.name).replace(/\{first\}/g,firstNameOf(c));}
+/* ── conditional email sections ────────────────────────────────
+   {Field:Value|Value2}…{/Field} keeps the enclosed text only when the
+   client's Field equals any listed value (case-insensitive, multi-word
+   safe via | separator). Tags are ALWAYS stripped from the sent mail, so
+   nothing leaks. Highlighting (markupTemplate) is screen-only. Field keys
+   and their allowed values mirror the hub's ITR_ClientTracker vocab. */
+const TAG_VOCAB={
+  entity:{label:'Entity',get:c=>c.entity,vals:['AC','ASI']},
+  applicability:{label:'Applicability',get:c=>c.applicability,vals:['Salary','House Property','Business Income','GST Business Income','Capital Gain','Other Source','Partner','Stat Audit','Tax Audit','10B/10BB','Tax Audit Partner','TA Partner','Trust','NA']},
+  constitution:{label:'Constitution',get:c=>c.constitution,vals:['Individual','HUF','Firm','LLP','AOP','BOI','Company','Trust','Co-op Society']},
+  servicecategory:{label:'ServiceCategory',get:c=>c.serviceCategory,vals:['ITR Only','Tax Audit','10B (Trust)','Stat Audit']},
+  datastatus:{label:'DataStatus',get:c=>c.dataStatus,vals:['Received','Further documents required','Prepared & draft shared']},
+  filingstatus:{label:'FilingStatus',get:c=>c.filingStatus,vals:['Not Started','In Progress','Filed']},
+  status:{label:'Status',get:c=>c.status,vals:['needs','pending','responded','idle']}
+};
+const TAG_COLORS={entity:'#2563EB',applicability:'#2d6a4f',constitution:'#6D5BD0',servicecategory:'#0e7490',datastatus:'#e07b00',filingstatus:'#a82822',status:'#506680'};
+const tagKey=k=>String(k||'').trim().toLowerCase().replace(/\s+/g,'');
+function tagTokens(text){ // → [{type:'open'|'close',raw,key,value,i,j}]
+  const re=/\{(\/?)([A-Za-z][A-Za-z ]*?)(?::([^{}]*))?\}/g,toks=[];let m;
+  while((m=re.exec(text))){
+    if(m[1]==='/')toks.push({type:'close',raw:m[0],key:tagKey(m[2]),i:m.index,j:re.lastIndex});
+    else if(m[3]!==undefined)toks.push({type:'open',raw:m[0],key:tagKey(m[2]),value:m[3],i:m.index,j:re.lastIndex});
+    // a {Word} with no colon (e.g. {name}) is not a conditional token — left as literal
+  }
+  return toks;
+}
+function valMatches(value,clientVal){
+  const cv=String(clientVal==null?'':clientVal).trim().toLowerCase();
+  return String(value||'').split('|').map(s=>s.trim().toLowerCase()).filter(Boolean).some(v=>v===cv);
+}
+/* Strip tags + keep only the sections that apply to this client. */
+function resolveSections(text,c){
+  const toks=tagTokens(text);if(!toks.length)return text;
+  let out='',pos=0;const stack=[];
+  const keep=()=>stack.every(f=>f.active);
+  for(const t of toks){
+    if(keep())out+=text.slice(pos,t.i);
+    pos=t.j;
+    if(t.type==='open'){const f=TAG_VOCAB[t.key];stack.push({key:t.key,active:f?valMatches(t.value,f.get(c)):false});}
+    else{for(let k=stack.length-1;k>=0;k--){if(stack[k].key===t.key){stack.splice(k,1);break;}}}
+  }
+  if(keep())out+=text.slice(pos);
+  return out;
+}
+function personalize(s,c){return resolveSections(String(s),c).replace(/\{name\}/g,c.name).replace(/\{first\}/g,firstNameOf(c));}
+/* Screen-only highlight: tags as coloured chips, kept-region tints per field,
+   red wavy underline on unknown-field / unclosed / stray-close mistakes. */
+function hexA(hex,a){const n=parseInt(hex.replace('#',''),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
+/* values (|-split) of a known field that aren't in its vocab — soft warning. */
+function tagBadValues(key,value){const f=TAG_VOCAB[key];if(!f)return[];const set=f.vals.map(v=>v.toLowerCase());
+  return String(value||'').split('|').map(s=>s.trim()).filter(Boolean).filter(v=>set.indexOf(v.toLowerCase())<0);}
+function markupTemplate(text){
+  const toks=tagTokens(text),stack=[];
+  toks.forEach(t=>{
+    if(t.type==='open'){t.bad=!TAG_VOCAB[t.key];t.warn=!t.bad&&tagBadValues(t.key,t.value).length>0;stack.push(t);}
+    else{let idx=-1;for(let k=stack.length-1;k>=0;k--){if(stack[k].key===t.key){idx=k;break;}}
+      if(idx>=0){t.match=stack.splice(idx,1)[0];t.match.match=t;}else t.stray=true;}
+  });
+  stack.forEach(o=>o.unclosed=true);
+  const E=s=>String(s).replace(/[&<>]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
+  let html='',pos=0;const open=[];
+  for(const t of toks){
+    const lit=E(text.slice(pos,t.i));pos=t.j;
+    const c=open.length?(TAG_COLORS[open[open.length-1].key]||'#888'):null;
+    html+=c?'<span class="hlz" style="background:'+hexA(c,.16)+'">'+lit+'</span>':lit;
+    const err=t.bad||t.stray||t.unclosed,col=TAG_COLORS[t.key]||'#888';
+    const cls='hltag'+(err?' hlerr':(t.warn?' hlwarn':'')),style=(err||t.warn)?'':' style="background:'+hexA(col,.32)+'"';
+    html+='<span class="'+cls+'"'+style+'>'+E(t.raw)+'</span>';
+    if(t.type==='open'&&!t.unclosed&&!t.bad)open.push(t);
+    else if(t.type==='close'&&t.match){const k=open.indexOf(t.match);if(k>=0)open.splice(k,1);}
+  }
+  html+=E(text.slice(pos));
+  if(/\n$/.test(text))html+=' ';
+  return html;
+}
+function templateStatus(text){
+  const toks=tagTokens(text),stack=[],errs=[],warns=[],fields=new Set();let pairs=0;
+  toks.forEach(t=>{
+    if(t.type==='open'){
+      if(TAG_VOCAB[t.key]){fields.add(TAG_VOCAB[t.key].label);const bv=tagBadValues(t.key,t.value);if(bv.length)warns.push('"'+bv.join('", "')+'" not a known '+TAG_VOCAB[t.key].label+' value');}
+      else errs.push('Unknown field {'+t.key+'}');
+      stack.push(t);
+    }else{let idx=-1;for(let k=stack.length-1;k>=0;k--){if(stack[k].key===t.key){idx=k;break;}}
+      if(idx>=0){const o=stack.splice(idx,1)[0];if(TAG_VOCAB[o.key])pairs++;}else errs.push('Stray {/'+t.key+'}');}
+  });
+  stack.forEach(o=>errs.push('Unclosed {'+o.key+'}'));
+  return {pairs,fields:[...fields],errs,warns};
+}
+/* Resolved preview HTML for one client — kept conditional regions get a faint
+   per-field tint + left border so the user sees which text is conditional. */
+function previewHTML(text,c){
+  const toks=tagTokens(text);
+  const E=s=>esc(s).replace(/\{name\}/g,esc(c.name)).replace(/\{first\}/g,esc(firstNameOf(c)));
+  if(!toks.length)return E(text);
+  let html='',pos=0;const stack=[];
+  const keep=()=>stack.every(f=>f.active);
+  const tint=()=>{for(let k=stack.length-1;k>=0;k--){if(stack[k].color)return stack[k].color;}return null;};
+  for(const t of toks){
+    if(keep()){const seg=E(text.slice(pos,t.i));const col=stack.length?tint():null;
+      html+=col?'<span class="emp-cond" style="background:'+hexA(col,.14)+';box-shadow:inset 2px 0 0 '+hexA(col,.55)+'">'+seg+'</span>':seg;}
+    pos=t.j;
+    if(t.type==='open'){const f=TAG_VOCAB[t.key];stack.push({key:t.key,active:f?valMatches(t.value,f.get(c)):false,color:TAG_COLORS[t.key]});}
+    else{for(let k=stack.length-1;k>=0;k--){if(stack[k].key===t.key){stack.splice(k,1);break;}}}
+  }
+  if(keep())html+=E(text.slice(pos));
+  return html;
+}
 /* Web WhatsApp (the team uses web.whatsapp.com, not the wa.me redirect).
    The /send/ router needs type=phone_number & app_absent=0, and the text
    form-encoded (spaces as +). URLSearchParams gives exactly that. */
@@ -1822,7 +2158,7 @@ $('chipsNext').addEventListener('click',e=>{const ch=e.target.closest('.chip');i
   const i=$('compNext');i.value=i.value.trim()?i.value.trim()+'; '+ch.dataset.t:ch.dataset.t;
   if(ch.dataset.due)$('compDue').value=addDays(TODAY,parseInt(ch.dataset.due,10));i.focus();});
 $('compClose').addEventListener('click',closeComposer);
-$('compOv').addEventListener('click',e=>{if(e.target===$('compOv'))closeComposer();});
+onBackdrop($('compOv'),closeComposer);
 
 async function saveComposer(){
   const out=$('compOutcome').value.trim(),na=$('compNext').value.trim(),due=$('compDue').value,
@@ -1866,37 +2202,66 @@ async function saveComposer(){
 }
 $('compSave').addEventListener('click',saveComposer);
 
-/* ── in-app Outlook email (Graph /me/sendMail, From = team@) ────
-   ALWAYS sends AS the team mailbox — never the signed-in user. We POST to
-   /me/sendMail with an explicit From = TEAM_MAILBOX: this is the supported
-   DELEGATED send pattern (Mail.Send.Shared + the signed-in user's Exchange
-   "Send As" right). The message goes out as team@, not the operator.
-   NB: POST /users/{team}/sendMail returns 404 ErrorItemNotFound under
-   delegated auth — that endpoint is for APPLICATION permissions only, which
-   a browser SPA can't use. If the rights are missing Graph returns 403; we
-   surface a clear explanation + the mail-app fallback and send NOTHING.
-   On success every recipient gets a SoniaLog row holding the FULL email,
-   plus the tracker summary patch. */
-let emTargets=[],emAfter='',emSentVia='';
-async function graphSendMail(to,subject,body){
-  // From/Sender pinned to the team mailbox so the message is sent AS team@,
-  // never silently from the signed-in user's own account.
-  const payload={message:{subject:subject,body:{contentType:'Text',content:body},
+/* ── in-app Outlook email (always sends AS team@) ──────────────
+   ALWAYS sends AS the team mailbox — never the signed-in user.
+
+   PRIMARY: create the draft IN the team mailbox (POST /users/team@/messages,
+   needs Mail.ReadWrite.Shared) then send it (POST .../{id}/send). This keeps
+   the message, its id/conversationId, and the Sent copy all native to team@
+   (which the dashboard reads), and returns real IDs we can log.
+
+   FALLBACK: if the team-mailbox create is refused (e.g. 404 ErrorItemNotFound,
+   the same way /users/team@/sendMail is under delegated auth), fall back to
+   POST /me/sendMail with From pinned to team@ — still team@, NEVER the
+   personal mailbox; we just can't capture an id on that path. We only fall
+   back when NO mail was sent yet (create failed), so there's no double-send.
+
+   Returns {msgId, convId, viaFallback}. On total failure throws the clear
+   Mail.Send.Shared + Send As explanation. */
+let emTargets=[],emRawTargets=[],emAfter='',emSentVia='';
+const isAuthErr=e=>/403|404|ErrorAccessDenied|ErrorItemNotFound|Authorization_RequestDenied/i.test(e&&e.message||'');
+const isTransient=e=>/\b(429|500|502|503|504)\b|TooManyRequests|ServiceUnavailable|Failed to fetch|NetworkError|timeout/i.test(e&&e.message||'');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const PERM_MSG='<strong>Sending as '+esc(TEAM_MAILBOX)+' is not enabled yet.</strong> All mail goes out from the team mailbox — never your personal account. The Entra app needs delegated <strong>Mail.Send.Shared</strong> (admin-consented), plus Exchange <em>Send As</em> rights on '+esc(TEAM_MAILBOX)+'. Until then, use <em>Open in Mail App Instead</em> below.';
+function emMsg(to,subject,body){
+  // From/Sender pinned to the team mailbox so the message is sent AS team@.
+  return {subject:subject,body:{contentType:'Text',content:body},
     from:{emailAddress:{address:TEAM_MAILBOX}},
     sender:{emailAddress:{address:TEAM_MAILBOX}},
-    toRecipients:[{emailAddress:{address:to}}]},saveToSentItems:true};
-  try{await graphPost('/me/sendMail',payload);emSentVia=TEAM_MAILBOX;}
+    toRecipients:[{emailAddress:{address:to}}]};
+}
+async function graphSendMail(to,subject,body){
+  const msg=emMsg(to,subject,body);
+  let draft=null;
+  try{draft=await graphPost(mailboxBase()+'/messages',msg);}
   catch(e){
-    if(/403|404|ErrorAccessDenied|ErrorItemNotFound|Authorization_RequestDenied/i.test(e.message)){
-      throw new Error('Cannot send as '+TEAM_MAILBOX+': the signed-in user needs Exchange "Send As" rights on '+TEAM_MAILBOX+' and the Entra app needs delegated Mail.Send.Shared. ('+e.message+')');
+    // couldn't even create the draft in team@ → nothing sent yet, safe to fall
+    // back to the proven /me/sendMail + From=team@ path (no id capture there)
+    if(isAuthErr(e)){
+      try{await graphPost('/me/sendMail',{message:msg,saveToSentItems:true});emSentVia=TEAM_MAILBOX;return {msgId:null,convId:null,viaFallback:true};}
+      catch(e2){
+        if(isAuthErr(e2))throw new Error('Cannot send as '+TEAM_MAILBOX+': the signed-in user needs Exchange "Send As" rights on '+TEAM_MAILBOX+' and the Entra app needs delegated Mail.Send.Shared. ('+e2.message+')');
+        throw e2;
+      }
     }
     throw e;
   }
+  // draft now exists in team@; send it. If /send fails we DON'T fall back
+  // (would duplicate) — best-effort delete the lingering draft and rethrow.
+  try{await graphPost(mailPath(draft.id)+'/send',{});}
+  catch(e){
+    try{await fetch(GRAPH_BASE+mailPath(draft.id),{method:'DELETE',headers:{Authorization:'Bearer '+appState.token}});}catch(_){}
+    if(isAuthErr(e))throw new Error('Cannot send as '+TEAM_MAILBOX+': the signed-in user needs Exchange "Send As" rights on '+TEAM_MAILBOX+' and the Entra app needs delegated Mail.Send.Shared. ('+e.message+')');
+    throw e;
+  }
+  emSentVia=TEAM_MAILBOX;
+  return {msgId:draft.id||null,convId:draft.conversationId||null,viaFallback:false};
 }
 function openEmail(targets){
-  const t=(targets||[]).filter(c=>c.mail);
+  const raw=(targets||[]);
+  const t=raw.filter(c=>c.mail);
   if(!t.length){toast('No mail ID on file for the selected file(s)');return;}
-  emTargets=t;
+  emRawTargets=raw;emTargets=t;
   const single=t.length===1,c=t[0];
   $('emTitle').textContent=single?c.name:t.length+' clients — bulk send';
   $('emSub').textContent=(single?(c.id+' · '+c.mail):'One personalised email per client, each logged separately')+' · sends as '+TEAM_MAILBOX;
@@ -1904,6 +2269,7 @@ function openEmail(targets){
   $('emTo').disabled=!single;
   $('emSubj').value=MAIL_SUBJ;
   $('emBody').value=MAIL_BODY;
+  empIdx=0;syncTagHL();
   $('emNext').value='Wait for documents';$('emDue').value='';
   emAfter='pending';
   $('segEmAfter').querySelectorAll('.seg-b').forEach(b=>b.classList.toggle('on',b.dataset.v===emAfter));
@@ -1913,67 +2279,197 @@ function openEmail(targets){
   setTimeout(()=>$('emBody').focus(),60);
 }
 function closeEmail(){$('emOv').classList.remove('open');}
+/* ── conditional-section editor wiring ─────────────────────────
+   Live backdrop highlight + a chip per taggable field that wraps the
+   current selection in {Field:Value}…{/Field}. Highlight never leaves
+   the screen — the sent body comes from personalize()/resolveSections(). */
+function buildTagChips(){
+  const box=$('emTagChips');if(!box)return;
+  box.innerHTML=Object.keys(TAG_VOCAB).map(k=>'<button type="button" class="tag-chip" data-tag="'+k+'"><span class="dot" style="background:'+(TAG_COLORS[k]||'#888')+'"></span>'+esc(TAG_VOCAB[k].label)+'</button>').join('');
+}
+function insertTag(key){
+  const ta=$('emBody'),f=TAG_VOCAB[key];if(!ta||!f)return;
+  const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||'…';
+  const open='{'+f.label+':'+(f.vals[0]||'VALUE')+'}',close='{/'+f.label+'}';
+  ta.value=v.slice(0,s)+open+sel+close+v.slice(e);
+  const caret=s+open.length;ta.focus();ta.setSelectionRange(caret,caret+sel.length);
+  syncTagHL();
+}
+function syncTagHL(){
+  const ta=$('emBody'),hl=$('emBodyHL');if(!ta)return;
+  if(hl){hl.innerHTML=markupTemplate(ta.value);hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft;}
+  const st=templateStatus(ta.value),el=$('emTagStatus');
+  if(el){
+    if(st.errs.length){el.className='tag-status err';el.textContent='⚠ '+st.errs.concat(st.warns).join(' · ');}
+    else if(st.warns.length){el.className='tag-status warn';el.textContent='⚠ '+st.warns.join(' · ')+' — section won’t match anyone';}
+    else if(st.pairs){el.className='tag-status ok';el.textContent='✓ '+st.pairs+' valid section'+(st.pairs>1?'s':'')+(st.fields.length?' · '+st.fields.join(', '):'')+' · shaded on-screen only';}
+    else{el.className='tag-status';el.textContent='Wrap text in a field below so it only sends to matching clients.';}
+  }
+  if($('emCard').classList.contains('expanded'))renderPreview();
+}
+/* ── side-by-side per-recipient preview ─────────────────────────
+   Steps through the eligible recipients (emTargets) and renders the
+   resolved email exactly as each client will receive it. */
+let empIdx=0;
+function setExpanded(on){
+  const card=$('emCard');card.classList.toggle('expanded',on);
+  $('emExpand').classList.toggle('on',on);
+  $('emExpand').innerHTML=on?'⇆ Hide preview':'⇆ Preview';
+  if(on){empIdx=Math.min(empIdx,Math.max(0,emTargets.length-1));renderPreview();}
+}
+function empNav(d){if(!emTargets.length)return;empIdx=(empIdx+d+emTargets.length)%emTargets.length;renderPreview();}
+function renderPreview(){
+  const n=emTargets.length;
+  if(!n){$('empName').textContent='No recipient with a valid email';$('empIdx').textContent='';$('empFields').innerHTML='';$('empSubj').textContent='';$('empBody').innerHTML='<span class="emp-empty">Nothing to preview.</span>';$('empPrev').disabled=$('empNext').disabled=true;return;}
+  if(empIdx>=n)empIdx=0;
+  const c=emTargets[empIdx];
+  $('empName').textContent=c.name;
+  $('empIdx').textContent=(empIdx+1)+' / '+n+(c.id?(' · '+c.id):'');
+  $('empPrev').disabled=$('empNext').disabled=(n<2);
+  // show the client's values for whichever fields the template references
+  const subjT=$('emSubj').value,bodyT=$('emBody').value;
+  const usedKeys=[...new Set(tagTokens(subjT+'\n'+bodyT).filter(t=>t.type==='open'&&TAG_VOCAB[t.key]).map(t=>t.key))];
+  $('empFields').innerHTML=usedKeys.length?usedKeys.map(k=>{const f=TAG_VOCAB[k],v=f.get(c)||'—',col=TAG_COLORS[k]||'#888';
+    return '<span class="emp-f'+(f.get(c)?'':' muted')+'" style="background:'+col+'">'+esc(f.label)+': '+esc(v)+'</span>';}).join(''):'<span class="emp-f muted" style="background:#bbb">No conditional fields used</span>';
+  // per-section verdict: included / hidden + why, so it's never ambiguous
+  const seen=new Set();
+  const secRows=tagTokens(bodyT).filter(t=>t.type==='open'&&TAG_VOCAB[t.key]).filter(t=>{const id=t.key+':'+t.value;if(seen.has(id))return false;seen.add(id);return true;}).map(t=>{
+    const f=TAG_VOCAB[t.key],cv=f.get(c),col=TAG_COLORS[t.key]||'#888',inc=valMatches(t.value,cv);
+    const why=inc?'':(cv?('client is "'+cv+'"'):(f.label+' is blank for this client'));
+    return '<div class="emp-sec"><span class="dot" style="background:'+col+'"></span><span class="lab">'+esc(f.label)+':'+esc(t.value)+'</span><span class="badge '+(inc?'in':'out')+'">'+(inc?'Included':'Hidden')+'</span>'+(why?'<span class="why">— '+esc(why)+'</span>':'')+'</div>';
+  });
+  $('empSections').innerHTML=secRows.length?('<div class="emp-sec-h">Conditional sections for this recipient</div>'+secRows.join('')):'';
+  $('empSubj').textContent=personalize(subjT,c)||'(no subject)';
+  $('empBody').innerHTML=previewHTML(bodyT,c)||'<span class="emp-empty">(empty)</span>';
+}
+buildTagChips();
+$('emTagChips').addEventListener('click',e=>{const b=e.target.closest('.tag-chip');if(b)insertTag(b.dataset.tag);});
+$('emBody').addEventListener('input',syncTagHL);
+$('emBody').addEventListener('scroll',()=>{const ta=$('emBody'),hl=$('emBodyHL');if(hl){hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft;}});
+$('emSubj').addEventListener('input',()=>{if($('emCard').classList.contains('expanded'))renderPreview();});
+$('emExpand').addEventListener('click',()=>setExpanded(!$('emCard').classList.contains('expanded')));
+$('empPrev').addEventListener('click',()=>empNav(-1));
+$('empNext').addEventListener('click',()=>empNav(1));
+/* ── tag value/field prompter (terminal-style completion) ──────
+   When the caret is inside an open {Field:…} tag, suggest the field's
+   allowed values (or field names before the colon), narrowing as you type.
+   Click or Tab to accept; Esc dismisses without closing the modal. */
+let tagSuggestCtx=null;
+function tagCaretContext(ta){
+  const pos=ta.selectionStart,val=ta.value,open=val.lastIndexOf('{',pos-1);
+  if(open<0)return null;
+  const between=val.slice(open+1,pos);
+  if(between.indexOf('}')>=0||between.indexOf('{')>=0||between[0]==='/')return null;
+  const ci=between.indexOf(':');
+  if(ci<0)return {mode:'field',frag:between,fragStart:open+1,pos};
+  const valuePart=between.slice(ci+1),lastBar=valuePart.lastIndexOf('|');
+  return {mode:'value',key:tagKey(between.slice(0,ci)),frag:valuePart.slice(lastBar+1),fragStart:open+1+ci+1+lastBar+1,pos};
+}
+function updateTagSuggest(){
+  const ta=$('emBody'),box=$('emTagSuggest');if(!ta||!box)return;
+  const ctx=tagCaretContext(ta);tagSuggestCtx=ctx;
+  const hide=()=>{box.style.display='none';box.innerHTML='';};
+  if(!ctx)return hide();
+  let title,items;
+  const fr=ctx.frag.trim().toLowerCase();
+  if(ctx.mode==='field'){
+    title='Field:';
+    items=Object.keys(TAG_VOCAB).map(k=>TAG_VOCAB[k]).filter(f=>!fr||f.label.toLowerCase().indexOf(fr)>=0).map(f=>({val:f.label,color:TAG_COLORS[tagKey(f.label)]}));
+  }else{
+    const f=TAG_VOCAB[ctx.key];if(!f)return hide();
+    title=f.label+' values:';
+    items=f.vals.filter(v=>!fr||v.toLowerCase().indexOf(fr)>=0).map(v=>({val:v,color:TAG_COLORS[ctx.key]}));
+  }
+  if(!items.length||(items.length===1&&items[0].val.toLowerCase()===fr))return hide();
+  box.style.display='flex';
+  box.innerHTML='<span class="ts-lbl">'+esc(title)+'</span>'+items.map((it,i)=>'<button type="button" class="ts-chip'+(i===0?' ts-first':'')+'" data-v="'+esc(it.val)+'"><span class="dot" style="background:'+(it.color||'#888')+'"></span>'+esc(it.val)+'</button>').join('')+'<span class="ts-hint">Tab ↹ accepts first</span>';
+}
+function applyTagSuggest(v){
+  const ta=$('emBody'),ctx=tagSuggestCtx;if(!ctx)return;
+  const lead=ctx.frag.length-ctx.frag.replace(/^\s+/,'').length,s=ctx.fragStart+lead;
+  const insert=v+(ctx.mode==='field'?':':'');
+  ta.value=ta.value.slice(0,s)+insert+ta.value.slice(ctx.pos);
+  const caret=s+insert.length;ta.focus();ta.setSelectionRange(caret,caret);
+  syncTagHL();updateTagSuggest();
+}
+$('emTagSuggest').addEventListener('mousedown',e=>{const b=e.target.closest('.ts-chip');if(b){e.preventDefault();applyTagSuggest(b.dataset.v);}});
+['input','keyup','click','select'].forEach(ev=>$('emBody').addEventListener(ev,updateTagSuggest));
+$('emBody').addEventListener('keydown',e=>{
+  const box=$('emTagSuggest');if(box.style.display==='none'||!box.innerHTML)return;
+  if(e.key==='Tab'){const first=box.querySelector('.ts-chip');if(first){e.preventDefault();applyTagSuggest(first.dataset.v);}}
+  else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();box.style.display='none';box.innerHTML='';}
+});
 $('segEmAfter').addEventListener('click',e=>{
   const b=e.target.closest('.seg-b');if(!b)return;
   emAfter=b.dataset.v;
   $('segEmAfter').querySelectorAll('.seg-b').forEach(x=>x.classList.toggle('on',x===b));
 });
+/* Send + log ONE client. Shared by single-send and the bulk queue, so both
+   honour the team@-only path. Returns {msgId,convId,to}; throws on failure. */
+async function deliverEmail(c,ctx){
+  const now=new Date().toISOString(),today=now.split('T')[0];
+  const to=(ctx.toOverride||c.mail||'').trim();
+  const subj=personalize(ctx.subjT,c),body=personalize(ctx.bodyT,c);
+  const na=ctx.na||'',due=ctx.due||'',after=ctx.after||'';
+  let msgId=null,convId=null;
+  // THE SEND. Only this may throw out of deliverEmail — so a retry never
+  // re-sends an email that already went out (post-send logging is guarded).
+  if(appState.token){const ids=await graphSendMail(to,subj,body);msgId=ids.msgId||null;convId=ids.convId||null;}
+  // Mail is now sent. Logging/tracker writes must NOT propagate (a SoniaLog
+  // hiccup must not trigger a resend) — record a warning instead.
+  let spId=null,logWarn='';
+  const patch={LastContactDate:now,LastContactOutcome:'Email sent: '+subj,NextActionSummary:na,NextActionDue:due||null,LastUpdated:now};
+  if(after==='needs')patch.OutreachRequired=true;
+  if(after==='pending'){patch.OutreachRequired=false;if(!na)patch.NextActionSummary='Awaiting client response';}
+  if(after==='responded')patch.OutreachRequired=false;
+  if(appState.token){
+    try{
+      // log the full email; if the Outcome column rejects long text, retry with subject only
+      const fields={ClientID:c.id,ClientName:c.name,ContactDate:now,Channel:'Email',
+        Outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,NextAction:na,LoggedBy:loggedByName(),
+        OutcomeType:'Follow-up needed',ContactOwner:'Sonia',NeedsEscalation:false};
+      if(due)fields.NextActionDue=due;
+      try{const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
+      catch(e){fields.Outcome='Email sent: '+subj;
+        const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
+      if(c._sp)await graphPatch(trackerPath(c),patch);
+    }catch(e){logWarn=e.message||String(e);console.warn('[outreach] sent OK but log/patch failed for',c.id,e);}
+  }
+  c.comms.push({_sp:spId,type:'email',date:today,dir:'out',content:subj,read:true,
+    outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,nextAction:na,outcomeType:'Follow-up needed',
+    docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:due,escalation:false,
+    msgId:msgId,convId:convId});
+  c.lastContactDate=today;c.lastContactOutcome='Email sent: '+subj;
+  c.nextActionSummary=patch.NextActionSummary||na;c.nextActionDue=due||'';
+  if(after==='needs')c.outreachRequired=true;else if(after)c.outreachRequired=false;
+  rederive(c);
+  return {msgId,convId,to,logWarn};
+}
 async function sendEmails(){
   const subjT=$('emSubj').value.trim(),bodyT=$('emBody').value,na=$('emNext').value.trim(),due=$('emDue').value;
   if(!subjT){toast('Subject is required');$('emSubj').focus();return;}
   if(!bodyT.trim()){toast('Write the message first');$('emBody').focus();return;}
-  const btn=$('emSend');btn.disabled=true;
+  const ctx={subjT,bodyT,na,due,after:emAfter};
+  // bulk → hand off to the confirmation + live-progress flow
+  if(emTargets.length>1||emRawTargets.length>1){openBulkConfirm(ctx);return;}
+  // single send
+  const btn=$('emSend');btn.disabled=true;btn.textContent='Sending…';
   $('emErr').classList.remove('show');
-  const now=new Date().toISOString(),today=now.split('T')[0];
-  const single=emTargets.length===1;
-  let ok=0,fail=0,permErr=false,lastErr='';
-  for(let i=0;i<emTargets.length;i++){
-    const c=emTargets[i];
-    btn.textContent=`Sending ${i+1}/${emTargets.length}…`;
-    const to=single?$('emTo').value.trim():c.mail;
-    const subj=personalize(subjT,c),body=personalize(bodyT,c);
-    try{
-      if(appState.token)await graphSendMail(to,subj,body);
-      // log the full email; if the Outcome column rejects long text, retry with subject only
-      let spId=null;
-      if(appState.token){
-        const fields={ClientID:c.id,ClientName:c.name,ContactDate:now,Channel:'Email',
-          Outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,NextAction:na,LoggedBy:loggedByName(),
-          OutcomeType:'Follow-up needed',ContactOwner:'Sonia',NeedsEscalation:false};
-        if(due)fields.NextActionDue=due;
-        try{const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
-        catch(e){fields.Outcome='Email sent: '+subj;
-          const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
-      }
-      const patch={LastContactDate:now,LastContactOutcome:'Email sent: '+subj,NextActionSummary:na,NextActionDue:due||null,LastUpdated:now};
-      if(emAfter==='needs')patch.OutreachRequired=true;
-      if(emAfter==='pending'){patch.OutreachRequired=false;if(!na)patch.NextActionSummary='Awaiting client response';}
-      if(emAfter==='responded')patch.OutreachRequired=false;
-      if(appState.token&&c._sp)await graphPatch(trackerPath(c),patch);
-      c.comms.push({_sp:spId,type:'email',date:today,dir:'out',content:subj,read:true,
-        outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,nextAction:na,outcomeType:'Follow-up needed',
-        docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:due,escalation:false});
-      c.lastContactDate=today;c.lastContactOutcome='Email sent: '+subj;
-      c.nextActionSummary=patch.NextActionSummary||na;c.nextActionDue=due||'';
-      if(emAfter==='needs')c.outreachRequired=true;else if(emAfter)c.outreachRequired=false;
-      rederive(c);ok++;
-    }catch(e){
-      fail++;lastErr=e.message;console.error('[outreach] email failed for',c.id,e);
-      if(/403|Forbidden|ErrorAccessDenied|Authorization_RequestDenied/i.test(e.message)){permErr=true;break;}
-    }
+  const c=emTargets[0];
+  try{
+    await deliverEmail(c,{...ctx,toOverride:$('emTo').value.trim()});
+    closeEmail();clearSel();refreshAfterWrite();
+    toast(`✉ Sent & logged 1 email from ${TEAM_MAILBOX}${demoSuffix()}`);
+  }catch(e){
+    console.error('[outreach] email failed for',c.id,e);
+    if(isAuthErr(e)){$('emErr').innerHTML=PERM_MSG;$('emErr').classList.add('show');}
+    else toast('⚠ Send failed ('+(e.message||'').slice(0,60)+')');
   }
-  btn.disabled=false;btn.textContent='Send as '+TEAM_MAILBOX;
-  if(permErr){
-    $('emErr').innerHTML='<strong>Sending as '+esc(TEAM_MAILBOX)+' is not enabled yet.</strong> All mail goes out from the team mailbox — never your personal account. The Entra app needs delegated <strong>Mail.Send.Shared</strong> (admin-consented), plus Exchange <em>Send As</em> rights on '+esc(TEAM_MAILBOX)+'. Until then, use <em>Open in Mail App Instead</em> below.';
-    $('emErr').classList.add('show');return;
-  }
-  if(ok){closeEmail();clearSel();refreshAfterWrite();}
-  const via=appState.token&&emSentVia?(' from '+emSentVia):'';
-  toast(fail?`⚠ Sent ${ok} · ${fail} failed (${lastErr.slice(0,60)})`:`✉ Sent & logged ${ok} email${ok!==1?'s':''}${via}${demoSuffix()}`);
+  btn.disabled=false;btn.textContent='Send from team mailbox';
 }
 $('emSend').addEventListener('click',sendEmails);
 $('emClose').addEventListener('click',closeEmail);
-$('emOv').addEventListener('click',e=>{if(e.target===$('emOv'))closeEmail();});
+onBackdrop($('emOv'),closeEmail);
 $('emFallback').addEventListener('click',()=>{
   const single=emTargets.length===1;
   const subj=$('emSubj').value.trim()||MAIL_SUBJ;
@@ -1984,6 +2480,162 @@ $('emFallback').addEventListener('click',()=>{
   closeEmail();
   openComposer(emTargets,{channel:'email',dir:'out',outcomeType:'Follow-up needed',outcome:single?'Sent data-request email':'Sent bulk reminder email ('+emTargets.length+' recipients)'});
 });
+
+/* ── BULK EMAIL: confirm → paced queue → live progress ─────────
+   One separate email per client, sent sequentially ~1s apart, always AS
+   team@ (reuses deliverEmail → graphSendMail). State per client drives a
+   live modal + a minimised widget. Transient errors retry with backoff;
+   a permissions error is global, so it aborts the whole batch. */
+const SEND_DELAY=1000, MAX_ATTEMPTS=3;
+let bulkRunning=false, bulkBatch=null;
+function openBulkConfirm(ctx){
+  const seen=new Set();
+  const items=emRawTargets.map(c=>{
+    let state='queued',reason='';
+    const mail=(c.mail||'').trim();
+    if(!mail){state='skipped';reason='No email';}
+    else if(mailIssue(mail)){state='skipped';reason='Bad email';}
+    else if(seen.has(mail.toLowerCase())){state='skipped';reason='Duplicate';}
+    else seen.add(mail.toLowerCase());
+    return {c,id:c.id,name:c.name,to:mail,state,reason,error:'',attempts:0,msgId:null,convId:null,ts:''};
+  });
+  bulkBatch={ctx,items,status:'confirm',cancel:false,startedAt:''};
+  const eli=items.filter(i=>i.state==='queued').length, skp=items.length-eli;
+  $('blkCEli').textContent=eli;$('blkCSkip').textContent=skp;$('blkCSel').textContent=items.length;
+  $('blkFrom').textContent=TEAM_MAILBOX;
+  const skipped=items.filter(i=>i.state==='skipped');
+  $('blkSkipLbl').style.display=skipped.length?'block':'none';
+  $('blkSkipList').innerHTML=skipped.map(i=>`<div class="blk-skip-row"><span>${esc(i.name)} <span style="color:var(--mut3)">${esc(i.to||'—')}</span></span><span class="r">${esc(i.reason)}</span></div>`).join('');
+  const sample=items.find(i=>i.state==='queued')||items[0], pc=sample&&sample.c;
+  $('blkPrev').innerHTML=pc?`<span class="s">${esc(personalize(ctx.subjT,pc))}</span>${esc(personalize(ctx.bodyT,pc))}`:'<em>No eligible recipients</em>';
+  $('blkPrevHint').textContent=pc?('— resolved for '+pc.name+' · shaded sections vary per client'):'— {name}/{first} personalised per client';
+  // section coverage: for each distinct conditional tag, how many eligible recipients it applies to
+  const eligibleC=items.filter(i=>i.state==='queued').map(i=>i.c);
+  const opens=tagTokens((ctx.subjT||'')+'\n'+(ctx.bodyT||'')).filter(t=>t.type==='open'&&TAG_VOCAB[t.key]);
+  const seenTag=new Set(),cov=[];
+  opens.forEach(t=>{const id=t.key+':'+t.value;if(seenTag.has(id))return;seenTag.add(id);
+    const f=TAG_VOCAB[t.key],n=eligibleC.filter(c=>valMatches(t.value,f.get(c))).length;
+    cov.push({label:f.label+':'+t.value,n,total:eligibleC.length});});
+  $('blkCovLbl').style.display=cov.length?'block':'none';
+  $('blkCovList').innerHTML=cov.map(x=>`<div class="blk-cov-row"><span>${esc(x.label)}</span><span class="n">${x.n} of ${x.total}</span></div>`).join('');
+  $('blkStart').textContent='Send '+eli+' email'+(eli===1?'':'s');
+  $('blkStart').disabled=eli===0;
+  setBulkPhase('confirm');
+  $('emOv').classList.remove('open');
+  $('blkMini').classList.remove('show');
+  $('blkOv').classList.add('open');
+}
+function setBulkPhase(p){
+  const confirm=p==='confirm',running=p==='running',done=p==='done';
+  $('blkConfirm').style.display=confirm?'block':'none';
+  $('blkProgress').style.display=confirm?'none':'block';
+  $('blkCancel').style.display=confirm?'inline-flex':'none';
+  $('blkStart').style.display=confirm?'inline-flex':'none';
+  $('blkMin2').style.display=running?'inline-flex':'none';
+  $('blkCancelRun').style.display=running?'inline-flex':'none';
+  $('blkDone').style.display=done?'inline-flex':'none';
+  $('blkExport').style.display=done?'inline-flex':'none';
+  $('blkClose').style.display=running?'none':'inline-flex';
+  $('blkTitle').textContent=confirm?'Bulk send — confirm':(running?'Bulk send — sending':'Bulk send — complete');
+  $('blkSub').textContent='Sends as '+TEAM_MAILBOX+' · one separate email per client';
+}
+async function startBulk(){
+  if(bulkRunning){toast('A bulk send is already running');return;}
+  if(!bulkBatch||!bulkBatch.items.some(i=>i.state==='queued')){toast('No eligible recipients');return;}
+  bulkRunning=true;bulkBatch.startedAt=new Date().toISOString();
+  $('blkStart').disabled=true;
+  setBulkPhase('running');renderBulk();
+  await runBulkQueue();
+}
+async function runBulkQueue(){
+  const b=bulkBatch;b.status='running';
+  const ts=()=>new Date().toISOString();
+  for(let i=0;i<b.items.length;i++){
+    if(b.cancel)break;
+    const it=b.items[i];
+    if(it.state==='skipped')continue;
+    let sent=false;
+    for(let a=1;a<=MAX_ATTEMPTS&&!sent;a++){
+      it.attempts=a;it.state='sending';renderBulk();
+      try{
+        const res=await deliverEmail(it.c,b.ctx);
+        it.msgId=res.msgId;it.convId=res.convId;it.ts=ts();
+        it.error=res.logWarn?('sent · log failed: '+res.logWarn):'';it.state='sent';sent=true;
+      }catch(e){
+        it.error=e.message||String(e);console.error('[outreach] bulk send failed for',it.id,e);
+        if(isAuthErr(e)){ // global permissions problem — every send will fail
+          it.state='failed';b.status='aborted';b.fatalErr=it.error;
+          bulkRunning=false;renderBulk();return finishBulk();
+        }
+        if(a<MAX_ATTEMPTS&&isTransient(e)){ // only transient errors are worth a retry
+          it.state='retrying';renderBulk();
+          await sleep(Math.min(1500*Math.pow(2,a-1),8000));
+        }else{it.state='failed';break;} // non-transient → fail now, don't re-send
+      }
+    }
+    renderBulk();
+    if(i<b.items.length-1&&!b.cancel)await sleep(SEND_DELAY);
+  }
+  b.status=b.cancel?'cancelled':'done';
+  bulkRunning=false;finishBulk();
+}
+function bulkCounts(){const c={queued:0,sending:0,sent:0,failed:0,skipped:0,retrying:0};(bulkBatch?bulkBatch.items:[]).forEach(i=>c[i.state]=(c[i.state]||0)+1);return c;}
+function renderBulk(){
+  const b=bulkBatch;if(!b)return;
+  const c=bulkCounts(),total=b.items.length,done=c.sent+c.failed+c.skipped;
+  $('blkSent').textContent=c.sent;$('blkSending').textContent=c.sending+c.retrying;
+  $('blkQueued').textContent=c.queued;$('blkFailed').textContent=c.failed;
+  $('blkSkipped').textContent=c.skipped;$('blkTotal').textContent=total;
+  const pct=total?Math.round(done/total*100):0;
+  $('blkBar').style.width=pct+'%';
+  const cur=b.items.find(i=>i.state==='sending'||i.state==='retrying');
+  let curHtml='';
+  if(b.status==='running')curHtml=cur?((cur.state==='retrying'?'<span class="err">Retry '+cur.attempts+' — </span>':'')+'Sending to <b>'+esc(cur.name)+'</b> · '+esc(cur.to)):'Preparing…';
+  else if(b.status==='aborted')curHtml='<span class="err">Batch stopped — '+esc((b.fatalErr||'').slice(0,140))+'</span>';
+  else if(b.status==='cancelled')curHtml='Stopped by user · '+c.sent+' sent before stop · '+c.queued+' not sent';
+  else curHtml='Done · '+c.sent+' sent · '+c.failed+' failed · '+c.skipped+' skipped';
+  $('blkCur').innerHTML=curHtml;
+  $('blkList').innerHTML=b.items.map(i=>{
+    const cls=i.state==='sending'?'is-sending':(i.state==='sent'?'is-sent':(i.state==='skipped'?'is-skipped':''));
+    const right=i.state==='skipped'?('<span class="er">'+esc(i.reason)+'</span>'):(i.error&&i.state!=='sent'?('<span class="er">'+esc(i.error.slice(0,52))+'</span>'):'');
+    const lbl=i.state==='retrying'?('Retry '+i.attempts):i.state;
+    return '<div class="blk-row '+cls+'"><span class="nm">'+esc(i.name)+'</span><span class="em">'+esc(i.to||'—')+'</span>'+right+'<span class="blk-st '+i.state+'">'+esc(lbl)+'</span></div>';
+  }).join('');
+  // minimised widget
+  $('blkMiniFill').style.width=pct+'%';
+  $('blkMiniCount').textContent=c.sent+'/'+total;
+  const st=$('blkMiniStatus');
+  if(b.status==='running'){st.textContent=cur?('→ '+cur.name):'Sending…';st.classList.toggle('err',c.failed>0);}
+  else if(b.status==='aborted'){st.textContent='Stopped — permissions';st.classList.add('err');}
+  else if(b.status==='cancelled'){st.textContent='Stopped · '+c.sent+' sent';st.classList.remove('err');}
+  else{st.textContent='Done · '+c.sent+' sent';st.classList.toggle('err',c.failed>0);}
+}
+function finishBulk(){
+  setBulkPhase('done');renderBulk();
+  clearSel();refreshAfterWrite();
+  const c=bulkCounts();
+  toast(`✉ Bulk done — ${c.sent} sent · ${c.failed} failed · ${c.skipped} skipped${demoSuffix()}`);
+}
+function bulkMinimize(){$('blkOv').classList.remove('open');$('blkMini').classList.add('show');}
+function bulkRestore(){$('blkMini').classList.remove('show');$('blkOv').classList.add('open');}
+function bulkCloseDone(){$('blkOv').classList.remove('open');$('blkMini').classList.remove('show');bulkBatch=null;}
+function exportBulkLog(){
+  const b=bulkBatch;if(!b)return;
+  const rows=[['ClientID','ClientName','Email','Status','Attempts','SentAt','Sender','MessageID','ConversationID','Note']];
+  b.items.forEach(i=>rows.push([i.id,i.name,i.to,i.state,i.attempts,i.ts,i.state==='sent'?TEAM_MAILBOX:'',i.msgId||'',i.convId||'',i.error||i.reason||'']));
+  const csv=rows.map(r=>r.map(x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='bulk-send-log.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+$('blkStart').addEventListener('click',startBulk);
+$('blkCancel').addEventListener('click',()=>{$('blkOv').classList.remove('open');$('emOv').classList.add('open');});
+$('blkClose').addEventListener('click',()=>{if(bulkRunning)return;if(bulkBatch&&bulkBatch.status==='confirm'){$('blkOv').classList.remove('open');$('emOv').classList.add('open');}else bulkCloseDone();});
+$('blkMin2').addEventListener('click',bulkMinimize);
+$('blkMiniOpen').addEventListener('click',bulkRestore);
+$('blkCancelRun').addEventListener('click',()=>{if(bulkBatch){bulkBatch.cancel=true;$('blkCancelRun').disabled=true;toast('Stopping after current send…');}});
+$('blkDone').addEventListener('click',bulkCloseDone);
+$('blkExport').addEventListener('click',exportBulkLog);
+onBackdrop($('blkOv'),()=>{if(bulkRunning)return;if(bulkBatch&&bulkBatch.status==='confirm'){$('blkOv').classList.remove('open');$('emOv').classList.add('open');}else if(bulkBatch&&bulkBatch.status!=='running')bulkCloseDone();});
 
 /* ── live team-mailbox controls: load full body + in-app reply ──
    Replies go through POST /messages/{id}/reply, so Outlook sends from
