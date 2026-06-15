@@ -417,6 +417,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   font-family:var(--cond);font-size:.7rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .13s;white-space:nowrap;}
 .bb-btn:hover{border-color:#888;color:#fff;}
 .bb-btn.red{background:var(--red);border-color:var(--red);color:#fff;}
+.bb-btn.bb-on{background:#3a8f6a;border-color:#3a8f6a;color:#fff;}
 .bb-btn.red:hover{background:var(--red-dk);}
 .bb-date{height:28px;border:1px solid #4a4647;background:#2c2829;color:#fff;border-radius:2px;padding:0 6px;font-family:var(--body);font-size:.78rem;color-scheme:dark;outline:none;}
 .bb-x{width:28px;height:28px;border-radius:2px;border:1px solid #4a4647;background:transparent;color:#ccc;cursor:pointer;flex-shrink:0;}
@@ -679,7 +680,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 <header>
   <div class="logo">
     <div class="logo-mark">A</div>
-    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.2.0</span></div></div>
+    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.3.0</span></div></div>
   </div>
   <div class="hd"></div>
   <div class="filters" id="filters">
@@ -728,6 +729,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   <button class="tb-btn" id="tbFollowSet">⏰ Set</button>
   <div class="tb-sep"></div>
   <button class="tb-btn" id="tbSelect">☐ Select</button>
+  <button class="tb-btn" id="tbSelectAll">☑ All</button>
   <button class="tb-btn" id="tbExport">↓ Export</button>
   <button class="tb-btn" onclick="markAllRead()">✓✓ Mark All Read</button>
   <div class="tb-sep"></div>
@@ -1900,6 +1902,7 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(e.key==='Escape'&&selectMode)toggleSelectMode(false);
+  if(selectMode&&(e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'&&!/^(INPUT|TEXTAREA)$/.test((e.target&&e.target.tagName)||'')){e.preventDefault();selectAllShownForce();}
 });
 
 /* ═══ FILTER / TOOLBAR EVENTS ══════════════════════════════════ */
@@ -1960,7 +1963,19 @@ function toggleSelectMode(force){
   $('tbSelect').classList.toggle('tb-on',selectMode);
   $('tbSelect').textContent=selectMode?'☑ Selecting…':'☐ Select';
   renderGrid();updateBulkbar();
-  if(selectMode)toast('Click cards to select · Esc to exit');
+  if(selectMode)toast('Click cards · or “All shown” to select everything · Esc to exit');
+}
+/* One-click select-all: ensure select mode, then select every shown card. */
+function selectAllShownForce(){
+  if(!selectMode)toggleSelectMode(true);
+  getFiltered().forEach(c=>SEL.add(c.id));
+  renderGrid();updateBulkbar();
+}
+/* Bulk-bar toggle: select all shown, or clear them if all are already selected. */
+function selectAllShownToggle(){
+  const shown=getFiltered(),allSel=shown.length>0&&shown.every(c=>SEL.has(c.id));
+  shown.forEach(c=>allSel?SEL.delete(c.id):SEL.add(c.id));
+  renderGrid();updateBulkbar();
 }
 function toggleSel(c,el){
   SEL.has(c.id)?SEL.delete(c.id):SEL.add(c.id);
@@ -1968,7 +1983,12 @@ function toggleSel(c,el){
   const k=el.querySelector('.selchk');if(k)k.textContent=SEL.has(c.id)?'✓':'';
   updateBulkbar();
 }
-function updateBulkbar(){$('bbN').textContent=SEL.size;$('bulkbar').classList.toggle('show',SEL.size>0);}
+function updateBulkbar(){
+  $('bbN').textContent=SEL.size;
+  $('bulkbar').classList.toggle('show',selectMode||SEL.size>0);
+  const shown=getFiltered(),allSel=shown.length>0&&shown.every(c=>SEL.has(c.id)),ab=$('bbAll');
+  if(ab){ab.textContent=(allSel?'Clear shown':'All shown')+' ('+shown.length+')';ab.classList.toggle('bb-on',allSel);}
+}
 function clearSel(){SEL.clear();updateBulkbar();if(selectMode)renderGrid();}
 /* toolbar actions target the selection, else the open desk file */
 function targetsOrWarn(){
@@ -2811,7 +2831,8 @@ $('tbDone').addEventListener('click',()=>{const t=targetsOrWarn();if(t)statusSet
 $('tbFollowSet').addEventListener('click',()=>{const t=targetsOrWarn();if(t)followUp(t,$('tbFollowDate').value);});
 $('tbSelect').addEventListener('click',()=>toggleSelectMode());
 $('tbExport').addEventListener('click',()=>exportCsv(SEL.size?selTargets():getFiltered()));
-$('bbAll').addEventListener('click',()=>{getFiltered().forEach(c=>SEL.add(c.id));renderGrid();updateBulkbar();});
+$('bbAll').addEventListener('click',selectAllShownToggle);
+$('tbSelectAll').addEventListener('click',selectAllShownForce);
 $('bbLog').addEventListener('click',()=>openComposer(selTargets()));
 $('bbEmail').addEventListener('click',()=>actEmail(selTargets()));
 $('bbNeeds').addEventListener('click',()=>statusSet(selTargets(),'needs'));
