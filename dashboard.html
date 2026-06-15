@@ -796,7 +796,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
     </div>
     <div class="comp-ft">
       <div class="comp-open"><button class="co-btn" id="emFallback">Open in Mail App Instead</button></div>
-      <button class="comp-save" id="emSend">Send via Outlook</button>
+      <button class="comp-save" id="emSend">Send from team mailbox</button>
     </div>
   </div>
 </div>
@@ -1858,22 +1858,31 @@ async function saveComposer(){
 }
 $('compSave').addEventListener('click',saveComposer);
 
-/* ── in-app Outlook email (Graph /me/sendMail) ─────────────────
-   Sends from the signed-in @acutant account. Needs delegated Mail.Send on
-   the Entra app; until consented, Graph returns 403 and we surface a clear
-   explanation + the mail-app fallback. On success every recipient gets a
-   SoniaLog row holding the FULL email, plus the tracker summary patch. */
+/* ── in-app Outlook email (Graph /me/sendMail, From = team@) ────
+   ALWAYS sends AS the team mailbox — never the signed-in user. We POST to
+   /me/sendMail with an explicit From = TEAM_MAILBOX: this is the supported
+   DELEGATED send pattern (Mail.Send.Shared + the signed-in user's Exchange
+   "Send As" right). The message goes out as team@, not the operator.
+   NB: POST /users/{team}/sendMail returns 404 ErrorItemNotFound under
+   delegated auth — that endpoint is for APPLICATION permissions only, which
+   a browser SPA can't use. If the rights are missing Graph returns 403; we
+   surface a clear explanation + the mail-app fallback and send NOTHING.
+   On success every recipient gets a SoniaLog row holding the FULL email,
+   plus the tracker summary patch. */
 let emTargets=[],emAfter='',emSentVia='';
 async function graphSendMail(to,subject,body){
+  // From/Sender pinned to the team mailbox so the message is sent AS team@,
+  // never silently from the signed-in user's own account.
   const payload={message:{subject:subject,body:{contentType:'Text',content:body},
+    from:{emailAddress:{address:TEAM_MAILBOX}},
+    sender:{emailAddress:{address:TEAM_MAILBOX}},
     toRecipients:[{emailAddress:{address:to}}]},saveToSentItems:true};
-  // send AS the team mailbox so replies come back to it; fall back to the
-  // signed-in user's own mailbox if shared-send rights are missing
-  try{await graphPost(mailboxBase()+'/sendMail',payload);emSentVia=TEAM_MAILBOX;}
+  try{await graphPost('/me/sendMail',payload);emSentVia=TEAM_MAILBOX;}
   catch(e){
     if(/403|404|ErrorAccessDenied|ErrorItemNotFound|Authorization_RequestDenied/i.test(e.message)){
-      await graphPost('/me/sendMail',payload);emSentVia='your personal mailbox';
-    }else throw e;
+      throw new Error('Cannot send as '+TEAM_MAILBOX+': the signed-in user needs Exchange "Send As" rights on '+TEAM_MAILBOX+' and the Entra app needs delegated Mail.Send.Shared. ('+e.message+')');
+    }
+    throw e;
   }
 }
 function openEmail(targets){
@@ -1891,7 +1900,7 @@ function openEmail(targets){
   emAfter='pending';
   $('segEmAfter').querySelectorAll('.seg-b').forEach(b=>b.classList.toggle('on',b.dataset.v===emAfter));
   $('emErr').classList.remove('show');
-  const btn=$('emSend');btn.disabled=false;btn.textContent='Send via Outlook'+(single?'':' ('+t.length+')');
+  const btn=$('emSend');btn.disabled=false;btn.textContent='Send as '+TEAM_MAILBOX+(single?'':' ('+t.length+')');
   $('emOv').classList.add('open');
   setTimeout(()=>$('emBody').focus(),60);
 }
@@ -1945,9 +1954,9 @@ async function sendEmails(){
       if(/403|Forbidden|ErrorAccessDenied|Authorization_RequestDenied/i.test(e.message)){permErr=true;break;}
     }
   }
-  btn.disabled=false;btn.textContent='Send via Outlook';
+  btn.disabled=false;btn.textContent='Send as '+TEAM_MAILBOX;
   if(permErr){
-    $('emErr').innerHTML='<strong>Outlook sending is not enabled on this app yet.</strong> The Entra app needs delegated <strong>Mail.Send.Shared</strong> (to send as '+esc(TEAM_MAILBOX)+') or <strong>Mail.Send</strong> (own mailbox), admin-consented, plus Exchange <em>Send As</em> rights on the shared mailbox. Until then, use <em>Open in Mail App Instead</em> below.';
+    $('emErr').innerHTML='<strong>Sending as '+esc(TEAM_MAILBOX)+' is not enabled yet.</strong> All mail goes out from the team mailbox — never your personal account. The Entra app needs delegated <strong>Mail.Send.Shared</strong> (admin-consented), plus Exchange <em>Send As</em> rights on '+esc(TEAM_MAILBOX)+'. Until then, use <em>Open in Mail App Instead</em> below.';
     $('emErr').classList.add('show');return;
   }
   if(ok){closeEmail();clearSel();refreshAfterWrite();}
