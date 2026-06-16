@@ -188,9 +188,10 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .dh-flag{display:inline-flex;align-items:center;gap:5px;margin-top:7px;padding:3px 9px;border-radius:2px;
   background:rgba(218,56,50,.16);border:1px solid rgba(218,56,50,.5);
   font-family:var(--cond);font-size:.7rem;font-weight:700;color:#f08a86;letter-spacing:.4px;text-transform:uppercase;}
-.dh-controls{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.dh-controls{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.dh-nav-group{display:flex;align-items:center;gap:6px;}
 .dh-status{font-family:var(--cond);font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:2px;
-  text-transform:uppercase;letter-spacing:.6px;margin-right:4px;}
+  text-transform:uppercase;letter-spacing:.6px;}
 .dh-status.needs{background:rgba(218,56,50,.2);color:#f08a86;}
 .dh-status.responded{background:rgba(45,106,79,.28);color:#7fd6a0;}
 .dh-status.pending{background:rgba(224,123,0,.24);color:#f2b06a;}
@@ -202,7 +203,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .dh-btn.mark-all{width:auto;padding:0 11px;font-family:var(--cond);font-size:.68rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
 .dh-btn.mark-all:hover{border-color:var(--wa);color:#fff;background:rgba(31,168,85,.2);}
 .dh-contact{font-family:var(--cond);font-size:.72rem;font-weight:600;color:#ccc;letter-spacing:.3px;white-space:nowrap;
-  padding:4px 10px;border-radius:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);margin-right:6px;}
+  padding:4px 10px;border-radius:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);max-width:min(280px,42vw);overflow:hidden;text-overflow:ellipsis;}
 .dh-contact .sep{color:#666;margin:0 6px;}
 
 /* desk body — slips rail (left) + shadow shelf (right) */
@@ -779,12 +780,14 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
         <div id="dhFlag"></div>
       </div>
       <div class="dh-controls">
+        <div class="dh-nav-group">
+          <button class="dh-btn mark-all" id="dhMarkAll">✓ Mark All Read</button>
+          <span class="dh-status" id="dhStatus"></span>
+          <button class="dh-btn" id="dhPrev" title="Previous file">‹</button>
+          <button class="dh-btn" id="dhNext" title="Next file">›</button>
+          <button class="dh-btn close" id="dhClose" title="Close">✕</button>
+        </div>
         <span class="dh-contact" id="dhContact"></span>
-        <span class="dh-status" id="dhStatus"></span>
-        <button class="dh-btn mark-all" id="dhMarkAll">✓ Mark All Read</button>
-        <button class="dh-btn" id="dhPrev" title="Previous file">‹</button>
-        <button class="dh-btn" id="dhNext" title="Next file">›</button>
-        <button class="dh-btn close" id="dhClose" title="Close">✕</button>
       </div>
     </div>
     <div class="desk-rule"></div>
