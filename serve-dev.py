@@ -22,6 +22,7 @@ Usage:
 """
 import http.server
 import os
+import socketserver
 import sys
 
 PORT = 62672
@@ -31,6 +32,10 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=DIR, **kw)
+
+    def handle_one_request(self):
+        self.connection.settimeout(30)
+        super().handle_one_request()
 
     def end_headers(self):
         # Dev server: never cache, so edits to the HTML always load fresh.
@@ -44,6 +49,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             print(f"  {args[0]}  {args[1]}")
         except Exception:
             super().log_message(fmt, *args)
+
+
+class ThreadingServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
+    daemon_threads = True
+    allow_reuse_address = False
 
 
 def main():
@@ -60,7 +70,7 @@ def main():
     print(f"  Ctrl+C to stop\n")
 
     try:
-        http.server.HTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+        ThreadingServer(("127.0.0.1", PORT), Handler).serve_forever()
     except KeyboardInterrupt:
         print("\n  Stopped.")
     except OSError as e:
