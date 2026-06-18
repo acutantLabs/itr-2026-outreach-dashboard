@@ -154,10 +154,13 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   padding:10px 10px 9px;min-height:96px;box-shadow:var(--sh1);transition:border-color .16s,box-shadow .16s;}
 .sc:hover .sc-tray{border-color:#c9c9c9;box-shadow:var(--sh2);}
 .sc[data-flag] .sc-tray{border-top-color:var(--red);}
+/* comm stack: each slab is one communication, oldest on top. Client→us slabs
+   hug the left (under the left-aligned name); us→client slabs hug the right —
+   so the heavier side tells you who's been talking more at a glance. */
 .sheets{display:flex;flex-direction:column;gap:3px;margin-bottom:9px;}
-.sheet{height:7px;border-radius:1px;transition:height .18s;}
-.sheet:nth-child(odd){margin-left:3px;}
-.sheet:nth-child(even){margin-right:3px;}
+.sheet{height:7px;width:56%;border-radius:1px;transition:height .18s,width .18s;}
+.sheet.dir-in{align-self:flex-start;}
+.sheet.dir-out{align-self:flex-end;}
 .sheet.top{height:9px;}
 .sheet.unread-sheet{box-shadow:0 0 0 1px rgba(31,168,85,.4);}
 .sc:hover .sheet{height:8px;}
@@ -527,6 +530,12 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 /* live team-mailbox slips */
 .live-tag{font-family:var(--cond);font-size:.54rem;font-weight:700;color:var(--email);background:rgba(37,99,235,.1);
   padding:1px 4px;border-radius:2px;letter-spacing:.4px;white-space:nowrap;}
+.res-pill{color:#fff;}
+.slip.needs-review{border-color:var(--red);background:rgba(218,56,50,.05);}
+.res-panel{margin-top:14px;border-top:1px dashed var(--line2);padding-top:11px;}
+.res-head{font-family:var(--cond);font-size:.7rem;font-weight:800;color:var(--mut);letter-spacing:.7px;
+  text-transform:uppercase;margin-bottom:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.res-choose{margin-top:11px;}
 .reply-box{margin-top:6px;}
 .reply-ta{width:100%;min-height:72px;border:1px solid var(--line2);border-radius:2px;padding:9px 11px;
   font-family:var(--body);font-size:.86rem;outline:none;resize:vertical;background:var(--surface);}
@@ -701,7 +710,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 <header>
   <div class="logo">
     <div class="logo-mark">A</div>
-    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.3.1</span></div></div>
+    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.5.0</span></div></div>
   </div>
   <div class="hd"></div>
   <div class="filters" id="filters">
@@ -1177,7 +1186,7 @@ function mailPath(id){return mailboxBase()+'/messages/'+id;}
 /* SoniaLog Channel (VOCAB.soniaChannel) → dashboard comm type. */
 const CHANNEL_TYPE={'whatsapp':'whatsapp','call':'call','email':'email','in person':'note'};
 /* Heuristic inbound markers, used only when no explicit Direction column exists. */
-const INBOUND_OUTCOMES=['info received','doc shared'];
+const INBOUND_OUTCOMES=['info received','doc shared','received','docs received','clarification received'];
 
 const appState={msalApp:null,token:null,user:null,isSonia:false};
 
@@ -1246,12 +1255,22 @@ async function buildClientsFromSharePoint(){
     if(c)matched++;else{unmatched++;
       c=byId[f.ClientID||f.ClientName||('log-'+it.id)]={id:f.ClientID||'',name:f.ClientName||'(unknown client)',status:'idle',_sp:null,flagged:false,flagReason:'',comms:[],contactName:'',phone:'',mail:'',outreachRequired:false,outreachReason:'',lastContactDate:'',lastContactOutcome:'',nextActionSummary:'',nextActionDue:'',dueDate:'',dataStatus:'',filingStatus:'',activeIssueCount:0,queueSummary:'',entity:'',applicability:'',constitution:'',serviceCategory:''};}
     const type=CHANNEL_TYPE[lc(f.Channel)]||'note';
-    let dir;
-    if(f.Direction)dir=lc(f.Direction).indexOf('in')===0?'in':'out';      // explicit column wins
-    else dir=INBOUND_OUTCOMES.indexOf(lc(f.OutcomeType))>=0?'in':'out';   // heuristic fallback
+    let dir;const dval=lc(f.Direction);
+    if(dval==='inbound'||dval==='outbound')dir=dval==='inbound'?'in':'out';  // explicit column wins
+    else dir=INBOUND_OUTCOMES.indexOf(lc(f.OutcomeType))>=0?'in':'out';      // legacy/Unknown heuristic
+    const mc=(f.MatchConfidence===0||f.MatchConfidence)?Number(f.MatchConfidence):null;
     c.comms.push({_sp:it.id,type:type,date:String(f.ContactDate||'').split('T')[0],dir:dir,
-      content:f.Outcome||f.NextAction||TL_[type]+' contact',read:spBool(f.SoniaRead),
+      content:f.Subject||f.Outcome||f.NextAction||TL_[type]+' contact',read:spBool(f.SoniaRead),
       outcome:f.Outcome||'',nextAction:f.NextAction||'',outcomeType:f.OutcomeType||'',
+      subject:f.Subject||'',preview:f.PreviewSnippet||'',
+      msgId:f.MessageId||null,convId:f.ConversationId||null,internetMsgId:f.InternetMessageId||null,
+      senderEmail:f.SenderEmail||'',recipientEmail:f.RecipientEmail||'',
+      matchConfidence:mc,matchMethod:f.MatchMethod||'',
+      resStatus:f.ResolutionStatus||'',resMethod:f.ResolutionMethod||'',resEvidence:f.ResolutionEvidence||'',
+      resCandIDs:f.ResolutionCandidateClientIDs||'',resCandNames:f.ResolutionCandidateClientNames||'',
+      resCandCount:(f.ResolutionCandidateCount===0||f.ResolutionCandidateCount)?Number(f.ResolutionCandidateCount):null,
+      resTokenClientID:f.ResolutionTokenClientID||'',resTokenStatus:f.ResolutionTokenStatus||'',
+      resTokenRaw:f.ResolutionTokenRaw||'',resConvUsed:spBool(f.ResolutionConversationUsed),
       docName:f.DocName||'',docUrl:f.DocUrl||'',loggedBy:f.LoggedBy||'',contactOwner:f.ContactOwner||'',
       nextActionDue:String(f.NextActionDue||'').split('T')[0],escalation:spBool(f.NeedsEscalation)});
     if(spBool(f.NeedsEscalation)){c.flagged=true;if(!c.flagReason)c.flagReason=f.Outcome||'Escalation flagged';}
@@ -1299,7 +1318,9 @@ function mergeTeamMail(clients,messages){
     const c=addrs.filter(Boolean).map(a=>byAddr[lc(a)]).find(Boolean);
     if(!c)return;
     const date=String((inbound?msg.receivedDateTime:msg.sentDateTime)||'').split('T')[0];
-    // skip mail we already logged to SoniaLog from the app (same day, same subject)
+    // prefer the persisted row: if SoniaLog already carries this Graph message id, skip the live copy
+    if(msg.id&&c.comms.some(m=>m.msgId&&m.msgId===msg.id))return;
+    // legacy fallback for rows without a stored id (same day, same subject)
     if(c.comms.some(m=>m.type==='email'&&m.date===date&&norm(m.content)===norm(msg.subject)))return;
     c.comms.push({_sp:null,_mail:{id:msg.id,conv:msg.conversationId,
         from:inbound?addrs[0]:TEAM_MAILBOX,fromName:inbound?(msg.from.emailAddress.name||''):'',
@@ -1530,7 +1551,7 @@ function makeOpenCard(c){
   const sheetHtml=sheets.map((m,i)=>{
     const isTop=i===sheets.length-1;
     const isU=!isRead(c.id,comms.indexOf(m));
-    return`<div class="sheet${isTop?' top':''}${isU?' unread-sheet':''}" style="background:${TC[m.type]};opacity:${.5+.5*(i/Math.max(sheets.length-1,1))}"></div>`;
+    return`<div class="sheet dir-${m.dir==='in'?'in':'out'}${isTop?' top':''}${isU?' unread-sheet':''}" style="background:${TC[m.type]};opacity:${.5+.5*(i/Math.max(sheets.length-1,1))}"></div>`;
   }).join('')||'<div class="sheet" style="background:var(--line2);opacity:.6"></div>';
   el.innerHTML=`${selectMode?`<div class="selchk">${SEL.has(c.id)?'✓':''}</div>`:''}<div class="sc-tray">
     <div class="sheets">${sheetHtml}</div>
@@ -1592,18 +1613,103 @@ function renderDeskFrame(){
   $('dhMarkAll').style.display=unreadCount?'':'none';
   renderContactCard(c);
 }
+/* ── inbound shared-email resolution: explainability + manual review ──
+   The backend now records HOW an inbound message was bucketed to a client
+   (ResolutionStatus/Method/Token/Candidates…). We surface that so operators
+   can see shared-email cases, trust auto-resolution, and re-assign the rare
+   ambiguous one instead of it being silently misfiled. */
+const RES_AMBIG=['manual_review','ambiguous','unresolved','invalid_token'];
+function resNeedsReview(m){return !!m&&RES_AMBIG.indexOf(lc(m.resStatus))>=0;}
+function hasResData(m){return !!(m&&(m.resStatus||m.resMethod||m.resCandCount!=null||m.resTokenClientID||m.resConvUsed||m.resEvidence||m.resCandIDs));}
+function resPill(label,bg,title){return `<span class="live-tag res-pill" style="background:${bg}"${title?` title="${esc(title)}"`:''}>${esc(label)}</span>`;}
+function resBadges(m){
+  if(!m)return '';
+  const out=[],mth=lc(m.resMethod);
+  if(m.resCandCount!=null&&m.resCandCount>1)out.push(resPill('Shared email','#8a5a00','Sender email maps to '+m.resCandCount+' clients'+(m.resCandNames?' — '+m.resCandNames:'')));
+  if(mth==='cid-subject'||mth==='cid-body')out.push(resPill('Resolved by CID','#1F6FEB','ClientID marker ('+mth+')'+(m.resTokenClientID?' → '+m.resTokenClientID:'')));
+  if(mth==='conversation-memory'||(m.resConvUsed&&mth!=='cid-subject'&&mth!=='cid-body'))out.push(resPill('Resolved by conversation','#6D5BD0','Matched via ConversationId thread memory'));
+  if(mth==='content-match')out.push(resPill('Content match','#0F8A6A','Resolved by body/subject evidence'));
+  if(resNeedsReview(m))out.push(resPill('Manual review needed','var(--red)',(m.resStatus||'ambiguous')+' — assign the correct client'));
+  return out.join('');
+}
+// pairs of [id,name] from the parallel comma-separated candidate columns
+function resCandidatePairs(m){
+  const ids=String(m.resCandIDs||'').split(/[,;]/).map(s=>s.trim()).filter(Boolean);
+  const names=String(m.resCandNames||'').split(/[,;]/).map(s=>s.trim());
+  return ids.map((id,i)=>[id,names[i]||(clientById(id)&&clientById(id).name)||'']);
+}
+function resolutionPanel(m){
+  if(!hasResData(m))return '';
+  const row=(lbl,val)=>val?`<div class="email-row"><span class="ef">${esc(lbl)}</span><span class="ev">${esc(val)}</span></div>`:'';
+  const badges=resBadges(m);
+  const tok=m.resTokenClientID?(m.resTokenClientID+(m.resTokenStatus?(' ('+m.resTokenStatus+')'):'')):(m.resTokenStatus&&m.resTokenStatus!=='absent'?m.resTokenStatus:'');
+  const candTxt=m.resCandCount!=null?(m.resCandCount+(m.resCandNames?' — '+m.resCandNames:(m.resCandIDs?' — '+m.resCandIDs:''))):'';
+  let chooser='';
+  if(resNeedsReview(m)){
+    const pairs=resCandidatePairs(m);
+    const btns=pairs.map(([id,nm])=>`<button class="act-b" data-action="reassign:${esc(id)}">${esc(id)}${nm?' — '+esc(nm):''}</button>`).join('');
+    chooser=`<div class="res-choose"><div class="next-lbl">Assign to client</div>
+      <div class="act-row" style="flex-wrap:wrap">${btns}<button class="act-b" style="border-color:var(--red);color:var(--red)" data-action="reassign-other">Other client…</button></div></div>`;
+  }
+  return `<div class="res-panel">
+    <div class="res-head">Inbound resolution${badges?' '+badges:''}</div>
+    <div class="email-meta">
+      ${row('Status',m.resStatus)}
+      ${row('Method',m.resMethod)}
+      ${row('CID token',tok)}
+      ${row('Candidates',candTxt)}
+      ${row('Conversation',m.resConvUsed?'Used thread memory':'')}
+      ${row('Evidence',m.resEvidence)}
+      ${row('Sender',m.senderEmail)}
+      ${row('ConversationId',m.convId)}
+      ${row('Token raw',m.resTokenRaw)}
+    </div>
+    ${chooser}
+  </div>`;
+}
+// which comm is on screen (comm modal takes priority over the desk rail)
+function activeComm(){
+  if($('cmOv').classList.contains('open'))return{c:cmClient,m:cmComms[cmIdx]};
+  return{c:deskClient,m:deskComms[deskIdx]};
+}
+async function reassignComm(targetId){
+  const {c,m}=activeComm();
+  targetId=String(targetId||'').trim();
+  if(!m||!targetId)return;
+  const target=clientById(targetId);
+  const name=target?target.name:targetId;
+  try{
+    if(appState.token&&m._sp){
+      const patch={ClientID:targetId,ClientName:name,ResolutionStatus:'resolved',ResolutionMethod:'manual-review'};
+      if(target&&target._sp)patch.RelatedClientTrackerId=String(target._sp);
+      await graphPatch(soniaPath(m._sp),patch);
+    }
+    m.resStatus='resolved';m.resMethod='manual-review';
+    if(target&&c&&target!==c){
+      const i=c.comms.indexOf(m);if(i>=0)c.comms.splice(i,1);
+      target.comms.push(m);target.comms.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+      rederive(c);rederive(target);
+    }
+    if($('cmOv').classList.contains('open'))closeCommModal();
+    if(deskClient)closeDesk();
+    refreshAfterWrite();
+    toast('✓ Assigned to '+name+demoSuffix());
+  }catch(e){toast('⚠ Reassign failed: '+(e.message||String(e)).slice(0,60));}
+}
 function renderDeskRail(){
   const c=deskClient;
   $('deskRail').innerHTML=deskComms.map((m,i)=>{
     const isU=!isRead(c.id,i);const isFlag=m.type==='flag';
-    return`<div class="slip${isU?' unread':''}${i===deskIdx?' active':''}" data-idx="${i}">
-      <div class="slip-bar" style="background:${TC[m.type]}"></div>
+    return`<div class="slip${isU?' unread':''}${i===deskIdx?' active':''}${resNeedsReview(m)?' needs-review':''}" data-idx="${i}">
+      <div class="slip-bar" style="background:${resNeedsReview(m)?'var(--red)':TC[m.type]}"></div>
       <div class="slip-inner">
         <div class="slip-row1">
           <span class="slip-type" style="color:${TC[m.type]}">${TL_[m.type]}</span>
           <div class="slip-meta">
             ${isU?'<div class="udot"></div>':''}
             ${m.live?'<span class="live-tag">OUTLOOK</span>':''}
+            ${m.matchConfidence!=null&&m.matchConfidence<80?`<span class="live-tag" style="background:var(--red)" title="Weak auto-match (${m.matchConfidence}%${m.matchMethod?' · '+esc(m.matchMethod):''}) — review the client link">⚠ ${m.matchConfidence}%</span>`:''}
+            ${resBadges(m)}
             ${!isFlag?`<span class="slip-dir ${m.dir}">${m.dir==='out'?'OUT':'IN'}</span>`:''}
             <span class="slip-date">${fmt(m.date)}</span>
           </div>
@@ -1709,6 +1815,7 @@ function buildCommBody(client,m){
     ?`<div class="next-lbl">Next action${m.nextActionDue?(' · due '+fmt(m.nextActionDue)):''}</div><div class="next-txt">${esc(m.nextAction)}</div>`:'';
   const extras=(otChip||docLink||nextRow)
     ?`<div class="comm-extras">${otChip}${docLink}${nextRow}</div>`:'';
+  const resP=resolutionPanel(m);
 
   if(m.type==='email'){
     const isIn=m.dir==='in';
@@ -1732,7 +1839,7 @@ function buildCommBody(client,m){
         <div class="call-notes-lbl" style="margin-top:14px">Reply as ${esc(TEAM_MAILBOX)}</div>
         <textarea class="reply-ta" placeholder="Type your reply — it sends from ${esc(TEAM_MAILBOX)} with the original quoted, and is logged automatically."></textarea>
         <div class="act-row"><button class="act-b reply-send" data-mailact="reply">↩ Send Reply</button></div>
-      </div>`:''}${extras}`;
+      </div>`:''}${extras}${resP}`;
     }
     return`<div class="email-wrap">
       <div class="email-meta">
@@ -1742,7 +1849,7 @@ function buildCommBody(client,m){
         <div class="email-row"><span class="ef">Logged</span><span class="ev">${esc(m.loggedBy||m.contactOwner||'—')}</span></div>
       </div>
       <div class="email-body">${text||'(no summary recorded)'}</div>
-    </div>${extras}`;
+    </div>${extras}${resP}`;
   }
   if(m.type==='whatsapp'){
     const isSent=m.dir==='out';
@@ -2126,7 +2233,7 @@ function toast(msg){const el=$('snack');el.textContent=msg;el.classList.add('sho
    tracker's outreach-summary fields, follow-ups, flags, and bulk operations.
    Field names mirror the hub exactly. Demo mode mutates the local model only. */
 const CH_POST={email:'Email',whatsapp:'WhatsApp',call:'Call',note:'In Person'};
-const OTYPE_LIST=['Info received','Follow-up needed','No response','Doc shared','Escalated','Other'];
+const OTYPE_LIST=['Sent','Received','Reached','No Response','Docs Requested','Docs Received','Clarification Requested','Clarification Received','Follow-up Scheduled','Escalated','Closed'];
 const CHIP_OUT=['Documents received','Partial documents received','No response — will retry','Client requested a callback','Client confirmed the details','Client asked for more time'];
 const CHIP_NEXT=[{t:'Send reminder'},{t:'Wait for documents'},{t:'Call client'},{t:'Follow up in 3 days',due:3},{t:'Follow up next week',due:7},{t:'Escalate to AR'}];
 function loggedByName(){return (appState.user&&(appState.user.name||appState.user.username))||'Sonia';}
@@ -2316,7 +2423,7 @@ function actWa(targets){
   const c=targets[0];
   if(!waPhone(c.phone)){toast('No phone number on file');return;}
   window.open(waUrl(c),'_blank');
-  openComposer(targets,{channel:'whatsapp',dir:'out',outcomeType:'Follow-up needed',outcome:'Sent WhatsApp reminder'});
+  openComposer(targets,{channel:'whatsapp',dir:'out',outcomeType:'Sent',outcome:'Sent WhatsApp reminder'});
 }
 function actCall(targets){
   if(targets.length!==1){toast('Calls are one file at a time');return;}
@@ -2388,7 +2495,9 @@ async function saveComposer(){
       let spId=null;
       if(appState.token){
         const fields={ClientID:c.id,ClientName:c.name,ContactDate:now,Channel:CH_POST[comp.channel],
+          Direction:comp.dir==='in'?'Inbound':'Outbound',SoniaRead:comp.dir!=='in',
           Outcome:out,NextAction:na,LoggedBy:loggedByName(),OutcomeType:ot,ContactOwner:'Sonia',NeedsEscalation:wantsEsc};
+        if(c._sp)fields.RelatedClientTrackerId=String(c._sp);
         if(due)fields.NextActionDue=due;
         const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});
         spId=r&&r.id;
@@ -2400,7 +2509,7 @@ async function saveComposer(){
       if(wantsEsc)patch.QCFlag=true;
       if(appState.token&&c._sp)await graphPatch(trackerPath(c),patch);
       // local model
-      c.comms.push({_sp:spId,type:comp.channel,date:today,dir:comp.dir,content:out||ot,read:true,
+      c.comms.push({_sp:spId,type:comp.channel,date:today,dir:comp.dir,content:out||ot,read:comp.dir!=='in',
         outcome:out,nextAction:na,outcomeType:ot,docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',
         nextActionDue:due,escalation:wantsEsc});
       c.lastContactDate=today;c.lastContactOutcome=patch.LastContactOutcome;
@@ -2452,7 +2561,7 @@ async function graphSendMail(to,subject,body){
     // couldn't even create the draft in team@ → nothing sent yet, safe to fall
     // back to the proven /me/sendMail + From=team@ path (no id capture there)
     if(isAuthErr(e)){
-      try{await graphPost('/me/sendMail',{message:msg,saveToSentItems:true});emSentVia=TEAM_MAILBOX;return {msgId:null,convId:null,viaFallback:true};}
+      try{await graphPost('/me/sendMail',{message:msg,saveToSentItems:true});emSentVia=TEAM_MAILBOX;return {msgId:null,convId:null,internetMsgId:null,viaFallback:true};}
       catch(e2){
         if(isAuthErr(e2))throw new Error('Cannot send as '+TEAM_MAILBOX+': the signed-in user needs Exchange "Send As" rights on '+TEAM_MAILBOX+' and the Entra app needs delegated Mail.Send.Shared. ('+e2.message+')');
         throw e2;
@@ -2469,7 +2578,7 @@ async function graphSendMail(to,subject,body){
     throw e;
   }
   emSentVia=TEAM_MAILBOX;
-  return {msgId:draft.id||null,convId:draft.conversationId||null,viaFallback:false};
+  return {msgId:draft.id||null,convId:draft.conversationId||null,internetMsgId:draft.internetMessageId||null,viaFallback:false};
 }
 function openEmail(targets){
   const raw=(targets||[]);
@@ -2633,17 +2742,36 @@ $('segEmAfter').addEventListener('click',e=>{
   emAfter=b.dataset.v;
   $('segEmAfter').querySelectorAll('.seg-b').forEach(x=>x.classList.toggle('on',x===b));
 });
+/* ── ClientID marker injection (shared-email disambiguation) ──
+   Every system-generated outbound email carries the client's id in two
+   places so an inbound reply from a shared sender address can be bucketed
+   back to the right client: ` [CID:<id>]` appended to the subject and a
+   plain `ClientRef: <id>` footer line near the end of the body.
+   Idempotent + self-correcting: any existing CID tag / ClientRef line is
+   stripped first, so re-sending or regenerating from a client record always
+   re-injects the CORRECT id rather than stacking duplicates. If the operator
+   deleted the marker on purpose it's simply re-applied for the matching
+   client — the only way to truly suppress it is to not have a ClientID. */
+function injectCID(subject,body,cid){
+  if(!cid)return {subject:String(subject||''),body:String(body||'')};
+  let s=String(subject||'').replace(/\s*\[CID:[^\]]*\]/gi,'').replace(/\s+$/,'');
+  s=s+' [CID:'+cid+']';
+  let b=String(body||'').replace(/(^|\n)[ \t]*ClientRef:[^\n]*(?=\n|$)/gi,'').replace(/\s+$/,'');
+  b=b+'\n\nClientRef: '+cid;
+  return {subject:s,body:b};
+}
 /* Send + log ONE client. Shared by single-send and the bulk queue, so both
    honour the team@-only path. Returns {msgId,convId,to}; throws on failure. */
 async function deliverEmail(c,ctx){
   const now=new Date().toISOString(),today=now.split('T')[0];
   const to=(ctx.toOverride||c.mail||'').trim();
-  const subj=personalize(ctx.subjT,c),body=personalize(ctx.bodyT,c);
+  const inj=injectCID(personalize(ctx.subjT,c),personalize(ctx.bodyT,c),c.id);
+  const subj=inj.subject,body=inj.body;
   const na=ctx.na||'',due=ctx.due||'',after=ctx.after||'';
-  let msgId=null,convId=null;
+  let msgId=null,convId=null,internetMsgId=null;
   // THE SEND. Only this may throw out of deliverEmail — so a retry never
   // re-sends an email that already went out (post-send logging is guarded).
-  if(appState.token){const ids=await graphSendMail(to,subj,body);msgId=ids.msgId||null;convId=ids.convId||null;}
+  if(appState.token){const ids=await graphSendMail(to,subj,body);msgId=ids.msgId||null;convId=ids.convId||null;internetMsgId=ids.internetMsgId||null;}
   // Mail is now sent. Logging/tracker writes must NOT propagate (a SoniaLog
   // hiccup must not trigger a resend) — record a warning instead.
   let spId=null,logWarn='';
@@ -2655,8 +2783,14 @@ async function deliverEmail(c,ctx){
     try{
       // log the full email; if the Outcome column rejects long text, retry with subject only
       const fields={ClientID:c.id,ClientName:c.name,ContactDate:now,Channel:'Email',
-        Outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,NextAction:na,LoggedBy:loggedByName(),
-        OutcomeType:'Follow-up needed',ContactOwner:'Sonia',NeedsEscalation:false};
+        Direction:'Outbound',SoniaRead:true,
+        Outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,Subject:subj,NextAction:na,LoggedBy:loggedByName(),
+        OutcomeType:'Sent',ContactOwner:'Sonia',NeedsEscalation:false,
+        SenderEmail:TEAM_MAILBOX,RecipientEmail:to,SourceMailbox:TEAM_MAILBOX};
+      if(c._sp)fields.RelatedClientTrackerId=String(c._sp);
+      if(msgId)fields.MessageId=msgId;
+      if(convId)fields.ConversationId=convId;
+      if(internetMsgId)fields.InternetMessageId=internetMsgId;
       if(due)fields.NextActionDue=due;
       try{const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
       catch(e){fields.Outcome='Email sent: '+subj;
@@ -2665,7 +2799,7 @@ async function deliverEmail(c,ctx){
     }catch(e){logWarn=e.message||String(e);console.warn('[outreach] sent OK but log/patch failed for',c.id,e);}
   }
   c.comms.push({_sp:spId,type:'email',date:today,dir:'out',content:subj,read:true,
-    outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,nextAction:na,outcomeType:'Follow-up needed',
+    outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,subject:subj,nextAction:na,outcomeType:'Sent',
     docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:due,escalation:false,
     msgId:msgId,convId:convId});
   c.lastContactDate=today;c.lastContactOutcome='Email sent: '+subj;
@@ -2707,7 +2841,7 @@ $('emFallback').addEventListener('click',()=>{
     :`mailto:?bcc=${encodeURIComponent(emTargets.map(c=>c.mail).join(','))}&subject=${encodeURIComponent(subj)}`;
   window.open(url,'_self');
   closeEmail();
-  openComposer(emTargets,{channel:'email',dir:'out',outcomeType:'Follow-up needed',outcome:single?'Sent data-request email':'Sent bulk reminder email ('+emTargets.length+' recipients)'});
+  openComposer(emTargets,{channel:'email',dir:'out',outcomeType:'Sent',outcome:single?'Sent data-request email':'Sent bulk reminder email ('+emTargets.length+' recipients)'});
 });
 
 /* ── BULK EMAIL: confirm → paced queue → live progress ─────────
@@ -2893,22 +3027,31 @@ async function sendMailReply(container,client,m,btn){
   btn.disabled=true;btn.textContent='Sending…';
   const now=new Date().toISOString(),today=now.split('T')[0];
   const subj='Re: '+String(m.content).replace(/^((re|fw|fwd):\s*)+/i,'');
+  // carry the ClientID footer so a reply from a shared sender address stays
+  // bucketable to this client (the /reply endpoint owns the subject, so the
+  // footer + ConversationId thread-memory are the disambiguators here)
+  const replyBody=client.id?(txt+'\n\nClientRef: '+client.id):txt;
   try{
-    await graphPost(mailPath(m._mail.id)+'/reply',{comment:txt.replace(/\n/g,'<br>')});
+    await graphPost(mailPath(m._mail.id)+'/reply',{comment:replyBody.replace(/\n/g,'<br>')});
     // log the reply + tracker summary
     let spId=null;
     try{
       const fields={ClientID:client.id,ClientName:client.name,ContactDate:now,Channel:'Email',
-        Outcome:'EMAIL REPLY — '+subj+'\nTo: '+m._mail.from+'\n\n'+txt,NextAction:'',
-        LoggedBy:loggedByName(),OutcomeType:'Follow-up needed',ContactOwner:'Sonia',NeedsEscalation:false};
+        Direction:'Outbound',SoniaRead:true,
+        Outcome:'EMAIL REPLY — '+subj+'\nTo: '+m._mail.from+'\n\n'+txt,Subject:subj,NextAction:'',
+        LoggedBy:loggedByName(),OutcomeType:'Sent',ContactOwner:'Sonia',NeedsEscalation:false,
+        SenderEmail:TEAM_MAILBOX,RecipientEmail:m._mail.from||'',SourceMailbox:TEAM_MAILBOX};
+      if(client._sp)fields.RelatedClientTrackerId=String(client._sp);
+      if(m._mail.conv)fields.ConversationId=m._mail.conv;
       try{const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
       catch(e){fields.Outcome='Email reply sent: '+subj;
         const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
       if(client._sp)await graphPatch(trackerPath(client),{LastContactDate:now,LastContactOutcome:'Replied: '+subj,LastUpdated:now});
     }catch(e){console.warn('[outreach] reply sent but logging failed:',e.message);}
     client.comms.push({_sp:spId,type:'email',date:today,dir:'out',content:subj,read:true,
-      outcome:'EMAIL REPLY — '+subj+'\n\n'+txt,nextAction:'',outcomeType:'Follow-up needed',
-      docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:'',escalation:false});
+      outcome:'EMAIL REPLY — '+subj+'\n\n'+txt,subject:subj,nextAction:'',outcomeType:'Sent',
+      docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:'',escalation:false,
+      convId:m._mail.conv||null});
     client.lastContactDate=today;client.lastContactOutcome='Replied: '+subj;
     rederive(client);
     // reading + answering it counts as read (Sonia only, mirrors to mailbox)
@@ -3013,6 +3156,12 @@ async function resolveFlag(c){
 }
 function doAct(a){
   if(a==='resolve-flag'&&deskClient){resolveFlag(deskClient);return;}
+  if(a.indexOf('reassign:')===0){reassignComm(a.slice(9));return;}
+  if(a==='reassign-other'){
+    const id=window.prompt('Assign this message to which ClientID?');
+    if(id&&id.trim())reassignComm(id.trim());
+    return;
+  }
   toast(a);
 }
 
