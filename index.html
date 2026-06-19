@@ -233,6 +233,10 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .udot{width:7px;height:7px;border-radius:50%;background:var(--wa);flex-shrink:0;box-shadow:0 0 0 2px rgba(31,168,85,.18);}
 .slip-txt{font-family:var(--body);font-size:.78rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
 .slip.unread .slip-txt{color:var(--ink2);font-weight:500;}
+.slip.slip-out{flex-direction:row-reverse;}
+.slip.slip-out .slip-row1{flex-direction:row-reverse;}
+.slip.slip-out .slip-txt{text-align:right;}
+.slip.slip-out:hover{transform:translateX(-2px);}
 
 /* the shadow shelf — recessed surface the comm rests on */
 .desk-shelf{display:flex;flex-direction:column;min-width:0;min-height:0;
@@ -255,6 +259,12 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .doc-dir.in{background:rgba(31,168,85,.12);color:var(--wa);}
 .doc-unread{font-family:var(--cond);font-size:.6rem;font-weight:700;color:var(--wa);letter-spacing:.5px;margin-top:4px;text-align:right;}
 .doc-body{padding:16px;}
+.shelf-doc.doc-in{border-top:none;border-left:4px solid var(--doccol,var(--ink));}
+.shelf-doc.doc-out{border-top:none;border-right:4px solid var(--doccol,var(--ink));}
+.doc-head .dh-right{text-align:right;}
+.shelf-doc.doc-out .doc-head{flex-direction:row-reverse;}
+.shelf-doc.doc-out .doc-type,.shelf-doc.doc-out .doc-date{text-align:right;}
+.shelf-doc.doc-out .doc-head .dh-right{text-align:left;}
 
 /* shelf footer — predictable controls */
 .shelf-foot{flex-shrink:0;background:var(--surface);border-top:1px solid var(--line);
@@ -323,6 +333,11 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .cm-modal{background:var(--surface);border-radius:3px;width:min(540px,92vw);max-height:82vh;display:flex;flex-direction:column;
   overflow:hidden;box-shadow:var(--sh3);animation:deskRise .18s var(--ease);border-top:3px solid var(--doccol,var(--ink));}
 .cm-head{padding:13px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;border-bottom:1px solid var(--line);}
+.cm-modal.cm-in{border-top:none;border-left:4px solid var(--doccol,var(--ink));}
+.cm-modal.cm-out{border-top:none;border-right:4px solid var(--doccol,var(--ink));}
+.cm-modal.cm-out .cm-head{flex-direction:row-reverse;}
+.cm-modal.cm-out .cm-head-l{align-items:flex-end;}
+.cm-modal.cm-out .cm-type-lbl,.cm-modal.cm-out .cm-client{text-align:right;}
 .cm-head-l{display:flex;flex-direction:column;gap:2px;}
 .cm-type-lbl{font-family:var(--cond);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
 .cm-client{font-family:var(--cond);font-size:1.05rem;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.4px;}
@@ -623,6 +638,25 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .tag-status.ok{color:var(--green);}
 .tag-status.err{color:var(--red-dk);}
 .tag-status.warn{color:var(--amber);}
+/* WYSIWYG rich-text editor (sends HTML); {tags} coloured in place, screen-only */
+.rt-wrap{border:1px solid var(--line2);border-radius:4px;overflow:hidden;background:var(--surface);}
+.rt-wrap:focus-within{border-color:var(--red);}
+.rt-ribbon{display:flex;align-items:center;gap:8px;padding:5px 7px;border-bottom:1px solid var(--line);background:#F6F6F7;}
+.rt-toggle{flex:none;width:28px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line2);background:var(--surface);border-radius:3px;cursor:pointer;color:var(--mut);font-size:.82rem;line-height:1;}
+.rt-toggle:hover{color:var(--ink);border-color:#c7c7c7;}
+.rt-ribbon.collapsed .rt-toggle{background:none;border-color:transparent;color:var(--mut2);}
+.rt-ribbon.collapsed .rt-tools{display:none;}
+.rt-tools{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;}
+.rt-grp{display:inline-flex;align-items:center;gap:2px;padding-right:8px;border-right:1px solid var(--line);}
+.rt-b{width:28px;height:26px;border:1px solid transparent;background:none;border-radius:3px;cursor:pointer;font-size:.95rem;color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;font-family:Georgia,'Times New Roman',serif;line-height:1;}
+.rt-b svg,.rt-b svg text{fill:currentColor;}
+.rt-b:hover{background:#E9E9EC;color:var(--ink);}
+.rt-b:active{background:#dcdce0;}
+.rt-ribbon .rt-font{flex:none;width:150px;height:26px;font-family:var(--body);font-size:.8rem;border:1px solid var(--line2);border-radius:3px;padding:0 6px;background:var(--surface);color:var(--ink);cursor:pointer;}
+.rt-editor{min-height:300px;max-height:46vh;overflow-y:auto;padding:11px 13px;font-family:var(--body);font-size:.9rem;line-height:1.5;color:var(--ink);outline:none;}
+.rt-editor ul,.rt-editor ol{margin:6px 0 6px 22px;}
+.em-tag{font-weight:700;}
+.em-zone{border-radius:2px;}
 /* terminal-style value prompter (shows while caret is inside a tag) */
 .tag-suggest{display:none;flex-wrap:wrap;align-items:center;gap:5px;margin:2px 0 6px;padding:7px 9px;background:#1f1c1d;border-radius:3px;border-left:3px solid var(--red);}
 .tag-suggest .ts-lbl{font-family:var(--cond);font-size:.6rem;font-weight:700;color:var(--mut2);letter-spacing:.6px;text-transform:uppercase;margin-right:2px;}
@@ -710,7 +744,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 <header>
   <div class="logo">
     <div class="logo-mark">A</div>
-    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.5.0</span></div></div>
+    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.6.0</span></div></div>
   </div>
   <div class="hd"></div>
   <div class="filters" id="filters">
@@ -942,9 +976,31 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
       <div class="cf-lbl">Subject</div>
       <input type="text" id="emSubj" autocomplete="off">
       <div class="cf-lbl">Message <span class="em-hint">— {name}/{first} personalised per recipient</span></div>
-      <div class="ta-wrap"><div class="ta-hl" id="emBodyHL" aria-hidden="true"></div><textarea id="emBody" style="min-height:238px" spellcheck="true"></textarea></div>
+      <div class="rt-wrap">
+        <div class="rt-ribbon" id="emRibbon">
+          <button type="button" class="rt-toggle" id="emRibbonToggle" title="Show / hide formatting">✎</button>
+          <div class="rt-tools" id="emRibbonTools">
+            <div class="rt-grp">
+              <button type="button" class="rt-b" data-rt="bold" title="Bold"><b>B</b></button>
+              <button type="button" class="rt-b" data-rt="italic" title="Italic"><i>I</i></button>
+              <button type="button" class="rt-b" data-rt="underline" title="Underline"><span style="text-decoration:underline">U</span></button>
+            </div>
+            <div class="rt-grp">
+              <button type="button" class="rt-b" data-rt="insertUnorderedList" title="Bulleted list"><svg viewBox="0 0 16 16" width="15" height="15"><circle cx="2.6" cy="4" r="1.4"/><circle cx="2.6" cy="8" r="1.4"/><circle cx="2.6" cy="12" r="1.4"/><rect x="6" y="3.2" width="8.5" height="1.6" rx=".6"/><rect x="6" y="7.2" width="8.5" height="1.6" rx=".6"/><rect x="6" y="11.2" width="8.5" height="1.6" rx=".6"/></svg></button>
+              <button type="button" class="rt-b" data-rt="insertOrderedList" title="Numbered list"><svg viewBox="0 0 16 16" width="15" height="15"><rect x="6" y="3.2" width="8.5" height="1.6" rx=".6"/><rect x="6" y="7.2" width="8.5" height="1.6" rx=".6"/><rect x="6" y="11.2" width="8.5" height="1.6" rx=".6"/><text x="0" y="5.7" font-size="5.6" font-family="sans-serif" font-weight="700">1</text><text x="0" y="9.7" font-size="5.6" font-family="sans-serif" font-weight="700">2</text><text x="0" y="13.7" font-size="5.6" font-family="sans-serif" font-weight="700">3</text></svg></button>
+            </div>
+            <select class="rt-font" id="emFont" title="Font">
+              <option value="">Default font</option>
+              <option value="Futura BT">Futura BT</option>
+              <option value="Arial">Arial</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Courier New">Courier</option>
+            </select>
+          </div>
+        </div>
+        <div id="emBody" class="rt-editor" contenteditable="true" spellcheck="true"></div>
+      </div>
       <div class="tag-chips" id="emTagChips"></div>
-      <div class="tag-suggest" id="emTagSuggest"></div>
       <div class="tag-status" id="emTagStatus"></div>
       <div class="cf-lbl">Log with — next action &amp; follow-up date</div>
       <div class="cf-row">
@@ -1700,7 +1756,7 @@ function renderDeskRail(){
   const c=deskClient;
   $('deskRail').innerHTML=deskComms.map((m,i)=>{
     const isU=!isRead(c.id,i);const isFlag=m.type==='flag';
-    return`<div class="slip${isU?' unread':''}${i===deskIdx?' active':''}${resNeedsReview(m)?' needs-review':''}" data-idx="${i}">
+    return`<div class="slip${isU?' unread':''}${i===deskIdx?' active':''}${resNeedsReview(m)?' needs-review':''}${!isFlag&&m.dir==='out'?' slip-out':''}" data-idx="${i}">
       <div class="slip-bar" style="background:${resNeedsReview(m)?'var(--red)':TC[m.type]}"></div>
       <div class="slip-inner">
         <div class="slip-row1">
@@ -1746,13 +1802,13 @@ function selectSlip(idx){
   // render the document on the shelf
   const isFlag=m.type==='flag';const read=isRead(c.id,idx);
   const surf=$('shelfSurface');
-  surf.innerHTML=`<div class="shelf-doc" style="--doccol:${TC[m.type]}">
+  surf.innerHTML=`<div class="shelf-doc${!isFlag&&m.dir==='out'?' doc-out':(!isFlag?' doc-in':'')}" style="--doccol:${TC[m.type]}">
     <div class="doc-head">
       <div>
         <div class="doc-type" style="color:${TC[m.type]}">${TL_[m.type]}</div>
         <div class="doc-date">${fmt(m.date)}, 2026</div>
       </div>
-      <div style="text-align:right;">
+      <div class="dh-right">
         ${!isFlag?`<div class="doc-dir ${m.dir}">${m.dir==='out'?'SENT':'RECEIVED'}</div>`:''}
         ${!read?'<div class="doc-unread">● UNREAD</div>':''}
       </div>
@@ -1895,6 +1951,9 @@ function renderCommModal(){
   if(!cmClient||!cmComms.length)return;
   const m=cmComms[cmIdx];
   $('cmModal').style.setProperty('--doccol',TC[m.type]);
+  const cmFlag=m.type==='flag';
+  $('cmModal').classList.remove('cm-out','cm-in');
+  if(!cmFlag)$('cmModal').classList.add(m.dir==='out'?'cm-out':'cm-in');
   $('cmType').innerHTML=`<span style="color:${TC[m.type]}">${TL_[m.type]}</span>`;
   $('cmClient').textContent=cmClient.name;
   $('cmCounter').textContent=`${cmIdx+1}/${cmComms.length}`;
@@ -2307,7 +2366,7 @@ const WA_TPL=c=>`Hello ${firstNameOf(c)}, this is Sonia from Acutant. A gentle r
    {Field:Value|Value2}…{/Field} keeps the enclosed text only when the
    client's Field equals any listed value (case-insensitive, multi-word
    safe via | separator). Tags are ALWAYS stripped from the sent mail, so
-   nothing leaks. Highlighting (markupTemplate) is screen-only. Field keys
+   nothing leaks. Tag colouring (decorateTags) is screen-only. Field keys
    and their allowed values mirror the hub's ITR_ClientTracker vocab. */
 const TAG_VOCAB={
   entity:{label:'Entity',get:c=>c.entity,vals:['AC','ASI']},
@@ -2354,30 +2413,6 @@ function hexA(hex,a){const n=parseInt(hex.replace('#',''),16);return 'rgba('+((n
 /* values (|-split) of a known field that aren't in its vocab — soft warning. */
 function tagBadValues(key,value){const f=TAG_VOCAB[key];if(!f)return[];const set=f.vals.map(v=>v.toLowerCase());
   return String(value||'').split('|').map(s=>s.trim()).filter(Boolean).filter(v=>set.indexOf(v.toLowerCase())<0);}
-function markupTemplate(text){
-  const toks=tagTokens(text),stack=[];
-  toks.forEach(t=>{
-    if(t.type==='open'){t.bad=!TAG_VOCAB[t.key];t.warn=!t.bad&&tagBadValues(t.key,t.value).length>0;stack.push(t);}
-    else{let idx=-1;for(let k=stack.length-1;k>=0;k--){if(stack[k].key===t.key){idx=k;break;}}
-      if(idx>=0){t.match=stack.splice(idx,1)[0];t.match.match=t;}else t.stray=true;}
-  });
-  stack.forEach(o=>o.unclosed=true);
-  const E=s=>String(s).replace(/[&<>]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
-  let html='',pos=0;const open=[];
-  for(const t of toks){
-    const lit=E(text.slice(pos,t.i));pos=t.j;
-    const c=open.length?(TAG_COLORS[open[open.length-1].key]||'#888'):null;
-    html+=c?'<span class="hlz" style="background:'+hexA(c,.16)+'">'+lit+'</span>':lit;
-    const err=t.bad||t.stray||t.unclosed,col=TAG_COLORS[t.key]||'#888';
-    const cls='hltag'+(err?' hlerr':(t.warn?' hlwarn':'')),style=(err||t.warn)?'':' style="background:'+hexA(col,.32)+'"';
-    html+='<span class="'+cls+'"'+style+'>'+E(t.raw)+'</span>';
-    if(t.type==='open'&&!t.unclosed&&!t.bad)open.push(t);
-    else if(t.type==='close'&&t.match){const k=open.indexOf(t.match);if(k>=0)open.splice(k,1);}
-  }
-  html+=E(text.slice(pos));
-  if(/\n$/.test(text))html+=' ';
-  return html;
-}
 function templateStatus(text){
   const toks=tagTokens(text),stack=[],errs=[],warns=[],fields=new Set();let pairs=0;
   toks.forEach(t=>{
@@ -2393,9 +2428,9 @@ function templateStatus(text){
 }
 /* Resolved preview HTML for one client — kept conditional regions get a faint
    per-field tint + left border so the user sees which text is conditional. */
-function previewHTML(text,c){
+function previewHTML(text,c,isHtml){
   const toks=tagTokens(text);
-  const E=s=>esc(s).replace(/\{name\}/g,esc(c.name)).replace(/\{first\}/g,esc(firstNameOf(c)));
+  const E=s=>(isHtml?String(s):esc(s)).replace(/\{name\}/g,esc(c.name)).replace(/\{first\}/g,esc(firstNameOf(c)));
   if(!toks.length)return E(text);
   let html='',pos=0;const stack=[];
   const keep=()=>stack.every(f=>f.active);
@@ -2546,15 +2581,15 @@ const isAuthErr=e=>/403|404|ErrorAccessDenied|ErrorItemNotFound|Authorization_Re
 const isTransient=e=>/\b(429|500|502|503|504)\b|TooManyRequests|ServiceUnavailable|Failed to fetch|NetworkError|timeout/i.test(e&&e.message||'');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const PERM_MSG='<strong>Sending as '+esc(TEAM_MAILBOX)+' is not enabled yet.</strong> All mail goes out from the team mailbox — never your personal account. The Entra app needs delegated <strong>Mail.Send.Shared</strong> (admin-consented), plus Exchange <em>Send As</em> rights on '+esc(TEAM_MAILBOX)+'. Until then, use <em>Open in Mail App Instead</em> below.';
-function emMsg(to,subject,body){
+function emMsg(to,subject,body,isHtml){
   // From/Sender pinned to the team mailbox so the message is sent AS team@.
-  return {subject:subject,body:{contentType:'Text',content:body},
+  return {subject:subject,body:{contentType:isHtml?'HTML':'Text',content:body},
     from:{emailAddress:{address:TEAM_MAILBOX}},
     sender:{emailAddress:{address:TEAM_MAILBOX}},
     toRecipients:[{emailAddress:{address:to}}]};
 }
-async function graphSendMail(to,subject,body){
-  const msg=emMsg(to,subject,body);
+async function graphSendMail(to,subject,body,isHtml){
+  const msg=emMsg(to,subject,body,isHtml);
   let draft=null;
   try{draft=await graphPost(mailboxBase()+'/messages',msg);}
   catch(e){
@@ -2591,8 +2626,8 @@ function openEmail(targets){
   $('emTo').value=single?c.mail:t.map(x=>x.mail).join('; ');
   $('emTo').disabled=!single;
   $('emSubj').value=MAIL_SUBJ;
-  $('emBody').value=MAIL_BODY;
-  empIdx=0;syncTagHL();
+  $('emBody').innerHTML=textToHtml(MAIL_BODY);
+  empIdx=0;emRefresh();
   $('emNext').value='Wait for documents';$('emDue').value='';
   emAfter='pending';
   $('segEmAfter').querySelectorAll('.seg-b').forEach(b=>b.classList.toggle('on',b.dataset.v===emAfter));
@@ -2606,29 +2641,88 @@ function closeEmail(){$('emOv').classList.remove('open');}
    Live backdrop highlight + a chip per taggable field that wraps the
    current selection in {Field:Value}…{/Field}. Highlight never leaves
    the screen — the sent body comes from personalize()/resolveSections(). */
+/* Rich-text editor helpers. The editor holds HTML; literal {template tags}
+   are wrapped in display-only <span class="em-tag"> for colour. emBodyHtml()
+   returns the clean template HTML (tag-spans unwrapped) for send/preview;
+   emBodyText() returns plain text (with the {tags} intact) for logging,
+   validation and tag detection. */
+function textToHtml(t){return esc(String(t||'')).replace(/\n/g,'<br>');}
+function emBodyHtml(){const ed=$('emBody');if(!ed)return'';const clone=ed.cloneNode(true);
+  clone.querySelectorAll('span.em-tag').forEach(s=>s.replaceWith(document.createTextNode(s.textContent)));
+  return clone.innerHTML;}
+function emBodyText(){const ed=$('emBody');return ed?ed.innerText:'';}
+function _caretOffset(ed){const sel=window.getSelection();if(!sel.rangeCount||!ed.contains(sel.anchorNode))return -1;
+  const r=sel.getRangeAt(0).cloneRange();r.selectNodeContents(ed);r.setEnd(sel.anchorNode,sel.anchorOffset);return r.toString().length;}
+function _setCaret(ed,off){const w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT,null);let n,acc=0;
+  while((n=w.nextNode())){const len=n.nodeValue.length;if(acc+len>=off){const r=document.createRange();r.setStart(n,Math.max(0,off-acc));r.collapse(true);const s=window.getSelection();s.removeAllRanges();s.addRange(r);return;}acc+=len;}
+  const r=document.createRange();r.selectNodeContents(ed);r.collapse(false);const s=window.getSelection();s.removeAllRanges();s.addRange(r);}
+/* Re-colour {tags} per field colour AND faintly tint the text inside each
+   open conditional block, so the user can see a block's boundaries. Display-
+   only — stripped before send. A single document-order pass tracks the open
+   conditional stack across text nodes; we only wrap text WITHIN a node (never
+   across element boundaries) so it never breaks the user's inline formatting.
+   Caret is preserved by character offset (decoration adds no characters). */
+const EM_TAG_RE=/\{(\/?)([A-Za-z][A-Za-z ]*?)(?::([^{}]*))?\}/g;
+function decorateTags(){
+  const ed=$('emBody');if(!ed)return;const off=_caretOffset(ed);
+  ed.querySelectorAll('span.em-tag,span.em-zone').forEach(s=>s.replaceWith(...s.childNodes));ed.normalize();
+  const w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT,null),nodes=[];let n;
+  while((n=w.nextNode()))nodes.push(n);
+  const stack=[]; // open conditional blocks: {key,color}
+  const zoneSpan=s=>{const z=document.createElement('span');z.className='em-zone';z.style.background=hexA(stack[stack.length-1].color,.13);z.textContent=s;return z;};
+  nodes.forEach(node=>{
+    const text=node.nodeValue;EM_TAG_RE.lastIndex=0;
+    let mm,last=0,any=false;const frag=document.createDocumentFragment();
+    const plain=s=>{if(!s)return;frag.appendChild(stack.length?zoneSpan(s):document.createTextNode(s));};
+    while((mm=EM_TAG_RE.exec(text))){
+      any=true;plain(text.slice(last,mm.index));
+      const isClose=mm[1]==='/',key=tagKey(mm[2]),f=TAG_VOCAB[key],col=TAG_COLORS[key]||'#1F6FEB';
+      const ts=document.createElement('span');ts.className='em-tag';ts.style.color=col;ts.textContent=mm[0];frag.appendChild(ts);
+      if(isClose){for(let k=stack.length-1;k>=0;k--){if(stack[k].key===key){stack.splice(k,1);break;}}}
+      else if(f)stack.push({key:key,color:col});
+      last=mm.index+mm[0].length;
+    }
+    plain(text.slice(last));
+    if(any)node.replaceWith(frag);
+    else if(stack.length)node.replaceWith(zoneSpan(text));
+  });
+  if(off>=0)_setCaret(ed,off);
+}
+/* Template status line (errs/warns/valid count) — same logic as old syncTagHL,
+   now driven by the editor's plain text. */
+function updateTplStatus(){const el=$('emTagStatus');if(!el)return;const st=templateStatus(emBodyText());
+  if(st.errs.length){el.className='tag-status err';el.textContent='⚠ '+st.errs.concat(st.warns).join(' · ');}
+  else if(st.warns.length){el.className='tag-status warn';el.textContent='⚠ '+st.warns.join(' · ')+' — section won’t match anyone';}
+  else if(st.pairs){el.className='tag-status ok';el.textContent='✓ '+st.pairs+' valid section'+(st.pairs>1?'s':'')+(st.fields.length?' · '+st.fields.join(', '):'')+' · coloured on-screen only';}
+  else{el.className='tag-status';el.textContent='Wrap text in a field below so it only sends to matching clients.';}}
+function emRefresh(){decorateTags();updateTplStatus();if($('emCard').classList.contains('expanded'))renderPreview();}
 function buildTagChips(){
   const box=$('emTagChips');if(!box)return;
   box.innerHTML=Object.keys(TAG_VOCAB).map(k=>'<button type="button" class="tag-chip" data-tag="'+k+'"><span class="dot" style="background:'+(TAG_COLORS[k]||'#888')+'"></span>'+esc(TAG_VOCAB[k].label)+'</button>').join('');
 }
+/* Wrap the current selection in {Field:value}…{/Field}, preserving any inline
+   formatting inside it. With nothing selected, drop an empty block with a "…"
+   placeholder at the caret. The chip uses mousedown+preventDefault so the
+   editor keeps its selection by the time we read it. */
 function insertTag(key){
-  const ta=$('emBody'),f=TAG_VOCAB[key];if(!ta||!f)return;
-  const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value,sel=v.slice(s,e)||'…';
+  const ed=$('emBody'),f=TAG_VOCAB[key];if(!ed||!f)return;
   const open='{'+f.label+':'+(f.vals[0]||'VALUE')+'}',close='{/'+f.label+'}';
-  ta.value=v.slice(0,s)+open+sel+close+v.slice(e);
-  const caret=s+open.length;ta.focus();ta.setSelectionRange(caret,caret+sel.length);
-  syncTagHL();
-}
-function syncTagHL(){
-  const ta=$('emBody'),hl=$('emBodyHL');if(!ta)return;
-  if(hl){hl.innerHTML=markupTemplate(ta.value);hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft;}
-  const st=templateStatus(ta.value),el=$('emTagStatus');
-  if(el){
-    if(st.errs.length){el.className='tag-status err';el.textContent='⚠ '+st.errs.concat(st.warns).join(' · ');}
-    else if(st.warns.length){el.className='tag-status warn';el.textContent='⚠ '+st.warns.join(' · ')+' — section won’t match anyone';}
-    else if(st.pairs){el.className='tag-status ok';el.textContent='✓ '+st.pairs+' valid section'+(st.pairs>1?'s':'')+(st.fields.length?' · '+st.fields.join(', '):'')+' · shaded on-screen only';}
-    else{el.className='tag-status';el.textContent='Wrap text in a field below so it only sends to matching clients.';}
+  const sel=window.getSelection();
+  if(sel.rangeCount&&ed.contains(sel.anchorNode)&&ed.contains(sel.focusNode)&&!sel.isCollapsed){
+    const range=sel.getRangeAt(0),inner=range.extractContents();
+    const out=document.createDocumentFragment();
+    out.appendChild(document.createTextNode(open));
+    out.appendChild(inner);
+    const closeNode=document.createTextNode(close);
+    out.appendChild(closeNode);
+    range.insertNode(out);
+    const r2=document.createRange();r2.setStartAfter(closeNode);r2.collapse(true);
+    sel.removeAllRanges();sel.addRange(r2);
+  }else{
+    ed.focus();
+    document.execCommand('insertText',false,open+'…'+close);
   }
-  if($('emCard').classList.contains('expanded'))renderPreview();
+  emRefresh();
 }
 /* ── side-by-side per-recipient preview ─────────────────────────
    Steps through the eligible recipients (emTargets) and renders the
@@ -2650,7 +2744,7 @@ function renderPreview(){
   $('empIdx').textContent=(empIdx+1)+' / '+n+(c.id?(' · '+c.id):'');
   $('empPrev').disabled=$('empNext').disabled=(n<2);
   // show the client's values for whichever fields the template references
-  const subjT=$('emSubj').value,bodyT=$('emBody').value;
+  const subjT=$('emSubj').value,bodyT=emBodyText(),bodyHtmlT=emBodyHtml();
   const usedKeys=[...new Set(tagTokens(subjT+'\n'+bodyT).filter(t=>t.type==='open'&&TAG_VOCAB[t.key]).map(t=>t.key))];
   $('empFields').innerHTML=usedKeys.length?usedKeys.map(k=>{const f=TAG_VOCAB[k],v=f.get(c)||'—',col=TAG_COLORS[k]||'#888';
     return '<span class="emp-f'+(f.get(c)?'':' muted')+'" style="background:'+col+'">'+esc(f.label)+': '+esc(v)+'</span>';}).join(''):'<span class="emp-f muted" style="background:#bbb">No conditional fields used</span>';
@@ -2663,80 +2757,20 @@ function renderPreview(){
   });
   $('empSections').innerHTML=secRows.length?('<div class="emp-sec-h">Conditional sections for this recipient</div>'+secRows.join('')):'';
   $('empSubj').textContent=personalize(subjT,c)||'(no subject)';
-  $('empBody').innerHTML=previewHTML(bodyT,c)||'<span class="emp-empty">(empty)</span>';
+  $('empBody').innerHTML=previewHTML(bodyHtmlT,c,true)||'<span class="emp-empty">(empty)</span>';
 }
 buildTagChips();
-$('emTagChips').addEventListener('click',e=>{const b=e.target.closest('.tag-chip');if(b)insertTag(b.dataset.tag);});
-$('emBody').addEventListener('input',syncTagHL);
-$('emBody').addEventListener('scroll',()=>{const ta=$('emBody'),hl=$('emBodyHL');if(hl){hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft;}});
+let _emDeco;
+$('emTagChips').addEventListener('mousedown',e=>{const b=e.target.closest('.tag-chip');if(b){e.preventDefault();insertTag(b.dataset.tag);}});
+$('emBody').addEventListener('input',()=>{clearTimeout(_emDeco);_emDeco=setTimeout(emRefresh,180);});
+$('emBody').addEventListener('blur',emRefresh);
 $('emSubj').addEventListener('input',()=>{if($('emCard').classList.contains('expanded'))renderPreview();});
 $('emExpand').addEventListener('click',()=>setExpanded(!$('emCard').classList.contains('expanded')));
 $('empPrev').addEventListener('click',()=>empNav(-1));
 $('empNext').addEventListener('click',()=>empNav(1));
-/* ── tag value/field prompter (terminal-style completion) ──────
-   When the caret is inside an open {Field:…} tag, suggest the field's
-   allowed values (or field names before the colon), narrowing as you type.
-   Click or Tab to accept; Esc dismisses without closing the modal. */
-let tagSuggestCtx=null;
-function tagCaretContext(ta){
-  const pos=ta.selectionStart,val=ta.value,open=val.lastIndexOf('{',pos-1);
-  if(open<0)return null;
-  const between=val.slice(open+1,pos);
-  if(between.indexOf('}')>=0||between.indexOf('{')>=0||between[0]==='/')return null;
-  const ci=between.indexOf(':');
-  if(ci<0)return {mode:'field',frag:between,open,pos};
-  const valuePart=between.slice(ci+1),lastBar=valuePart.lastIndexOf('|');
-  return {mode:'value',key:tagKey(between.slice(0,ci)),frag:valuePart.slice(lastBar+1),open,colonAbs:open+1+ci,pos};
-}
-function updateTagSuggest(){
-  const ta=$('emBody'),box=$('emTagSuggest');if(!ta||!box)return;
-  const ctx=tagCaretContext(ta);tagSuggestCtx=ctx;
-  const hide=()=>{box.style.display='none';box.innerHTML='';};
-  if(!ctx)return hide();
-  let title,items;
-  const fr=ctx.frag.trim().toLowerCase();
-  if(ctx.mode==='field'){
-    title='Field:';
-    items=Object.keys(TAG_VOCAB).map(k=>TAG_VOCAB[k]).filter(f=>!fr||f.label.toLowerCase().indexOf(fr)>=0).map(f=>({val:f.label,color:TAG_COLORS[tagKey(f.label)]}));
-  }else{
-    const f=TAG_VOCAB[ctx.key];if(!f)return hide();
-    title=f.label+' values:';
-    items=f.vals.filter(v=>!fr||v.toLowerCase().indexOf(fr)>=0).map(v=>({val:v,color:TAG_COLORS[ctx.key]}));
-  }
-  if(!items.length||(items.length===1&&items[0].val.toLowerCase()===fr))return hide();
-  box.style.display='flex';
-  box.innerHTML='<span class="ts-lbl">'+esc(title)+'</span>'+items.map((it,i)=>'<button type="button" class="ts-chip'+(i===0?' ts-first':'')+'" data-v="'+esc(it.val)+'"><span class="dot" style="background:'+(it.color||'#888')+'"></span>'+esc(it.val)+'</button>').join('')+'<span class="ts-hint">Tab ↹ accepts first</span>';
-}
-function applyTagSuggest(v){
-  const ta=$('emBody'),ctx=tagSuggestCtx;if(!ctx)return;
-  const val=ta.value;
-  // forward edge of the editable region inside this tag (stop at } { or newline)
-  let end=ctx.pos;while(end<val.length&&val[end]!=='}'&&val[end]!=='{'&&val[end]!=='\n')end++;
-  let segStart,segEnd,insert;
-  if(ctx.mode==='field'){
-    segStart=ctx.open+1;
-    let colon=val.indexOf(':',segStart);if(colon<0||colon>end)colon=end;
-    segEnd=colon;insert=v+(val[colon]===':'?'':':'); // replace field name, keep any :value
-  }else{
-    // replace the WHOLE |-segment around the caret (so a selected/partial value
-    // is overwritten, not appended)
-    const valStart=ctx.colonAbs+1,prevBar=val.lastIndexOf('|',ctx.pos-1);
-    segStart=(prevBar>=valStart)?prevBar+1:valStart;
-    const nextBar=val.indexOf('|',ctx.pos);
-    segEnd=(nextBar>=0&&nextBar<end)?nextBar:end;
-    insert=v;
-  }
-  ta.value=val.slice(0,segStart)+insert+val.slice(segEnd);
-  const caret=segStart+insert.length;ta.focus();ta.setSelectionRange(caret,caret);
-  syncTagHL();updateTagSuggest();
-}
-$('emTagSuggest').addEventListener('mousedown',e=>{const b=e.target.closest('.ts-chip');if(b){e.preventDefault();applyTagSuggest(b.dataset.v);}});
-['input','keyup','click','select'].forEach(ev=>$('emBody').addEventListener(ev,updateTagSuggest));
-$('emBody').addEventListener('keydown',e=>{
-  const box=$('emTagSuggest');if(box.style.display==='none'||!box.innerHTML)return;
-  if(e.key==='Tab'){const first=box.querySelector('.ts-chip');if(first){e.preventDefault();applyTagSuggest(first.dataset.v);}}
-  else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();box.style.display='none';box.innerHTML='';}
-});
+$('emRibbonToggle').addEventListener('click',()=>$('emRibbon').classList.toggle('collapsed'));
+$('emRibbonTools').addEventListener('mousedown',e=>{const b=e.target.closest('[data-rt]');if(!b)return;e.preventDefault();$('emBody').focus();document.execCommand(b.dataset.rt,false,null);emRefresh();});
+$('emFont').addEventListener('change',e=>{$('emBody').focus();if(e.target.value)document.execCommand('fontName',false,e.target.value);e.target.selectedIndex=0;});
 $('segEmAfter').addEventListener('click',e=>{
   const b=e.target.closest('.seg-b');if(!b)return;
   emAfter=b.dataset.v;
@@ -2752,12 +2786,13 @@ $('segEmAfter').addEventListener('click',e=>{
    re-injects the CORRECT id rather than stacking duplicates. If the operator
    deleted the marker on purpose it's simply re-applied for the matching
    client — the only way to truly suppress it is to not have a ClientID. */
-function injectCID(subject,body,cid){
+function injectCID(subject,body,cid,isHtml){
   if(!cid)return {subject:String(subject||''),body:String(body||'')};
   let s=String(subject||'').replace(/\s*\[CID:[^\]]*\]/gi,'').replace(/\s+$/,'');
   s=s+' [CID:'+cid+']';
-  let b=String(body||'').replace(/(^|\n)[ \t]*ClientRef:[^\n]*(?=\n|$)/gi,'').replace(/\s+$/,'');
-  b=b+'\n\nClientRef: '+cid;
+  let b=String(body||'');
+  if(isHtml){b=b.replace(/(?:<br\s*\/?>\s*){0,2}ClientRef:[^<\n]*/gi,'').replace(/\s+$/,'');b=b+'<br><br>ClientRef: '+cid;}
+  else{b=b.replace(/(^|\n)[ \t]*ClientRef:[^\n]*(?=\n|$)/gi,'').replace(/\s+$/,'');b=b+'\n\nClientRef: '+cid;}
   return {subject:s,body:b};
 }
 /* Send + log ONE client. Shared by single-send and the bulk queue, so both
@@ -2765,13 +2800,15 @@ function injectCID(subject,body,cid){
 async function deliverEmail(c,ctx){
   const now=new Date().toISOString(),today=now.split('T')[0];
   const to=(ctx.toOverride||c.mail||'').trim();
-  const inj=injectCID(personalize(ctx.subjT,c),personalize(ctx.bodyT,c),c.id);
+  const subjP=personalize(ctx.subjT,c);
+  const inj=injectCID(subjP,personalize(ctx.bodyHtmlT,c),c.id,true);
   const subj=inj.subject,body=inj.body;
+  const textBody=injectCID(subjP,personalize(ctx.bodyTextT,c),c.id,false).body;
   const na=ctx.na||'',due=ctx.due||'',after=ctx.after||'';
   let msgId=null,convId=null,internetMsgId=null;
   // THE SEND. Only this may throw out of deliverEmail — so a retry never
   // re-sends an email that already went out (post-send logging is guarded).
-  if(appState.token){const ids=await graphSendMail(to,subj,body);msgId=ids.msgId||null;convId=ids.convId||null;internetMsgId=ids.internetMsgId||null;}
+  if(appState.token){const ids=await graphSendMail(to,subj,body,true);msgId=ids.msgId||null;convId=ids.convId||null;internetMsgId=ids.internetMsgId||null;}
   // Mail is now sent. Logging/tracker writes must NOT propagate (a SoniaLog
   // hiccup must not trigger a resend) — record a warning instead.
   let spId=null,logWarn='';
@@ -2784,7 +2821,7 @@ async function deliverEmail(c,ctx){
       // log the full email; if the Outcome column rejects long text, retry with subject only
       const fields={ClientID:c.id,ClientName:c.name,ContactDate:now,Channel:'Email',
         Direction:'Outbound',SoniaRead:true,
-        Outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,Subject:subj,NextAction:na,LoggedBy:loggedByName(),
+        Outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+textBody,Subject:subj,NextAction:na,LoggedBy:loggedByName(),
         OutcomeType:'Sent',ContactOwner:'Sonia',NeedsEscalation:false,
         SenderEmail:TEAM_MAILBOX,RecipientEmail:to,SourceMailbox:TEAM_MAILBOX};
       if(c._sp)fields.RelatedClientTrackerId=String(c._sp);
@@ -2799,7 +2836,7 @@ async function deliverEmail(c,ctx){
     }catch(e){logWarn=e.message||String(e);console.warn('[outreach] sent OK but log/patch failed for',c.id,e);}
   }
   c.comms.push({_sp:spId,type:'email',date:today,dir:'out',content:subj,read:true,
-    outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+body,subject:subj,nextAction:na,outcomeType:'Sent',
+    outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+textBody,subject:subj,nextAction:na,outcomeType:'Sent',
     docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:due,escalation:false,
     msgId:msgId,convId:convId});
   c.lastContactDate=today;c.lastContactOutcome='Email sent: '+subj;
@@ -2809,10 +2846,10 @@ async function deliverEmail(c,ctx){
   return {msgId,convId,to,logWarn};
 }
 async function sendEmails(){
-  const subjT=$('emSubj').value.trim(),bodyT=$('emBody').value,na=$('emNext').value.trim(),due=$('emDue').value;
+  const subjT=$('emSubj').value.trim(),bodyHtmlT=emBodyHtml(),bodyTextT=emBodyText(),na=$('emNext').value.trim(),due=$('emDue').value;
   if(!subjT){toast('Subject is required');$('emSubj').focus();return;}
-  if(!bodyT.trim()){toast('Write the message first');$('emBody').focus();return;}
-  const ctx={subjT,bodyT,na,due,after:emAfter};
+  if(!bodyTextT.trim()){toast('Write the message first');$('emBody').focus();return;}
+  const ctx={subjT,bodyHtmlT,bodyTextT,na,due,after:emAfter};
   // bulk → hand off to the confirmation + live-progress flow
   if(emTargets.length>1||emRawTargets.length>1){openBulkConfirm(ctx);return;}
   // single send
@@ -2837,7 +2874,7 @@ $('emFallback').addEventListener('click',()=>{
   const single=emTargets.length===1;
   const subj=$('emSubj').value.trim()||MAIL_SUBJ;
   const url=single
-    ?`mailto:${$('emTo').value.trim()}?subject=${encodeURIComponent(personalize(subj,emTargets[0]))}&body=${encodeURIComponent(personalize($('emBody').value,emTargets[0]))}`
+    ?`mailto:${$('emTo').value.trim()}?subject=${encodeURIComponent(personalize(subj,emTargets[0]))}&body=${encodeURIComponent(personalize(emBodyText(),emTargets[0]))}`
     :`mailto:?bcc=${encodeURIComponent(emTargets.map(c=>c.mail).join(','))}&subject=${encodeURIComponent(subj)}`;
   window.open(url,'_self');
   closeEmail();
@@ -2870,11 +2907,11 @@ function openBulkConfirm(ctx){
   $('blkSkipLbl').style.display=skipped.length?'block':'none';
   $('blkSkipList').innerHTML=skipped.map(i=>`<div class="blk-skip-row"><span>${esc(i.name)} <span style="color:var(--mut3)">${esc(i.to||'—')}</span></span><span class="r">${esc(i.reason)}</span></div>`).join('');
   const sample=items.find(i=>i.state==='queued')||items[0], pc=sample&&sample.c;
-  $('blkPrev').innerHTML=pc?`<span class="s">${esc(personalize(ctx.subjT,pc))}</span>${esc(personalize(ctx.bodyT,pc))}`:'<em>No eligible recipients</em>';
+  $('blkPrev').innerHTML=pc?`<span class="s">${esc(personalize(ctx.subjT,pc))}</span>${esc(personalize(ctx.bodyTextT,pc))}`:'<em>No eligible recipients</em>';
   $('blkPrevHint').textContent=pc?('— resolved for '+pc.name+' · shaded sections vary per client'):'— {name}/{first} personalised per client';
   // section coverage: for each distinct conditional tag, how many eligible recipients it applies to
   const eligibleC=items.filter(i=>i.state==='queued').map(i=>i.c);
-  const opens=tagTokens((ctx.subjT||'')+'\n'+(ctx.bodyT||'')).filter(t=>t.type==='open'&&TAG_VOCAB[t.key]);
+  const opens=tagTokens((ctx.subjT||'')+'\n'+(ctx.bodyTextT||'')).filter(t=>t.type==='open'&&TAG_VOCAB[t.key]);
   const seenTag=new Set(),cov=[];
   opens.forEach(t=>{const id=t.key+':'+t.value;if(seenTag.has(id))return;seenTag.add(id);
     const f=TAG_VOCAB[t.key],n=eligibleC.filter(c=>valMatches(t.value,f.get(c))).length;
