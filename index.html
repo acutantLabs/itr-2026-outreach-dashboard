@@ -1496,8 +1496,9 @@ async function buildClientsFromSharePoint(){
       content:f.Subject||f.Outcome||f.NextAction||TL_[type]+' contact',read:spBool(f.SoniaRead),
       outcome:f.Outcome||'',nextAction:f.NextAction||'',outcomeType:f.OutcomeType||'',
       subject:f.Subject||'',preview:f.PreviewSnippet||'',
+      emailBodyText:f.EmailBodyText||'',emailBodyHtml:f.EmailBodyHtml||'',
       msgId:f.MessageId||null,convId:f.ConversationId||null,internetMsgId:f.InternetMessageId||null,
-      senderEmail:f.SenderEmail||'',recipientEmail:f.RecipientEmail||'',
+      senderEmail:f.SenderEmail||'',recipientEmail:f.RecipientEmail||'',sourceMailbox:f.SourceMailbox||'',
       matchConfidence:mc,matchMethod:f.MatchMethod||'',
       resStatus:f.ResolutionStatus||'',resMethod:f.ResolutionMethod||'',resEvidence:f.ResolutionEvidence||'',
       resCandIDs:f.ResolutionCandidateClientIDs||'',resCandNames:f.ResolutionCandidateClientNames||'',
@@ -2109,6 +2110,38 @@ function deskNavClient(dir){
 /* Render a SoniaLog slip from its REAL fields (outcome / next action / doc /
    logged-by). The channel only changes the visual treatment; the content is the
    logged outreach record, not a fabricated message body. */
+function htmlToText(html){
+  if(!html)return '';
+  const div=document.createElement('div');
+  div.innerHTML=html;
+  return (div.textContent||div.innerText||'').split(String.fromCharCode(13)).join('').trim();
+}
+function loggedEmailBody(m){
+  const body=(m.emailBodyText||'').trim();
+  if(body)return body;
+  const htmlBody=htmlToText(m.emailBodyHtml||'');
+  if(htmlBody)return htmlBody;
+  const outcome=(m.outcome||'').trim();
+  if(/^EMAIL\s*[—-]/i.test(outcome)){
+    return outcome
+      .replace(/^EMAIL\s*[—-][^\n]*\n?/i,'')
+      .replace(/^To:[^\n]*\n?/i,'')
+      .trim();
+  }
+  return '';
+}
+function loggedEmailSummary(m,fullBody){
+  const preview=(m.preview||'').trim();
+  if(preview){
+    if(fullBody&&preview===fullBody)return '';
+    return preview;
+  }
+  const outcome=(m.outcome||'').trim();
+  if(!outcome)return '';
+  if(/^EMAIL\s*[—-]/i.test(outcome))return '';
+  if(fullBody&&outcome===fullBody)return '';
+  return outcome;
+}
 function buildCommBody(client,m){
   const d=fmt(m.date);
   const text=esc(m.outcome||m.content||'');
@@ -2176,14 +2209,24 @@ function buildCommBody(client,m){
         </div>
       </div>`:''}${extras}${resP}`;
     }
+    const fullBody=loggedEmailBody(m);
+    const summary=loggedEmailSummary(m,fullBody);
+    const fromEmail=isIn?(m.senderEmail||'—'):(m.sourceMailbox||m.senderEmail||TEAM_MAILBOX||'—');
+    const toEmail=isIn?(m.recipientEmail||m.sourceMailbox||TEAM_MAILBOX||'—'):(m.recipientEmail||'—');
+    const subject=m.subject||m.content||'—';
+    const fallback=summary||fullBody||text||'(no summary recorded)';
     return`<div class="email-wrap">
       <div class="email-meta">
         <div class="email-row"><span class="ef">Client</span><span class="ev">${esc(client.name)}${client.id?(' · '+esc(client.id)):''}</span></div>
         <div class="email-row"><span class="ef">Dir</span><span class="ev">${isIn?'Inbound — client → Sonia':'Outbound — Sonia → client'}</span></div>
+        <div class="email-row"><span class="ef">From</span><span class="ev">${esc(fromEmail)}</span></div>
+        <div class="email-row"><span class="ef">To</span><span class="ev">${esc(toEmail)}</span></div>
         <div class="email-row"><span class="ef">Date</span><span class="ev">${d}</span></div>
+        <div class="email-row"><span class="ef">Subj</span><span class="ev subj">${esc(subject)}</span></div>
         <div class="email-row"><span class="ef">Logged</span><span class="ev">${esc(m.loggedBy||m.contactOwner||'—')}</span></div>
       </div>
-      <div class="email-body">${text||'(no summary recorded)'}</div>
+      ${summary?`<div class="next-lbl" style="margin-top:12px">Summary</div><div class="email-body">${esc(summary)}</div>`:''}
+      ${fullBody?`<details style="margin-top:12px"><summary style="cursor:pointer;font-family:var(--cond);font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink);">Full email</summary><div class="email-body" style="margin-top:8px">${esc(fullBody)}</div></details>`:`<div class="email-body">${fallback}</div>`}
     </div>${extras}${resP}`;
   }
   if(m.type==='whatsapp'){
