@@ -54,6 +54,57 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   font-size:.62rem;padding:0 5px;margin-left:4px;min-width:16px;text-align:center;line-height:15px;vertical-align:middle;}
 .flt.on.f-new .badge{background:var(--wa);}
 .flt.on.f-action .badge{background:var(--amber);}
+/* ─ Refine (composable facets) ─ */
+.refine-wrap{position:relative;display:flex;align-items:center;}
+.refine-btn{height:28px;padding:0 11px;border:none;background:transparent;color:var(--mut2);
+  font-family:var(--cond);font-size:.74rem;font-weight:700;cursor:pointer;letter-spacing:.6px;
+  text-transform:uppercase;border-bottom:3px solid transparent;transition:color .15s,border-color .15s;
+  white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.refine-btn:hover{color:#ddd;}
+.refine-btn.on{color:#fff;border-bottom-color:var(--amber);}
+.refine-btn .badge{display:inline-block;background:var(--amber);color:#fff;border-radius:2px;
+  font-size:.62rem;padding:0 5px;min-width:16px;text-align:center;line-height:15px;}
+.refine-btn .badge[hidden]{display:none;}
+.refine-btn .caret{font-size:.62rem;transition:transform .15s;}
+.refine-btn.open .caret{transform:rotate(180deg);}
+.refine-pop{position:absolute;top:calc(100% + 7px);left:0;z-index:120;width:256px;
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;box-shadow:var(--sh3);
+  padding:7px;animation:typeAheadBarIn .14s var(--ease);}
+.refine-pop[hidden]{display:none!important;}
+.refine-pop-hd{display:flex;align-items:center;justify-content:space-between;padding:3px 6px 8px;
+  border-bottom:1px solid var(--line);margin-bottom:5px;}
+.refine-pop-hd .t{font-family:var(--cond);font-size:.72rem;font-weight:800;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--ink);}
+.refine-clear{border:none;background:transparent;color:var(--mut2);font-family:var(--cond);font-size:.66rem;
+  font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;padding:2px 4px;}
+.refine-clear:hover{color:var(--red);}
+.refine-clear[disabled]{opacity:.35;cursor:default;}
+.rf-opt{display:flex;align-items:center;gap:9px;width:100%;padding:8px;border:1px solid transparent;
+  border-radius:3px;background:transparent;cursor:pointer;text-align:left;transition:background .12s,border-color .12s;}
+.rf-opt:hover{background:#fafafa;}
+.rf-opt.on{background:#fff;border-color:var(--amber);}
+.rf-ic{width:23px;height:23px;flex-shrink:0;border-radius:3px;display:flex;align-items:center;
+  justify-content:center;background:#f0f0f0;color:var(--mut);font-size:.82rem;}
+.rf-opt.on .rf-ic{background:var(--amber);color:#fff;}
+.rf-tx{flex:1;min-width:0;}
+.rf-tx .l{font-family:var(--cond);font-size:.8rem;font-weight:700;color:var(--ink);letter-spacing:.3px;line-height:1.15;}
+.rf-tx .d{font-size:.66rem;color:var(--mut2);margin-top:1px;line-height:1.2;}
+.rf-ct{font-family:var(--cond);font-size:.84rem;font-weight:800;color:var(--mut3);flex-shrink:0;min-width:18px;text-align:right;}
+.rf-opt.on .rf-ct{color:var(--amber);}
+.rf-body{max-height:min(74vh,580px);overflow-y:auto;overflow-x:hidden;}
+.rf-body::-webkit-scrollbar{width:7px;}
+.rf-body::-webkit-scrollbar-thumb{background:#cfcfcf;border-radius:4px;}
+.rf-sec{font-family:var(--cond);font-size:.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--mut2);padding:9px 8px 3px;display:flex;align-items:center;gap:6px;}
+.rf-sec::after{content:'';flex:1;height:1px;background:var(--line);}
+.rf-sel-row{display:flex;align-items:center;gap:8px;padding:3px 8px 5px;}
+.rf-sel-l{flex:0 0 94px;font-family:var(--cond);font-size:.7rem;font-weight:700;color:var(--ink);
+  letter-spacing:.3px;text-transform:uppercase;}
+.rf-sel{flex:1;min-width:0;height:28px;border:1px solid var(--line2);border-radius:3px;background:var(--surface);
+  color:var(--ink);font-family:var(--body);font-size:.79rem;padding:0 6px;cursor:pointer;outline:none;transition:border-color .12s,background .12s;}
+.rf-sel:hover{border-color:var(--ink);}
+.rf-sel:focus{border-color:var(--amber);}
+.rf-sel.set{border-color:var(--amber);background:#fffaf2;font-weight:600;}
 .mode-btn,.vinyl-btn{height:28px;padding:0 13px;border-radius:2px;border:1px solid #4a4647;background:transparent;
   color:#bbb;font-family:var(--cond);font-size:.74rem;font-weight:700;cursor:pointer;letter-spacing:.6px;
   text-transform:uppercase;transition:all .15s;white-space:nowrap;}
@@ -560,8 +611,55 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   font-family:var(--body);font-size:.86rem;outline:none;resize:vertical;background:var(--surface);}
 .reply-ta:focus{border-color:var(--red);}
 .reply-send:hover{border-color:var(--green);color:var(--green);}
+.reply-quick-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:8px;}
+.reply-q{font-family:var(--cond);font-size:.62rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  padding:4px 9px;border:1px solid var(--line2);border-radius:2px;background:var(--surface);color:var(--mut);
+  cursor:pointer;white-space:nowrap;}
+.reply-q:hover{border-color:var(--ink2);color:var(--ink2);}
+.reply-q.on{border-color:var(--email);color:var(--email);background:rgba(37,99,235,.08);}
+.reply-log-toggle{margin-left:auto;font-family:var(--cond);font-size:.6rem;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;padding:4px 9px;border:1px solid var(--line);border-radius:2px;background:#FAFAFA;
+  color:var(--mut);cursor:pointer;white-space:nowrap;}
+.reply-log-toggle:hover{border-color:var(--ink2);color:var(--ink2);}
+.reply-log-toggle.open{border-color:var(--email);color:var(--email);}
+.reply-log-panel{margin-top:8px;padding:10px 11px;border:1px solid var(--line);border-radius:2px;background:#FAFAFA;}
+.reply-log-panel .cf-lbl{margin-top:0;}
+.reply-log-panel .cf-lbl:not(:first-child){margin-top:12px;}
+.reply-log-panel .reply-next{width:100%;height:32px;border:1px solid var(--line2);border-radius:2px;padding:0 9px;
+  font-family:var(--body);font-size:.84rem;outline:none;background:var(--surface);}
+.reply-log-panel .reply-due{width:100%;height:32px;border:1px solid var(--line2);border-radius:2px;padding:0 7px;
+  font-family:var(--body);font-size:.82rem;outline:none;background:var(--surface);}
+.reply-log-summary{font-size:.76rem;color:var(--mut);margin-left:8px;align-self:center;}
 /* email modal extras */
 .em-hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--mut3);font-size:.62rem;}
+/* template picker — button shows selection; filter lives inside dropdown only */
+.tpl-picker{position:relative;}
+.tpl-sel{display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 10px;border:1px solid var(--line2);border-radius:2px;
+  background:var(--surface);cursor:pointer;text-align:left;font-family:var(--body);font-size:.86rem;color:var(--ink);}
+.tpl-sel:hover{border-color:var(--ink);}
+.tpl-picker.open .tpl-sel,.tpl-sel:focus-visible{border-color:var(--red);outline:none;}
+.tpl-sel-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tpl-sel-label.mut{color:var(--mut2);}
+.tpl-sel-chev{flex:none;color:var(--mut);font-size:.78rem;line-height:1;}
+.tpl-drop{position:fixed;z-index:620;background:var(--surface);border:1px solid var(--line2);
+  border-radius:2px;box-shadow:var(--sh3);max-height:min(280px,44vh);display:flex;flex-direction:column;overflow:hidden;}
+.tpl-drop[hidden]{display:none;}
+.tpl-filter-wrap{padding:7px 8px 6px;border-bottom:1px solid var(--line);background:#FAFAFA;flex-shrink:0;}
+.tpl-filter-wrap input{width:100%;height:28px;border:1px solid var(--line2);border-radius:2px;padding:0 8px;
+  font-family:var(--body);font-size:.82rem;background:var(--surface);}
+.tpl-filter-wrap input:focus{border-color:var(--red);outline:none;}
+.tpl-list{overflow-y:auto;flex:1 1 auto;min-height:0;}
+.tpl-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:8px 10px;border:none;
+  border-bottom:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;}
+.tpl-opt:last-child{border-bottom:none;}
+.tpl-opt:hover,.tpl-opt.hi{background:#fffaf2;}
+.tpl-opt.on{background:#fffaf2;box-shadow:inset 3px 0 0 var(--amber);}
+.tpl-opt.hi{box-shadow:inset 3px 0 0 var(--red);}
+.tpl-opt.on.hi{box-shadow:inset 3px 0 0 var(--red);}
+.tpl-opt-title{font-family:var(--cond);font-size:.82rem;font-weight:700;color:var(--ink);line-height:1.2;}
+.tpl-opt-cat{font-family:var(--cond);font-size:.58rem;font-weight:700;color:var(--mut2);text-transform:uppercase;letter-spacing:.5px;}
+.tpl-opt-subj{font-size:.72rem;color:var(--mut2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.tpl-empty{padding:10px 12px;font-size:.78rem;color:var(--mut2);}
 .em-err{display:none;background:#FDECEC;border-left:3px solid var(--red);padding:9px 12px;font-size:.8rem;color:var(--red-dk);margin-top:13px;border-radius:0 2px 2px 0;line-height:1.55;}
 .em-err.show{display:block;}
 /* bulk send: confirm */
@@ -661,6 +759,13 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .rt-editor ul,.rt-editor ol{margin:6px 0 6px 22px;}
 .em-tag{font-weight:700;}
 .em-zone{border-radius:2px;}
+/* template-swap scramble transition — screen-only, replaced by clean HTML on settle */
+.rt-editor.rt-scrambling{caret-color:transparent;}
+.rt-scr{font-weight:600;}
+.rt-scr.c0{color:var(--red);}
+.rt-scr.c1{color:#1F6FEB;}
+.rt-scr.c2{color:var(--amber,#c98a00);}
+.rt-scr.c3{color:var(--green,#2e8b57);}
 /* terminal-style value prompter (shows while caret is inside a tag) */
 .tag-suggest{display:none;flex-wrap:wrap;align-items:center;gap:5px;margin:2px 0 6px;padding:7px 9px;background:#1f1c1d;border-radius:3px;border-left:3px solid var(--red);}
 .tag-suggest .ts-lbl{font-family:var(--cond);font-size:.6rem;font-weight:700;color:var(--mut2);letter-spacing:.6px;text-transform:uppercase;margin-right:2px;}
@@ -748,7 +853,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 <header>
   <div class="logo">
     <div class="logo-mark">A</div>
-    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.6.0</span></div></div>
+    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.7.0</span></div></div>
   </div>
   <div class="hd"></div>
   <div class="filters" id="filters">
@@ -760,6 +865,18 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
     <button class="flt" data-f="responded">✓ DONE</button>
     <button class="flt" data-f="pending">⏳ WAIT</button>
     <button class="flt f-flag" data-f="flagged">⬟ FLAG</button>
+  </div>
+  <div class="refine-wrap">
+    <button class="refine-btn" id="refineBtn" title="Stack extra filters on top of the active view">▽ REFINE<span class="badge" id="refineBadge" hidden>0</span><span class="caret">▾</span></button>
+    <div class="refine-pop" id="refinePop" hidden>
+      <div class="refine-pop-hd"><span class="t">Refine view</span><button class="refine-clear" id="refineClear" disabled>Clear</button></div>
+      <div class="rf-body">
+        <div class="rf-sec">Quick filters</div>
+        <div id="refineOpts"></div>
+        <div class="rf-sec">Narrow by</div>
+        <div id="refineSelects"></div>
+      </div>
+    </div>
   </div>
   <div class="hd"></div>
   <button class="mode-btn" id="modeBtn">◫ OPEN FILES</button>
@@ -847,6 +964,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
       <button class="da-btn" id="daNeeds">↩ Needs Reply</button>
       <button class="da-btn" id="daWait">⏳ Waiting</button>
       <button class="da-btn" id="daDone">✓ Done</button>
+      <button class="da-btn" id="daFlag" style="border-color:var(--red);color:var(--red)">⬟ Raise Flag</button>
       <div class="da-sep"></div>
       <span class="da-lbl">Follow-up</span>
       <input type="date" class="da-date" id="daDue">
@@ -962,6 +1080,26 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   </div>
 </div>
 
+<!-- RAISE FLAG MODAL -->
+<div class="comp-ov" id="flagOv">
+  <div class="comp" style="width:min(480px,94vw);">
+    <div class="comp-head">
+      <div><div class="comp-title" id="flagTitle">Raise Flag</div><div class="comp-sub" id="flagSub"></div></div>
+      <button class="dh-btn close" id="flagClose">✕</button>
+    </div>
+    <div class="red-rule"></div>
+    <div class="comp-bd">
+      <div class="cf-lbl">Reason for flag</div>
+      <textarea id="flagReason" placeholder="Why does this file need attention?" style="margin-top:7px"></textarea>
+      <div class="chips" id="chipsFlag"></div>
+    </div>
+    <div class="comp-ft">
+      <button class="co-btn" id="flagCancel">Cancel</button>
+      <button class="comp-save" id="flagSave">Raise Flag</button>
+    </div>
+  </div>
+</div>
+
 <!-- OUTLOOK EMAIL MODAL -->
 <div class="comp-ov" id="emOv">
   <div class="comp" id="emCard" style="width:min(640px,94vw);">
@@ -977,7 +1115,20 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
     <div class="comp-bd">
       <div class="cf-lbl">To</div>
       <input type="text" id="emTo" autocomplete="off">
-      <div class="cf-lbl">Subject</div>
+      <div class="cf-lbl">Template</div>
+      <div class="tpl-picker" id="emTplPicker">
+        <button type="button" class="tpl-sel" id="emTplBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="emTplDrop">
+          <span class="tpl-sel-label mut" id="emTplLabel">Choose a template…</span>
+          <span class="tpl-sel-chev">▾</span>
+        </button>
+        <div class="tpl-drop" id="emTplDrop" hidden role="dialog" aria-label="Email templates">
+          <div class="tpl-filter-wrap">
+            <input type="text" id="emTplFilter" autocomplete="off" placeholder="Filter templates…">
+          </div>
+          <div class="tpl-list" id="emTplList" role="listbox"></div>
+        </div>
+      </div>
+      <div class="cf-lbl">Subject <span class="em-hint">— editable; [CID:id] appended on send</span></div>
       <input type="text" id="emSubj" autocomplete="off">
       <div class="cf-lbl">Message <span class="em-hint">— {name}/{first} personalised per recipient</span></div>
       <div class="rt-wrap">
@@ -1205,14 +1356,14 @@ function buildClients(n){
     }
     return{id:`ITR26-${String(i+1).padStart(4,'0')}`,name,status,flagged,flagReason,comms,
       _sp:null,contactName:name,phone:'9'+String(rnd(100000000,999999999)),mail:name.toLowerCase().replace(/ /g,'.')+'@gmail.com',
-      coordinator:'Sonia',stakeholder:'AR/Aio/Jathin',
+      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['AR','Aio','Jathin']),
       entity:pick(['AC','ASI']),applicability:pick(['Salary','House Property','Business Income','Capital Gain','Tax Audit','Trust','NA']),
       constitution:pick(['Individual','HUF','Firm','Company','Trust']),serviceCategory:pick(['ITR Only','Tax Audit','10B (Trust)','Stat Audit']),
       outreachRequired:status==='needs',outreachReason:flagged?flagReason:'',
       lastContactDate:comms.length?comms[comms.length-1].date:'',lastContactOutcome:'',
       nextActionSummary:status==='pending'?'Awaiting client response':'',
       nextActionDue:Math.random()<.3?addDays(TODAY,rnd(-5,9)):'',
-      dueDate:'',dataStatus:pick(['Received','Further documents required','Prepared & draft shared','']),
+      dueDate:Math.random()<.85?addDays(TODAY,rnd(-12,45)):'',dataStatus:pick(['Received','Further documents required','Prepared & draft shared','']),
       filingStatus:pick(['Not Started','In Progress','','']),activeIssueCount:Math.random()<.18?rnd(1,4):0,queueSummary:''};
   });
 }
@@ -1225,13 +1376,14 @@ function clientById(cid){return CLIENTS_BY_ID[cid];}
 
 /* ═══ SHAREPOINT BACKEND ════════════════════════════════════════════
    Live data layer — mirrors the ITR Hub (index.html) Graph pattern.
-   Reads ITR_ClientTracker (client master + outreach summary + flag) and
-   ITR_SoniaLog (the communication slips). Aio owns the SharePoint schema;
+   Reads ITR_ClientTracker (client master + outreach summary + flag),
+   ITR_SoniaLog (the communication slips), and ITR_EmailTemplates (outbound
+   email templates — read-only). Aio owns the SharePoint schema;
    this dashboard only READS, plus ONE gated write: Sonia's read-state on a
    SoniaLog row. Site/list IDs are the live values from the catch-up brief. */
 const GRAPH_BASE='https://graph.microsoft.com/v1.0';
 const SITE_ID='acutant.sharepoint.com,d8ad7910-90f7-4599-9036-cf829cfdb2b3,004f93dd-4e07-4183-8084-6c820ad8207d';
-const LIST_IDS={clients:'06e750b3-ea73-44b6-a6d7-37bcd467bfa2',soniaLog:'84c36592-50e9-4286-b1d2-eedc7898743f'};
+const LIST_IDS={clients:'06e750b3-ea73-44b6-a6d7-37bcd467bfa2',soniaLog:'84c36592-50e9-4286-b1d2-eedc7898743f',emailTemplates:'e18df2b2-7dd6-41b3-83e0-f81ff7850586'};
 const GRAPH_SCOPES=['https://graph.microsoft.com/.default'];
 /* The operator whose viewing mutates the shared read-state. Everyone else is
    read-only, so "unread" means "new to Sonia" for the whole team. Override with
@@ -1277,6 +1429,27 @@ async function fetchAll(listId){
   let url='/sites/'+SITE_ID+'/lists/'+listId+'/items?$expand=fields&$top=999',out=[];
   while(url){const d=await graphGet(url);out=out.concat(d.value||[]);const nx=d['@odata.nextLink'];url=nx?nx.replace(GRAPH_BASE,''):null;}
   return out;
+}
+
+/* ITR_EmailTemplates — read-only outbound template library (Aio schema). */
+const AFTER_STATUS_FROM_SP={'No change':'','Needs Reply':'needs','Waiting':'pending','Done':'responded'};
+let EMAIL_TEMPLATES=[];
+function normalizeBody(t){return String(t||'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');}
+function mapTemplateItem(it){
+  const f=it.fields||{};
+  return {id:String(it.id),title:f.Title||'',templateKey:f.TemplateKey||'',subject:f.Subject||'',
+    body:normalizeBody(f.Body||''),category:f.Category||'',defaultNextAction:f.DefaultNextAction||'',
+    defaultAfterStatus:f.DefaultAfterStatus||'',afterStatus:AFTER_STATUS_FROM_SP[f.DefaultAfterStatus]??'',
+    sortOrder:Number(f.SortOrder||0),isDefault:spBool(f.IsDefault),active:spBool(f.Active)};
+}
+async function buildEmailTemplatesFromSharePoint(){
+  const items=await fetchAll(LIST_IDS.emailTemplates);
+  return items.map(mapTemplateItem).filter(t=>t.active&&t.templateKey)
+    .sort((a,b)=>a.sortOrder-b.sortOrder||a.title.localeCompare(b.title));
+}
+function defaultEmailTemplate(){
+  const list=EMAIL_TEMPLATES.filter(t=>t.active);
+  return list.find(t=>t.isDefault)||list[0]||null;
 }
 
 /* Card status derived from ITR_ClientTracker outreach-summary fields. */
@@ -1471,7 +1644,11 @@ async function onToken(r){
 async function loadLive(){
   try{
     showStatus('Loading…');
-    CLIENTS=await buildClientsFromSharePoint();
+    const [clients,templates]=await Promise.all([
+      buildClientsFromSharePoint(),
+      buildEmailTemplatesFromSharePoint().catch(e=>{console.warn('[outreach] email templates unavailable: '+e.message);return[];})
+    ]);
+    CLIENTS=clients;EMAIL_TEMPLATES=templates;
     let mailNote='';
     try{
       const msgs=await fetchTeamMail();
@@ -1485,14 +1662,15 @@ async function loadLive(){
         toast('Team mailbox not readable — grant Mail.ReadWrite.Shared + mailbox access');
     }
     rebuildDates();renderGrid();renderTimeline();
-    showStatus(CLIENTS.length+' files · '+LAST_DIAG.logRows+' logged'+mailNote+(appState.isSonia?' · Sonia':' · view-only'));
+    showStatus(CLIENTS.length+' files · '+LAST_DIAG.logRows+' logged · '+EMAIL_TEMPLATES.length+' templates'+mailNote+(appState.isSonia?' · Sonia':' · view-only'));
   }catch(e){showSignin('Failed to load data: '+(e.message||e));showStatus('Load failed');}
 }
 function bootDemo(){
   hideAuth();
   appState.isSonia=true;                       // demo: allow read-state toggling locally
+  EMAIL_TEMPLATES=DEMO_EMAIL_TEMPLATES.slice();
   CLIENTS=buildClients(375);rebuildDates();renderGrid();renderTimeline();
-  showStatus(CLIENTS.length+' files · DEMO');
+  showStatus(CLIENTS.length+' files · DEMO · '+EMAIL_TEMPLATES.length+' templates');
 }
 async function signOut(){
   if(appState.msalApp){const a=appState.msalApp.getAllAccounts()[0];if(a)try{await appState.msalApp.logoutPopup({account:a});}catch(e){}}
@@ -1517,6 +1695,70 @@ let cmClient=null,cmComms=[],cmIdx=0;
 const $=id=>document.getElementById(id);
 function visComms(c){return c.comms.filter(m=>(!COMM_FLOOR||m.date>=COMM_FLOOR)&&(!timeCap||m.date<=timeCap));}
 
+/* ═══ REFINE FACETS — composable filters that AND on top of the active tab ═══
+   Each facet is an extra, optional lens. They stack (AND) with one another and
+   with whatever status tab is active, so "Reply + Stale" = files needing a reply
+   that have also gone quiet. Kept behind the Refine popover to avoid header clutter. */
+const STALE_DAYS=4;
+function realComms(c){return visComms(c).filter(m=>m.type!=='flag');}
+function lastRealComm(c){const r=realComms(c);return r.length?r[r.length-1]:null;}
+function daysSince(d){if(!d)return Infinity;return Math.floor((new Date(TODAY)-new Date(String(d).split('T')[0]))/86400000);}
+function daysUntil(d){if(!d)return Infinity;return Math.floor((new Date(String(d).split('T')[0])-new Date(TODAY))/86400000);}
+
+/* Boolean quick-filter facets (the toggle rows). */
+const TOGGLE_FACETS={
+  untouched:{ic:'◷',label:'Not Started',desc:'No outreach logged yet',
+    test:c=>realComms(c).length===0},
+  awaiting:{ic:'↩',label:'Awaiting My Reply',desc:'Client spoke last — ball in my court',
+    test:c=>{const m=lastRealComm(c);return !!m&&m.dir==='in';}},
+  stale:{ic:'⌛',label:'Stale · Needs Nudge',desc:'Waited '+STALE_DAYS+'+ days on the client',
+    test:c=>{const m=lastRealComm(c);return !!m&&m.dir==='out'&&daysSince(m.date)>=STALE_DAYS;}},
+  issues:{ic:'⚑',label:'Has Open Issues',desc:'One or more active issues',
+    test:c=>c.activeIssueCount>0},
+  nocontact:{ic:'⚠',label:'No Contact Info',desc:'Missing both phone & email',
+    test:c=>!c.phone&&!c.mail}
+};
+const TOGGLE_ORDER=['untouched','awaiting','stale','issues','nocontact'];
+
+/* Filing-deadline proximity (single-choice dropdown), driven by the tracker DueDate. */
+const DUE_BUCKETS={
+  overdue:{label:'Overdue',test:c=>c.dueDate&&c.dueDate<TODAY},
+  d3:{label:'Due in ≤3 days',test:c=>c.dueDate&&c.dueDate>=TODAY&&daysUntil(c.dueDate)<=3},
+  week:{label:'Due this week',test:c=>c.dueDate&&c.dueDate>=TODAY&&daysUntil(c.dueDate)<=7},
+  month:{label:'Due this month',test:c=>c.dueDate&&c.dueDate>=TODAY&&daysUntil(c.dueDate)<=30}
+};
+const DUE_ORDER=['overdue','d3','week','month'];
+
+/* Value dropdowns — each reads a field (or derives one). Options are built from
+   whatever values actually exist in the data, and a select is only shown when the
+   field has ≥2 distinct values, so empty/uniform columns never add clutter. */
+const CH_LABEL={email:'Email',whatsapp:'WhatsApp',call:'Call',note:'Note'};
+const FIELD_FACETS=[
+  {key:'coordinator',   label:'Coordinator',   get:c=>c.coordinator},
+  {key:'stakeholder',   label:'Stakeholder',   get:c=>c.stakeholder},
+  {key:'filingStatus',  label:'Filing status', get:c=>c.filingStatus},
+  {key:'dataStatus',    label:'Data status',   get:c=>c.dataStatus},
+  {key:'serviceCategory',label:'Service',      get:c=>c.serviceCategory},
+  {key:'constitution',  label:'Constitution',  get:c=>c.constitution},
+  {key:'entity',        label:'Entity',        get:c=>c.entity},
+  {key:'applicability', label:'Applicability', get:c=>c.applicability},
+  {key:'channel',       label:'Last channel',  get:c=>{const m=lastRealComm(c);return m?(CH_LABEL[m.type]||''):'';}}
+];
+const FIELD_FACET_BY_KEY={};FIELD_FACETS.forEach(f=>{FIELD_FACET_BY_KEY[f.key]=f;});
+
+/* Refine state — composes (AND) with one another and with the active status tab. */
+const facets=new Set();      // active toggle keys
+let dueFacet=null;           // active DUE_BUCKETS key, or null
+const fieldFacets={};        // {fieldKey: selectedValue}
+function refineCount(){return facets.size+(dueFacet?1:0)+Object.keys(fieldFacets).filter(k=>fieldFacets[k]).length;}
+function passesRefine(c){
+  for(const k of facets){if(!TOGGLE_FACETS[k].test(c))return false;}
+  if(dueFacet&&!DUE_BUCKETS[dueFacet].test(c))return false;
+  for(const k in fieldFacets){const v=fieldFacets[k];if(!v)continue;
+    const f=FIELD_FACET_BY_KEY[k];if(f&&String(f.get(c)||'').trim()!==v)return false;}
+  return true;
+}
+
 function getFiltered(){
   return CLIENTS.filter(c=>{
     const vc=visComms(c);
@@ -1528,6 +1770,7 @@ function getFiltered(){
     if(activeFilter==='new'&&!hasUnread(c))return false;
     if(activeFilter==='action'&&!(c.flagged||c.status==='needs'))return false;
     if(activeFilter==='due'&&!(c.nextActionDue&&c.nextActionDue<=TODAY))return false;
+    if(!passesRefine(c))return false;
     if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
     return true;
   }).sort((a,b)=>{
@@ -1553,6 +1796,7 @@ function updateBadges(){
 /* ═══ RENDER GRID ═══════════════════════════════════════════════ */
 function renderGrid(){
   updateBadges();
+  renderRefine();
   const grid=$('grid');grid.innerHTML='';
   const list=getFiltered();
   if(!list.length){grid.innerHTML='<div class="empty">No files match</div>';renderStats([]);applyTypeAhead();syncHalfSel();return;}
@@ -1666,7 +1910,8 @@ function renderDeskFrame(){
   const contactParts=[(c.phone?'☎ '+esc(c.phone):''),(c.mail?'✉ '+esc(c.mail):'')].filter(Boolean);
   $('dhContact').innerHTML=contactParts.length?contactParts.join('<span class="sep">·</span>'):'No contact on file';
   $('dhContact').style.display=contactParts.length?'':'none';
-  $('dhFlag').innerHTML=c.flagged?`<div class="dh-flag">⬟ ${c.flagReason}</div>`:'';
+  $('dhFlag').innerHTML=c.flagged?`<div class="dh-flag">⬟ ${esc(c.flagReason)}</div>`:'';
+  $('daFlag').textContent=c.flagged?'⬟ Update Flag':'⬟ Raise Flag';
   const SL={needs:'NEEDS REPLY',responded:'DONE',pending:'AWAITING',idle:'IDLE'};
   $('dhStatus').className=`dh-status ${c.status}`;
   $('dhStatus').textContent=SL[c.status];
@@ -1898,7 +2143,37 @@ function buildCommBody(client,m){
       ${isIn?`<div class="reply-box">
         <div class="call-notes-lbl" style="margin-top:14px">Reply as ${esc(TEAM_MAILBOX)}</div>
         <textarea class="reply-ta" placeholder="Type your reply — it sends from ${esc(TEAM_MAILBOX)} with the original quoted, and is logged automatically."></textarea>
-        <div class="act-row"><button class="act-b reply-send" data-mailact="reply">↩ Send Reply</button></div>
+        <div class="reply-quick-row">
+          <button type="button" class="reply-q" data-preset="wait1w">Wait +1w</button>
+          <button type="button" class="reply-q" data-preset="3d">+3 days</button>
+          <button type="button" class="reply-q" data-preset="needs">Needs reply</button>
+          <button type="button" class="reply-log-toggle">Log &amp; follow-up ▾</button>
+        </div>
+        <div class="reply-log-panel" hidden>
+          <div class="cf-lbl">Next action &amp; follow-up date</div>
+          <div class="cf-row">
+            <input type="text" class="reply-next" placeholder="Next action…">
+            <input type="date" class="reply-due">
+          </div>
+          <div class="qd-row">
+            <button type="button" class="qd reply-qd" data-d="1">Tomorrow</button>
+            <button type="button" class="qd reply-qd" data-d="3">+3 days</button>
+            <button type="button" class="qd reply-qd" data-d="7">+1 week</button>
+            <button type="button" class="qd reply-qd" data-d="14">+2 weeks</button>
+            <button type="button" class="qd reply-qd" data-d="clear">Clear</button>
+          </div>
+          <div class="cf-lbl">After sending, mark file as</div>
+          <div class="seg reply-seg">
+            <button type="button" class="seg-b on" data-v="">No change</button>
+            <button type="button" class="seg-b" data-v="needs">↩ Needs Reply</button>
+            <button type="button" class="seg-b" data-v="pending">⏳ Waiting</button>
+            <button type="button" class="seg-b" data-v="responded">✓ Done</button>
+          </div>
+        </div>
+        <div class="act-row">
+          <button class="act-b reply-send" data-mailact="reply">↩ Send Reply</button>
+          <span class="reply-log-summary"></span>
+        </div>
       </div>`:''}${extras}${resP}`;
     }
     return`<div class="email-wrap">
@@ -2227,6 +2502,7 @@ document.addEventListener('keydown',e=>{
   if($('blkOv').classList.contains('open')){if(e.key==='Escape'&&!bulkRunning)$('blkClose').click();return;}
   if($('emOv').classList.contains('open')){if(e.key==='Escape')closeEmail();return;}
   if($('compOv').classList.contains('open')){if(e.key==='Escape')closeComposer();return;}
+  if($('flagOv').classList.contains('open')){if(e.key==='Escape')closeFlagModal();return;}
   if($('authOv').classList.contains('open'))return;
   if($('vinylOv').classList.contains('open')){
     if(e.key==='ArrowLeft'){vinylIdx=Math.max(0,vinylIdx-1);renderVinyl();}
@@ -2275,6 +2551,84 @@ $('filters').addEventListener('click',e=>{
   activeFilter=btn.dataset.f;if(deskClient)closeDesk();
   document.querySelectorAll('.flt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
   renderGrid();
+});
+
+/* ── Refine facets popover ───────────────────────────────────── */
+function buildRefinePop(){
+  $('refineOpts').innerHTML=TOGGLE_ORDER.map(k=>{const f=TOGGLE_FACETS[k];
+    return `<button class="rf-opt" data-facet="${k}"><span class="rf-ic">${f.ic}</span>`+
+      `<span class="rf-tx"><span class="l">${f.label}</span><span class="d">${f.desc}</span></span>`+
+      `<span class="rf-ct" id="rfct-${k}">0</span></button>`;}).join('');
+}
+function selectRow(key,label,opts,anyLabel){
+  return `<label class="rf-sel-row"><span class="rf-sel-l">${label}</span>`+
+    `<select class="rf-sel" data-sel="${key}"><option value="">${anyLabel}</option>`+
+    opts.map(o=>`<option value="${esc(o.v)}">${esc(o.t)}</option>`).join('')+`</select></label>`;
+}
+/* Build the dropdowns from the live data. Guarded by a dataset signature so it only
+   rebuilds when the data actually changes (e.g. demo→live load), preserving selections. */
+let _selSig='';
+function buildRefineSelects(force){
+  const root=$('refineSelects');if(!root)return;
+  const sig=CLIENTS.length+'|'+((CLIENTS[0]&&CLIENTS[0].id)||'');
+  if(!force&&sig===_selSig&&root.children.length)return;
+  _selSig=sig;
+  let html=selectRow('__due','Filing deadline',DUE_ORDER.map(k=>({v:k,t:DUE_BUCKETS[k].label})),'Any deadline');
+  FIELD_FACETS.forEach(f=>{
+    const vals=[...new Set(CLIENTS.map(c=>String(f.get(c)||'').trim()).filter(Boolean))].sort();
+    if(vals.length<2)return;                          // uniform/empty field → no select, no clutter
+    html+=selectRow(f.key,f.label,vals.map(v=>({v,t:v})),'Any '+f.label.toLowerCase());
+  });
+  root.innerHTML=html;
+}
+function applySelectState(){
+  const root=$('refineSelects');if(!root||!root.children.length)return;
+  const dd=root.querySelector('[data-sel="__due"]');
+  if(dd){dd.value=dueFacet||'';dd.classList.toggle('set',!!dd.value);}
+  FIELD_FACETS.forEach(f=>{const s=root.querySelector(`[data-sel="${f.key}"]`);if(!s)return;
+    s.value=fieldFacets[f.key]||'';
+    if(fieldFacets[f.key]&&s.value!==fieldFacets[f.key])delete fieldFacets[f.key]; // stale value gone from data
+    s.classList.toggle('set',!!s.value);});
+}
+function renderRefine(){
+  buildRefineSelects();
+  applySelectState();
+  // toggle counts reflect the current time window (visComms), independent of the active tab
+  TOGGLE_ORDER.forEach(k=>{const ct=$('rfct-'+k);if(ct)ct.textContent=CLIENTS.filter(TOGGLE_FACETS[k].test).length;
+    const opt=$('refineOpts').querySelector(`[data-facet="${k}"]`);if(opt)opt.classList.toggle('on',facets.has(k));});
+  const n=refineCount(),b=$('refineBadge');
+  b.textContent=n;b.hidden=n===0;
+  $('refineBtn').classList.toggle('on',n>0);
+  const cl=$('refineClear');if(cl)cl.disabled=n===0;
+}
+function toggleRefinePop(open){
+  const pop=$('refinePop'),btn=$('refineBtn');
+  const show=open===undefined?pop.hidden:open;
+  pop.hidden=!show;btn.classList.toggle('open',show);
+  if(show)renderRefine();
+}
+buildRefinePop();
+$('refineBtn').addEventListener('click',e=>{e.stopPropagation();toggleRefinePop();});
+$('refineOpts').addEventListener('click',e=>{
+  const opt=e.target.closest('.rf-opt');if(!opt)return;
+  const k=opt.dataset.facet;facets.has(k)?facets.delete(k):facets.add(k);
+  if(deskClient)closeDesk();renderGrid();
+});
+$('refineSelects').addEventListener('change',e=>{
+  const s=e.target.closest('.rf-sel');if(!s)return;
+  const key=s.dataset.sel,val=s.value;
+  if(key==='__due'){dueFacet=val||null;}
+  else if(val){fieldFacets[key]=val;}else{delete fieldFacets[key];}
+  if(deskClient)closeDesk();renderGrid();
+});
+$('refineClear').addEventListener('click',()=>{
+  if(!refineCount())return;
+  facets.clear();dueFacet=null;Object.keys(fieldFacets).forEach(k=>delete fieldFacets[k]);
+  if(deskClient)closeDesk();renderGrid();
+});
+document.addEventListener('click',e=>{
+  if($('refinePop').hidden)return;
+  if(!e.target.closest('.refine-wrap'))toggleRefinePop(false);
 });
 $('search').addEventListener('input',e=>{searchQ=e.target.value.trim();if(deskClient)closeDesk();renderGrid();});
 $('modeBtn').addEventListener('click',()=>{
@@ -2365,6 +2719,19 @@ function targetsOrWarn(){
 /* Templates: {name}/{first} placeholders are personalised per recipient. */
 const MAIL_SUBJ='ITR FY 2025-26 — documents required';
 const MAIL_BODY=`Dear {first},\n\nHope you are doing well. As part of this year's ITR filing (FY 2025-26), we need your documents to proceed with your return.\n\nPlease share them at your earliest convenience.\n\nWarm regards,\nSonia\nAcutant · ITR Filing Team`;
+const DEMO_EMAIL_TEMPLATES=[
+  {id:'demo-1',title:'Documents request — FY 25-26',templateKey:'doc-request-fy2526',subject:MAIL_SUBJ,body:MAIL_BODY,
+    category:'Documents',defaultNextAction:'Wait for documents',defaultAfterStatus:'Waiting',afterStatus:'pending',
+    sortOrder:10,isDefault:true,active:true},
+  {id:'demo-2',title:'Gentle reminder — documents',templateKey:'doc-reminder-fy2526',
+    subject:'Reminder — ITR FY 2025-26 documents still pending',body:`Dear {first},\n\nThis is a gentle reminder regarding your ITR FY 2025-26 documents. Please share them at your earliest convenience.\n\nWarm regards,\nSonia\nAcutant · ITR Filing Team`,
+    category:'Reminder',defaultNextAction:'Wait for documents',defaultAfterStatus:'Waiting',afterStatus:'pending',
+    sortOrder:20,isDefault:false,active:true},
+  {id:'demo-3',title:'Clarification needed',templateKey:'clarification-request',
+    subject:'ITR FY 2025-26 — clarification required',body:`Dear {first},\n\nWe need a clarification from you to proceed with your ITR FY 2025-26 return. Please reply with the requested details at your earliest convenience.\n\nWarm regards,\nSonia\nAcutant · ITR Filing Team`,
+    category:'Clarification',defaultNextAction:'Follow up on clarification',defaultAfterStatus:'Needs Reply',afterStatus:'needs',
+    sortOrder:30,isDefault:false,active:true}
+];
 const WA_TPL=c=>`Hello ${firstNameOf(c)}, this is Sonia from Acutant. A gentle reminder regarding your ITR FY 2025-26 documents — please share them at your earliest. Thank you!`;
 /* ── conditional email sections ────────────────────────────────
    {Field:Value|Value2}…{/Field} keeps the enclosed text only when the
@@ -2545,7 +2912,7 @@ async function saveComposer(){
       if(comp.after==='needs')patch.OutreachRequired=true;
       if(comp.after==='responded'){patch.OutreachRequired=false;if(!out)patch.LastContactOutcome='Completed';}
       if(comp.after==='pending'){patch.OutreachRequired=false;if(!na)patch.NextActionSummary='Awaiting client response';}
-      if(wantsEsc)patch.QCFlag=true;
+      if(wantsEsc){patch.QCFlag=true;patch.OutreachReason=out||ot||'Escalated';}
       if(appState.token&&c._sp)await graphPatch(trackerPath(c),patch);
       // local model
       c.comms.push({_sp:spId,type:comp.channel,date:today,dir:comp.dir,content:out||ot,read:comp.dir!=='in',
@@ -2580,7 +2947,7 @@ $('compSave').addEventListener('click',saveComposer);
 
    Returns {msgId, convId, viaFallback}. On total failure throws the clear
    Mail.Send.Shared + Send As explanation. */
-let emTargets=[],emRawTargets=[],emAfter='',emSentVia='';
+let emTargets=[],emRawTargets=[],emAfter='',emSentVia='',emSelectedTpl='',emTplHi=-1;
 const isAuthErr=e=>/403|404|ErrorAccessDenied|ErrorItemNotFound|Authorization_RequestDenied/i.test(e&&e.message||'');
 const isTransient=e=>/\b(429|500|502|503|504)\b|TooManyRequests|ServiceUnavailable|Failed to fetch|NetworkError|timeout/i.test(e&&e.message||'');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -2619,6 +2986,86 @@ async function graphSendMail(to,subject,body,isHtml){
   emSentVia=TEAM_MAILBOX;
   return {msgId:draft.id||null,convId:draft.conversationId||null,internetMsgId:draft.internetMessageId||null,viaFallback:false};
 }
+/* ── email template picker (ITR_EmailTemplates) ──────────────── */
+function updateTplButton(){
+  const lbl=$('emTplLabel');if(!lbl)return;
+  const tpl=EMAIL_TEMPLATES.find(t=>t.templateKey===emSelectedTpl);
+  if(tpl){lbl.textContent=tpl.title+(tpl.category?' · '+tpl.category:'');lbl.classList.remove('mut');}
+  else{lbl.textContent='Choose a template…';lbl.classList.add('mut');}
+}
+function positionTplDrop(){
+  const picker=$('emTplPicker'),drop=$('emTplDrop'),btn=$('emTplBtn');
+  if(!picker||!drop||drop.hidden||!btn)return;
+  const r=btn.getBoundingClientRect();
+  drop.style.left=r.left+'px';
+  drop.style.top=(r.bottom+2)+'px';
+  drop.style.width=r.width+'px';
+}
+function setTplDropOpen(on){
+  const picker=$('emTplPicker'),drop=$('emTplDrop'),btn=$('emTplBtn');
+  if(!drop)return;
+  if(on){drop.hidden=false;picker.classList.add('open');if(btn)btn.setAttribute('aria-expanded','true');positionTplDrop();}
+  else{drop.hidden=true;picker.classList.remove('open');if(btn)btn.setAttribute('aria-expanded','false');emTplHi=-1;}
+}
+function applyEmailTemplate(tpl,animate){
+  let body;
+  if(!tpl){
+    emSelectedTpl='';
+    $('emSubj').value=MAIL_SUBJ;
+    body=MAIL_BODY;
+    $('emNext').value='Wait for documents';
+    emAfter='pending';
+  }else{
+    emSelectedTpl=tpl.templateKey;
+    $('emSubj').value=tpl.subject;
+    body=tpl.body;
+    $('emNext').value=tpl.defaultNextAction||'';
+    emAfter=tpl.afterStatus||'';
+  }
+  updateTplButton();
+  $('segEmAfter').querySelectorAll('.seg-b').forEach(b=>b.classList.toggle('on',b.dataset.v===emAfter));
+  const ed=$('emBody'),newText=String(body||'');
+  const prefersReduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(animate&&ed&&!prefersReduced&&ed.innerText.trim()&&ed.innerText.replace(/\r/g,'')!==newText){
+    scrambleBody(ed,newText,()=>{ed.innerHTML=textToHtml(newText);emRefresh();});
+  }else{
+    ed.innerHTML=textToHtml(newText);
+    emRefresh();
+  }
+}
+function filterEmailTemplates(q){
+  const qq=String(q||'').trim().toLowerCase();
+  const list=EMAIL_TEMPLATES.filter(t=>t.active);
+  if(!qq)return list;
+  return list.filter(t=>t.title.toLowerCase().includes(qq)||t.category.toLowerCase().includes(qq)||
+    t.subject.toLowerCase().includes(qq)||t.templateKey.toLowerCase().includes(qq));
+}
+function closeTplDrop(){setTplDropOpen(false);}
+function renderTplList(q){
+  const listEl=$('emTplList');if(!listEl)return;
+  const items=filterEmailTemplates(q);
+  if(emTplHi>=items.length)emTplHi=items.length-1;
+  if(!items.length){listEl.innerHTML='<div class="tpl-empty">No matching templates</div>';return;}
+  listEl.innerHTML=items.map((t,i)=>'<button type="button" class="tpl-opt'+
+    (t.templateKey===emSelectedTpl?' on':'')+(i===emTplHi?' hi':'')+'" data-key="'+esc(t.templateKey)+'" role="option">'+
+    '<span class="tpl-opt-title">'+esc(t.title)+'</span>'+
+    (t.category?'<span class="tpl-opt-cat">'+esc(t.category)+'</span>':'')+
+    '<span class="tpl-opt-subj">'+esc(t.subject)+'</span></button>').join('');
+}
+function openTplDrop(){
+  const f=$('emTplFilter');if(f)f.value='';
+  emTplHi=-1;
+  renderTplList('');
+  setTplDropOpen(true);
+  setTimeout(()=>{if(f){f.focus();f.select();}},20);
+}
+function toggleTplDrop(){const drop=$('emTplDrop');if(drop&&!drop.hidden)closeTplDrop();else openTplDrop();}
+function pickEmailTemplate(tpl){
+  if(!tpl)return;
+  applyEmailTemplate(tpl,true);
+  closeTplDrop();
+  setTimeout(()=>$('emSubj').focus(),30);
+}
 function openEmail(targets){
   const raw=(targets||[]);
   const t=raw.filter(c=>c.mail);
@@ -2629,18 +3076,18 @@ function openEmail(targets){
   $('emSub').textContent=(single?(c.id+' · '+c.mail):'One personalised email per client, each logged separately')+' · sends as '+TEAM_MAILBOX;
   $('emTo').value=single?c.mail:t.map(x=>x.mail).join('; ');
   $('emTo').disabled=!single;
-  $('emSubj').value=MAIL_SUBJ;
-  $('emBody').innerHTML=textToHtml(MAIL_BODY);
-  empIdx=0;emRefresh();
-  $('emNext').value='Wait for documents';$('emDue').value='';
-  emAfter='pending';
-  $('segEmAfter').querySelectorAll('.seg-b').forEach(b=>b.classList.toggle('on',b.dataset.v===emAfter));
+  closeTplDrop();
+  const def=defaultEmailTemplate();
+  if(def)applyEmailTemplate(def);
+  else{applyEmailTemplate(null);if(!EMAIL_TEMPLATES.length)toast('Templates unavailable — using built-in default');}
+  empIdx=0;
+  $('emDue').value='';
   $('emErr').classList.remove('show');
   const btn=$('emSend');btn.disabled=false;btn.textContent='Send as '+TEAM_MAILBOX+(single?'':' ('+t.length+')');
   $('emOv').classList.add('open');
   setTimeout(()=>$('emBody').focus(),60);
 }
-function closeEmail(){$('emOv').classList.remove('open');}
+function closeEmail(){closeTplDrop();$('emOv').classList.remove('open');}
 /* ── conditional-section editor wiring ─────────────────────────
    Live backdrop highlight + a chip per taggable field that wraps the
    current selection in {Field:Value}…{/Field}. Highlight never leaves
@@ -2651,6 +3098,46 @@ function closeEmail(){$('emOv').classList.remove('open');}
    emBodyText() returns plain text (with the {tags} intact) for logging,
    validation and tag detection. */
 function textToHtml(t){return esc(String(t||'')).replace(/\n/g,'<br>');}
+/* Template-swap "jumble & resolve" transition. Old body text dissolves into a
+   wave of coloured random glyphs that settle top-to-bottom into the new
+   template. Screen-only theatre: the caller replaces the editor with clean
+   HTML (and re-decorates tags) the moment it settles. Lengths are small and
+   we redraw via one innerHTML per frame, so it stays cheap. */
+const SCRAMBLE_GLYPHS='!<>-_\\/[]{}=+*^?#~$%@';
+let _scrambleRAF=0;
+function scrambleBody(ed,newText,onDone){
+  cancelAnimationFrame(_scrambleRAF);
+  const oldText=ed.innerText.replace(/\r/g,''),len=Math.max(oldText.length,newText.length);
+  if(!len){onDone&&onDone();return;}
+  const spread=20,q=[];
+  for(let i=0;i<len;i++){
+    const start=Math.floor((i/len)*spread)+Math.floor(Math.random()*6);
+    q.push({from:oldText[i]||'',to:newText[i]||'',start:start,end:start+7+Math.floor(Math.random()*10),ch:'',col:0});
+  }
+  const glyph=(c,scr,col)=>{
+    if(c==='\n')return '<br>';
+    if(c==='')return '';
+    const e=c==='&'?'&amp;':c==='<'?'&lt;':c==='>'?'&gt;':c;
+    return scr?'<span class="rt-scr c'+col+'">'+e+'</span>':e;
+  };
+  ed.classList.add('rt-scrambling');ed.setAttribute('aria-busy','true');
+  let frame=0;
+  const tick=()=>{
+    let out='',done=0;
+    for(let i=0;i<q.length;i++){
+      const c=q[i];
+      if(frame>=c.end){done++;out+=glyph(c.to,false,0);}
+      else if(frame>=c.start){
+        if(!c.ch||Math.random()<0.3){c.ch=SCRAMBLE_GLYPHS[Math.floor(Math.random()*SCRAMBLE_GLYPHS.length)];c.col=(c.col+1)&3;}
+        out+=glyph(c.ch,true,c.col);
+      }else out+=glyph(c.from,false,0);
+    }
+    ed.innerHTML=out;
+    if(done===q.length){ed.classList.remove('rt-scrambling');ed.removeAttribute('aria-busy');onDone&&onDone();return;}
+    frame++;_scrambleRAF=requestAnimationFrame(tick);
+  };
+  _scrambleRAF=requestAnimationFrame(tick);
+}
 function emBodyHtml(){const ed=$('emBody');if(!ed)return'';const clone=ed.cloneNode(true);
   clone.querySelectorAll('span.em-tag').forEach(s=>s.replaceWith(document.createTextNode(s.textContent)));
   return clone.innerHTML;}
@@ -2768,7 +3255,29 @@ let _emDeco;
 $('emTagChips').addEventListener('mousedown',e=>{const b=e.target.closest('.tag-chip');if(b){e.preventDefault();insertTag(b.dataset.tag);}});
 $('emBody').addEventListener('input',()=>{clearTimeout(_emDeco);_emDeco=setTimeout(emRefresh,180);});
 $('emBody').addEventListener('blur',emRefresh);
+$('emTplBtn').addEventListener('click',e=>{e.stopPropagation();toggleTplDrop();});
+$('emTplFilter').addEventListener('input',()=>{emTplHi=-1;renderTplList($('emTplFilter').value);});
+$('emTplFilter').addEventListener('keydown',e=>{
+  e.stopPropagation();
+  const q=$('emTplFilter').value;
+  const items=filterEmailTemplates(q);
+  if(e.key==='ArrowDown'){e.preventDefault();emTplHi=Math.min(emTplHi+1,items.length-1);renderTplList(q);}
+  else if(e.key==='ArrowUp'){e.preventDefault();emTplHi=Math.max(emTplHi-1,0);renderTplList(q);}
+  else if(e.key==='Enter'&&emTplHi>=0&&items[emTplHi]){e.preventDefault();pickEmailTemplate(items[emTplHi]);}
+  else if(e.key==='Escape'){e.preventDefault();closeTplDrop();$('emTplBtn').focus();}
+});
+$('emTplList').addEventListener('mousedown',e=>{
+  const b=e.target.closest('.tpl-opt');if(!b)return;
+  e.preventDefault();
+  const tpl=EMAIL_TEMPLATES.find(t=>t.templateKey===b.dataset.key);
+  if(tpl)pickEmailTemplate(tpl);
+});
 $('emSubj').addEventListener('input',()=>{if($('emCard').classList.contains('expanded'))renderPreview();});
+document.addEventListener('click',e=>{
+  if($('emOv').classList.contains('open')&&!e.target.closest('#emTplPicker'))closeTplDrop();
+});
+window.addEventListener('resize',positionTplDrop);
+$('emCard').querySelector('.comp-bd').addEventListener('scroll',positionTplDrop,{passive:true});
 $('emExpand').addEventListener('click',()=>setExpanded(!$('emCard').classList.contains('expanded')));
 $('empPrev').addEventListener('click',()=>empNav(-1));
 $('empNext').addEventListener('click',()=>empNav(1));
@@ -2801,6 +3310,16 @@ function injectCID(subject,body,cid,isHtml){
 }
 /* Send + log ONE client. Shared by single-send and the bulk queue, so both
    honour the team@-only path. Returns {msgId,convId,to}; throws on failure. */
+function buildFollowUpPatch(na,due,after,basePatch,applyFollowUp){
+  const patch={...basePatch};
+  if(!applyFollowUp)return patch;
+  patch.NextActionSummary=na;
+  patch.NextActionDue=due||null;
+  if(after==='needs')patch.OutreachRequired=true;
+  if(after==='pending'){patch.OutreachRequired=false;if(!na)patch.NextActionSummary='Awaiting client response';}
+  if(after==='responded')patch.OutreachRequired=false;
+  return patch;
+}
 async function deliverEmail(c,ctx){
   const now=new Date().toISOString(),today=now.split('T')[0];
   const to=(ctx.toOverride||c.mail||'').trim();
@@ -2816,10 +3335,7 @@ async function deliverEmail(c,ctx){
   // Mail is now sent. Logging/tracker writes must NOT propagate (a SoniaLog
   // hiccup must not trigger a resend) — record a warning instead.
   let spId=null,logWarn='';
-  const patch={LastContactDate:now,LastContactOutcome:'Email sent: '+subj,NextActionSummary:na,NextActionDue:due||null,LastUpdated:now};
-  if(after==='needs')patch.OutreachRequired=true;
-  if(after==='pending'){patch.OutreachRequired=false;if(!na)patch.NextActionSummary='Awaiting client response';}
-  if(after==='responded')patch.OutreachRequired=false;
+  const patch=buildFollowUpPatch(na,due,after,{LastContactDate:now,LastContactOutcome:'Email sent: '+subj,LastUpdated:now},true);
   if(appState.token){
     try{
       // log the full email; if the Outcome column rejects long text, retry with subject only
@@ -3045,6 +3561,76 @@ onBackdrop($('blkOv'),()=>{if(bulkRunning)return;if(bulkBatch&&bulkBatch.status=
    Replies go through POST /messages/{id}/reply, so Outlook sends from
    team@ with the original quoted. The reply is then logged to SoniaLog
    (full text) and the tracker summary patched — one motion. */
+const REPLY_PRESETS={
+  wait1w:{na:'Wait for documents',days:7,after:'pending'},
+  '3d':{na:'Follow up',days:3,after:'pending'},
+  needs:{na:'',days:null,after:'needs'}
+};
+function readReplyLog(root){
+  const box=root&&(root.classList&&root.classList.contains('reply-box'))?root:root.querySelector('.reply-box');
+  if(!box)return {na:'',due:'',after:''};
+  const na=(box.querySelector('.reply-next')?.value||'').trim();
+  const due=box.querySelector('.reply-due')?.value||'';
+  const onSeg=box.querySelector('.reply-seg .seg-b.on');
+  const after=onSeg?onSeg.dataset.v:'';
+  return {na,due,after};
+}
+function updateReplyLogSummary(box){
+  const el=box.querySelector('.reply-log-summary');
+  if(!el)return;
+  const {na,due,after}=readReplyLog(box);
+  const parts=[];
+  if(after==='needs')parts.push('Needs reply');
+  else if(after==='pending')parts.push('Waiting');
+  else if(after==='responded')parts.push('Done');
+  if(due)parts.push('follow-up '+fmt(due));
+  else if(na)parts.push(na);
+  el.textContent=parts.length?parts.join(' · '):'';
+}
+function applyReplyPreset(box,presetKey){
+  const p=REPLY_PRESETS[presetKey];if(!p)return;
+  const next=box.querySelector('.reply-next'),due=box.querySelector('.reply-due');
+  if(next)next.value=p.na||'';
+  if(due)due.value=p.days!=null?addDays(TODAY,p.days):'';
+  box.querySelectorAll('.reply-seg .seg-b').forEach(b=>b.classList.toggle('on',b.dataset.v===p.after));
+  box.querySelectorAll('.reply-q').forEach(b=>b.classList.toggle('on',b.dataset.preset===presetKey));
+  updateReplyLogSummary(box);
+}
+function wireReplyLogControls(container){
+  const box=container.querySelector('.reply-box');
+  if(!box)return;
+  const panel=box.querySelector('.reply-log-panel'),toggle=box.querySelector('.reply-log-toggle');
+  if(toggle&&panel)toggle.addEventListener('click',()=>{
+    const open=panel.hidden;
+    panel.hidden=!open;
+    toggle.classList.toggle('open',open);
+    toggle.textContent=open?'Log & follow-up ▴':'Log & follow-up ▾';
+  });
+  box.querySelectorAll('.reply-q').forEach(b=>b.addEventListener('click',()=>applyReplyPreset(box,b.dataset.preset)));
+  box.querySelectorAll('.reply-seg .seg-b').forEach(b=>b.addEventListener('click',()=>{
+    box.querySelectorAll('.reply-seg .seg-b').forEach(x=>x.classList.toggle('on',x===b));
+    box.querySelectorAll('.reply-q').forEach(x=>x.classList.remove('on'));
+    updateReplyLogSummary(box);
+  }));
+  box.querySelectorAll('.reply-qd').forEach(b=>b.addEventListener('click',()=>{
+    const inp=box.querySelector('.reply-due');if(!inp)return;
+    inp.value=b.dataset.d==='clear'?'':addDays(TODAY,parseInt(b.dataset.d,10));
+    box.querySelectorAll('.reply-q').forEach(x=>x.classList.remove('on'));
+    updateReplyLogSummary(box);
+    b.classList.add('qd-hit');setTimeout(()=>b.classList.remove('qd-hit'),220);
+  }));
+  box.querySelectorAll('.reply-next,.reply-due').forEach(inp=>{
+    const sync=()=>{box.querySelectorAll('.reply-q').forEach(x=>x.classList.remove('on'));updateReplyLogSummary(box);};
+    inp.addEventListener('input',sync);inp.addEventListener('change',sync);
+  });
+}
+function replyToastMsg(na,due,after){
+  if(due)return '↩ Reply sent · follow-up '+fmt(due);
+  if(after==='pending')return '↩ Reply sent · marked waiting';
+  if(after==='needs')return '↩ Reply sent · needs reply';
+  if(after==='responded')return '↩ Reply sent · marked done';
+  return '↩ Reply sent from '+TEAM_MAILBOX+' & logged';
+}
 function wireMailControls(container,client,m){
   if(!m||!m._mail)return;
   const lf=container.querySelector('[data-mailact="full"]');
@@ -3059,12 +3645,15 @@ function wireMailControls(container,client,m){
   });
   const rs=container.querySelector('[data-mailact="reply"]');
   if(rs)rs.addEventListener('click',()=>sendMailReply(container,client,m,rs));
+  wireReplyLogControls(container);
 }
 async function sendMailReply(container,client,m,btn){
   const ta=container.querySelector('.reply-ta');
   const txt=ta&&ta.value.trim();
   if(!txt){toast('Write the reply first');if(ta)ta.focus();return;}
   if(!appState.token){toast('Reply needs a live sign-in (not available in demo)');return;}
+  const {na,due,after}=readReplyLog(container);
+  const touchFollowUp=!!(after||na||due);
   btn.disabled=true;btn.textContent='Sending…';
   const now=new Date().toISOString(),today=now.split('T')[0];
   const subj='Re: '+String(m.content).replace(/^((re|fw|fwd):\s*)+/i,'');
@@ -3076,29 +3665,35 @@ async function sendMailReply(container,client,m,btn){
     await graphPost(mailPath(m._mail.id)+'/reply',{comment:replyBody.replace(/\n/g,'<br>')});
     // log the reply + tracker summary
     let spId=null;
+    const patch=buildFollowUpPatch(na,due,after,{LastContactDate:now,LastContactOutcome:'Replied: '+subj,LastUpdated:now},touchFollowUp);
     try{
       const fields={ClientID:client.id,ClientName:client.name,ContactDate:now,Channel:'Email',
         Direction:'Outbound',SoniaRead:true,
-        Outcome:'EMAIL REPLY — '+subj+'\nTo: '+m._mail.from+'\n\n'+txt,Subject:subj,NextAction:'',
+        Outcome:'EMAIL REPLY — '+subj+'\nTo: '+m._mail.from+'\n\n'+txt,Subject:subj,NextAction:na,
         LoggedBy:loggedByName(),OutcomeType:'Sent',ContactOwner:'Sonia',NeedsEscalation:false,
         SenderEmail:TEAM_MAILBOX,RecipientEmail:m._mail.from||'',SourceMailbox:TEAM_MAILBOX};
       if(client._sp)fields.RelatedClientTrackerId=String(client._sp);
       if(m._mail.conv)fields.ConversationId=m._mail.conv;
+      if(due)fields.NextActionDue=due;
       try{const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
       catch(e){fields.Outcome='Email reply sent: '+subj;
         const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
-      if(client._sp)await graphPatch(trackerPath(client),{LastContactDate:now,LastContactOutcome:'Replied: '+subj,LastUpdated:now});
+      if(client._sp)await graphPatch(trackerPath(client),patch);
     }catch(e){console.warn('[outreach] reply sent but logging failed:',e.message);}
     client.comms.push({_sp:spId,type:'email',date:today,dir:'out',content:subj,read:true,
-      outcome:'EMAIL REPLY — '+subj+'\n\n'+txt,subject:subj,nextAction:'',outcomeType:'Sent',
-      docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:'',escalation:false,
+      outcome:'EMAIL REPLY — '+subj+'\n\n'+txt,subject:subj,nextAction:na,outcomeType:'Sent',
+      docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:due,escalation:false,
       convId:m._mail.conv||null});
     client.lastContactDate=today;client.lastContactOutcome='Replied: '+subj;
+    if(touchFollowUp){
+      client.nextActionSummary=patch.NextActionSummary||na;client.nextActionDue=due||'';
+      if(after==='needs')client.outreachRequired=true;else if(after)client.outreachRequired=false;
+    }
     rederive(client);
     // reading + answering it counts as read (Sonia only, mirrors to mailbox)
     const idx=client.comms.indexOf(m);if(idx>=0)setRead(client.id,idx,true);
     refreshAfterWrite();
-    toast('↩ Reply sent from '+TEAM_MAILBOX+' & logged');
+    toast(replyToastMsg(na,due,after));
   }catch(e){
     btn.disabled=false;btn.textContent='↩ Send Reply';
     if(/403|ErrorAccessDenied|Authorization_RequestDenied/i.test(e.message))
@@ -3183,10 +3778,54 @@ async function followUp(targets,date){
   refreshAfterWrite();
   toast(fail?`⚠ ${ok} set · ${fail} failed`:`⏰ Follow-up ${fmt(date)} set on ${ok} file${ok!==1?'s':''}${demoSuffix()}`);
 }
+let flagTarget=null;
+function openFlagModal(c){
+  flagTarget=c;
+  $('flagTitle').textContent=c.flagged?'Update Flag':'Raise Flag';
+  $('flagSub').textContent=[c.id,c.name].filter(Boolean).join(' · ');
+  $('flagReason').value=c.flagged?c.flagReason:'';
+  $('flagSave').textContent=c.flagged?'Update Flag':'Raise Flag';
+  $('flagSave').disabled=false;
+  $('flagOv').classList.add('open');
+  setTimeout(()=>$('flagReason').focus(),60);
+}
+function closeFlagModal(){$('flagOv').classList.remove('open');flagTarget=null;}
+async function raiseFlag(c,reason){
+  const updating=c.flagged;
+  const now=new Date().toISOString(),today=now.split('T')[0];
+  let spId=null;
+  if(appState.token){
+    const fields={ClientID:c.id,ClientName:c.name,ContactDate:now,Channel:'Note',
+      Direction:'Outbound',SoniaRead:true,Outcome:reason,OutcomeType:'Escalated',
+      LoggedBy:loggedByName(),ContactOwner:'Sonia',NeedsEscalation:true};
+    if(c._sp)fields.RelatedClientTrackerId=String(c._sp);
+    const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});
+    spId=r&&r.id;
+    if(c._sp)await graphPatch(trackerPath(c),{QCFlag:true,OutreachReason:reason,LastUpdated:now});
+  }
+  c.flagged=true;c.flagReason=reason;
+  c.comms.push({_sp:spId,type:'note',date:today,dir:'out',content:reason,read:true,
+    outcome:reason,outcomeType:'Escalated',nextAction:'',docName:'',docUrl:'',
+    loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:'',escalation:true});
+  const flagComm=c.comms.find(m=>m.type==='flag');
+  if(flagComm){flagComm.content=reason;flagComm.date=today;}
+  else c.comms.push({_sp:null,type:'flag',date:today,dir:'out',content:reason,read:true});
+  closeFlagModal();
+  refreshAfterWrite();
+  toast('✓ Flag '+(updating?'updated':'raised')+demoSuffix());
+}
+async function saveFlag(){
+  const reason=$('flagReason').value.trim();
+  if(!reason){toast('Enter a reason for the flag');$('flagReason').focus();return;}
+  const c=flagTarget;if(!c)return;
+  const btn=$('flagSave');btn.disabled=true;
+  try{await raiseFlag(c,reason);}
+  catch(e){btn.disabled=false;toast('⚠ Flag failed: '+e.message.slice(0,60));}
+}
 async function resolveFlag(c){
   try{
     const now=new Date().toISOString();
-    if(appState.token&&c._sp)await graphPatch(trackerPath(c),{QCFlag:false,LastUpdated:now});
+    if(appState.token&&c._sp)await graphPatch(trackerPath(c),{QCFlag:false,OutreachReason:'',LastUpdated:now});
     if(appState.token)for(const m of c.comms)if(m.escalation&&m._sp)await graphPatch(soniaPath(m._sp),{NeedsEscalation:false}).catch(()=>{});
     c.flagged=false;c.flagReason='';
     c.comms=c.comms.filter(m=>m.type!=='flag');c.comms.forEach(m=>m.escalation=false);
@@ -3196,7 +3835,8 @@ async function resolveFlag(c){
   }catch(e){toast('⚠ Resolve failed: '+e.message.slice(0,60));}
 }
 function doAct(a){
-  if(a==='resolve-flag'&&deskClient){resolveFlag(deskClient);return;}
+  const c=cmClient||deskClient;
+  if(a==='resolve-flag'&&c){resolveFlag(c);return;}
   if(a.indexOf('reassign:')===0){reassignComm(a.slice(9));return;}
   if(a==='reassign-other'){
     const id=window.prompt('Assign this message to which ClientID?');
@@ -3253,7 +3893,15 @@ $('daLog').addEventListener('click',()=>deskClient&&openComposer([deskClient]));
 $('daNeeds').addEventListener('click',()=>deskClient&&statusSet([deskClient],'needs'));
 $('daWait').addEventListener('click',()=>deskClient&&statusSet([deskClient],'pending'));
 $('daDone').addEventListener('click',()=>deskClient&&statusSet([deskClient],'responded'));
+$('daFlag').addEventListener('click',()=>deskClient&&openFlagModal(deskClient));
 $('daDueSet').addEventListener('click',()=>deskClient&&followUp([deskClient],$('daDue').value));
+$('chipsFlag').innerHTML=FR.map(t=>`<span class="chip" data-t="${esc(t)}">${esc(t)}</span>`).join('');
+$('chipsFlag').addEventListener('click',e=>{const ch=e.target.closest('.chip');if(!ch)return;
+  const i=$('flagReason');i.value=i.value.trim()?i.value.trim()+'; '+ch.dataset.t:ch.dataset.t;i.focus();});
+$('flagClose').addEventListener('click',closeFlagModal);
+$('flagCancel').addEventListener('click',closeFlagModal);
+$('flagSave').addEventListener('click',saveFlag);
+onBackdrop($('flagOv'),closeFlagModal);
 
 /* quick follow-up date chips: fill the date input named in data-qd */
 document.addEventListener('click',e=>{
