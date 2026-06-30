@@ -1446,6 +1446,47 @@ const CHANNEL_TYPE={'whatsapp':'whatsapp','call':'call','email':'email','in pers
 /* Heuristic inbound markers, used only when no explicit Direction column exists. */
 const INBOUND_OUTCOMES=['info received','doc shared','received','docs received','clarification received'];
 
+/* ═══ FILE STORE ════════════════════════════════════════════
+   FILE_STORE is the in-memory source of truth for client folder contents.
+   Populated by the background scanner; updated on desk open (force-refresh).
+   { clientId: { files: [{name,url,modified}], loading: bool } }               */
+const FILE_STORE={};
+const FILE_CACHE_TTL=4*60*60*1000; // 4 hours
+function isStdFile(name){const n=lc(name);return n.includes('ais')||n.includes('26as');}
+function clientFolderPath(c){
+  // Returns a Graph-API-ready path string: each segment individually encoded.
+  return ['ITR 2026','Client Folders',c.id+' - '+c.name].map(encodeURIComponent).join('/');
+}
+function filesFromCache(clientId){
+  try{
+    const raw=localStorage.getItem('itr_files_'+clientId);
+    if(!raw)return null;
+    const e=JSON.parse(raw);
+    if(Date.now()-e.ts>FILE_CACHE_TTL)return null;
+    return e.files;
+  }catch{return null;}
+}
+function filesToCache(clientId,files){
+  try{localStorage.setItem('itr_files_'+clientId,JSON.stringify({ts:Date.now(),files}));}
+  catch{}
+}
+async function fetchClientFiles(c){
+  const path='/sites/'+SITE_ID+'/drive/root:/'+clientFolderPath(c)+':/children?$select=name,webUrl,lastModifiedDateTime,file';
+  try{
+    const data=await graphGet(path);
+    return(data.value||[])
+      .filter(item=>item.file) // files only, skip subfolders
+      .map(item=>({
+        name:item.name,
+        url:item.webUrl,
+        modified:item.lastModifiedDateTime?item.lastModifiedDateTime.split('T')[0]:''
+      }));
+  }catch(e){
+    // 404 = folder doesn't exist yet; treat as empty rather than error
+    if(String(e.message).includes('404'))return[];
+    throw e;
+  }
+}
 const appState={msalApp:null,token:null,user:null,isSonia:false};
 
 function spBool(v){return v===true||v==='true'||v==='Yes'||v===1||v==='1';}
@@ -1467,6 +1508,12 @@ async function graphPost(path,body){
   const r=await fetch(GRAPH_BASE+path,{method:'POST',headers:{Authorization:'Bearer '+appState.token,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(body)});
   if(!r.ok)throw new Error('POST '+r.status+' '+(await r.text()).slice(0,160));
   if(r.status===202||r.status===204)return{};   // e.g. /me/sendMail returns 202 with no body
+  return r.json();
+}
+async function graphPut(path,body,contentType){
+  const r=await fetch(GRAPH_BASE+path,{method:'PUT',
+    headers:{Authorization:'Bearer '+appState.token,'Content-Type':contentType||'application/octet-stream'},body});
+  if(!r.ok)throw new Error('PUT '+r.status+' '+(await r.text()).slice(0,160));
   return r.json();
 }
 function trackerPath(c){return '/sites/'+SITE_ID+'/lists/'+LIST_IDS.clients+'/items/'+c._sp+'/fields';}
