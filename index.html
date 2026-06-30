@@ -1907,6 +1907,34 @@ function renderGrid(){
   syncHalfSel();
 }
 
+/* ─── FILE TAB HELPERS ──────────────────────────────────── */
+function makeFileTabsHtml(c){
+  const entry=FILE_STORE[c.id];
+  if(!entry)return'<span class="fc-files-scan">···</span>';
+  const{files}=entry;
+  if(!files.length)return'<span class="fc-files-empty">— no files</span>';
+  const MAX=6;
+  const shown=files.slice(0,MAX);
+  const overflow=files.length-MAX;
+  const tabs=shown.map(f=>{
+    const col=isStdFile(f.name)?'var(--file-std)':'var(--file-add)';
+    return`<a class="file-tab" href="${esc(f.url)}" target="_blank" title="${esc(f.name)}" style="background:${col}" onclick="event.stopPropagation()"></a>`;
+  }).join('');
+  return tabs+(overflow>0?`<span class="file-tab-more">+${overflow}</span>`:'');
+}
+function makeFileBadgeHtml(c){
+  const entry=FILE_STORE[c.id];
+  if(!entry)return'';
+  const{files}=entry;
+  if(!files.length)return'';
+  const std=files.filter(f=>isStdFile(f.name)).length;
+  const add=files.filter(f=>!isStdFile(f.name)).length;
+  const parts=[];
+  if(std)parts.push(`<span class="fb-std">${std}S</span>`);
+  if(add)parts.push(`<span class="fb-add">+${add}</span>`);
+  return parts.join(' ');
+}
+
 /* ─── CLOSED CARD ───────────────────────────────────────────── */
 function makeClosedCard(c){
   const comms=visComms(c);const counts={};
@@ -1932,7 +1960,7 @@ function makeClosedCard(c){
     <div class="cchips">${chipHtml}${issueChip}</div>
     ${reason}
     <div class="cfoot"><div style="display:flex;gap:4px;align-items:center;min-width:0;"><span class="cdate">${footDate}</span>${dueChip(c)}</div>${c.status!=='idle'?`<span class="cst ${c.status}">${SL[c.status]}</span>`:''}</div>
-  </div>`;
+  </div><div class="fc-files">${makeFileTabsHtml(c)}</div>`;
   el.addEventListener('click',()=>{if(selectMode)toggleSel(c,el);else openDesk(c);});
   return el;
 }
@@ -1959,7 +1987,7 @@ function makeOpenCard(c){
   el.innerHTML=`${selectMode?`<div class="selchk">${SEL.has(c.id)?'✓':''}</div>`:''}<div class="sc-tray">
     <div class="sheets">${sheetHtml}</div>
     <div class="sname">${esc(c.name)}</div>
-    <div class="smeta"><span class="scnt">${comms.length} SLIP${comms.length!==1?'S':''}</span>${unreadCount?`<span class="sunread">${unreadCount} NEW</span>`:''}${dueChip(c)}<div class="sdot" style="background:${statusCol[c.status]}"></div></div>
+    <div class="smeta"><span class="scnt">${comms.length} SLIP${comms.length!==1?'S':''}</span>${unreadCount?`<span class="sunread">${unreadCount} NEW</span>`:''}${dueChip(c)}<div class="sdot" style="background:${statusCol[c.status]}"></div><span class="sc-file-badge">${makeFileBadgeHtml(c)}</span></div>
   </div>`;
   el.addEventListener('click',()=>{if(selectMode)toggleSel(c,el);else openDesk(c);});
   return el;
