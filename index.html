@@ -939,6 +939,10 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   <div class="sw"><span class="si">⌕</span><input class="search" id="search" placeholder="Search…"/></div>
 </header>
 <div class="red-rule"></div>
+<div class="scan-wrap" id="scanWrap" hidden>
+  <div class="scan-track"><div class="scan-fill" id="scanFill"></div></div>
+  <div class="scan-caption" id="scanCaption"></div>
+</div>
 
 <div class="toolbar">
   <span class="tb-lbl">Act:</span>
@@ -1756,6 +1760,7 @@ async function loadLive(){
         toast('Team mailbox not readable — grant Mail.ReadWrite.Shared + mailbox access');
     }
     rebuildDates();renderGrid();renderTimeline();
+    startFilesScan(CLIENTS).catch(e=>console.warn('[files] scan failed:',e.message));
     showStatus(CLIENTS.length+' files · '+LAST_DIAG.logRows+' logged · '+EMAIL_TEMPLATES.length+' templates'+mailNote+(appState.isSonia?' · Sonia':' · view-only'));
   }catch(e){showSignin('Failed to load data: '+(e.message||e));showStatus('Load failed');}
 }
@@ -2779,6 +2784,53 @@ window.addEventListener('resize',renderTimeline);
 /* ═══ TOAST ═════════════════════════════════════════════════════ */
 function mockAction(msg){toast(msg);}
 let _st;
+/* ─── SCAN BAR ──────────────────────────────────────────── */
+function updateScanBar(done,total){
+  const fill=$('scanFill'),cap=$('scanCaption');
+  if(!fill)return;
+  fill.style.width=(total?Math.round(done/total*100):0)+'%';
+  if(cap)cap.textContent='scanning files · '+done+' / '+total;
+}
+function hideScanBar(){
+  const wrap=$('scanWrap');if(!wrap)return;
+  wrap.style.opacity='0';
+  setTimeout(()=>{wrap.hidden=true;wrap.style.opacity='';},500);
+}
+async function startFilesScan(clients){
+  if(!appState.token)return;
+  // Seed FILE_STORE from cache immediately so cards render on first paint
+  clients.forEach(c=>{
+    const cached=filesFromCache(c.id);
+    if(cached)FILE_STORE[c.id]={files:cached,loading:false};
+  });
+  const toFetch=clients.filter(c=>!FILE_STORE[c.id]);
+  if(!toFetch.length){hideScanBar();renderRefine();return;}
+  const wrap=$('scanWrap');if(wrap)wrap.hidden=false;
+  updateScanBar(0,toFetch.length);
+  const BATCH=15;let done=0;
+  for(let i=0;i<toFetch.length;i+=BATCH){
+    const batch=toFetch.slice(i,i+BATCH);
+    await Promise.all(batch.map(async c=>{
+      try{
+        const files=await fetchClientFiles(c);
+        FILE_STORE[c.id]={files,loading:false};
+        filesToCache(c.id,files);
+      }catch{FILE_STORE[c.id]={files:[],loading:false};}
+      done++;
+      updateScanBar(done,toFetch.length);
+      // Update existing card in-place — no full grid re-render
+      const cardEl=document.querySelector('#grid [data-id="'+c.id+'"]');
+      if(cardEl){
+        const tabsEl=cardEl.querySelector('.fc-files');
+        if(tabsEl)tabsEl.innerHTML=makeFileTabsHtml(c);
+        const badgeEl=cardEl.querySelector('.sc-file-badge');
+        if(badgeEl)badgeEl.innerHTML=makeFileBadgeHtml(c);
+      }
+    }));
+  }
+  hideScanBar();
+  renderRefine(); // update file facet counts now that scan is complete
+}
 function toast(msg){const el=$('snack');el.textContent=msg;el.classList.add('show');clearTimeout(_st);_st=setTimeout(()=>el.classList.remove('show'),2200);}
 
 /* ═══ OPERATOR ENGINE ═══════════════════════════════════════════
