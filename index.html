@@ -161,7 +161,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .grid-wrap::-webkit-scrollbar{width:8px;}
 .grid-wrap::-webkit-scrollbar-thumb{background:#cfcfcf;border-radius:4px;}
 .grid-wrap::-webkit-scrollbar-thumb:hover{background:#bbb;}
-#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:12px;align-items:start;}
+#grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:10px;align-items:start;}
 
 /* ─── CLOSED CARD ────────────────────────────────────────── */
 .fc{position:relative;cursor:pointer;transition:transform .16s var(--ease);}
@@ -176,7 +176,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   letter-spacing:1.2px;text-transform:uppercase;padding:5px 12px;border-radius:2px;box-shadow:var(--sh2);
   animation:typeHintFade 1s var(--ease) forwards;}
 @keyframes typeHintFade{0%,65%{opacity:1;}100%{opacity:0;}}
-.fc-face{background:var(--surface);border:1px solid var(--line);border-radius:2px;
+.fc-face{background:var(--surface);border:1px solid var(--line);border-radius:2px 2px 0 0;
   padding:11px 11px 9px;min-height:96px;position:relative;overflow:hidden;box-shadow:var(--sh1);
   transition:border-color .16s,box-shadow .16s;}
 .fc:hover .fc-face{border-color:#c9c9c9;box-shadow:var(--sh2);}
@@ -189,8 +189,14 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .fc[data-flag] .unread-badge{right:19px;}
 @keyframes pflag{0%,100%{opacity:1;}50%{opacity:.45;}}
 .cid{font-family:var(--cond);font-size:.62rem;color:var(--mut2);letter-spacing:.6px;margin-bottom:2px;}
-.cname{font-family:var(--cond);font-size:.92rem;font-weight:700;color:var(--ink);line-height:1.15;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px;text-transform:uppercase;letter-spacing:.2px;}
+.cname{overflow:hidden;height:calc(2*1.15*0.92rem);margin-bottom:8px;text-transform:uppercase;width:100%;}
+.cname-r{font-family:var(--cond);font-size:.92rem;font-weight:700;color:var(--ink);line-height:1.15;
+  letter-spacing:.2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;max-width:100%;}
+.cname-r2{display:block;overflow:hidden;height:calc(1*1.15*0.92rem);width:100%;}
+.cname-r2-inner{font-family:var(--cond);font-size:.92rem;font-weight:700;color:var(--ink);line-height:1.15;
+  letter-spacing:.2px;display:inline-block;white-space:nowrap;}
+.fc:hover .cname-r2--long .cname-r2-inner{animation:cnameMarq 4s linear infinite;animation-delay:.3s;}
+@keyframes cnameMarq{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
 .cchips{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px;}
 .cchip{font-family:var(--cond);font-size:.6rem;font-weight:700;padding:2px 5px;border-radius:2px;color:#fff;letter-spacing:.3px;}
 .cfoot{display:flex;align-items:center;justify-content:space-between;}
@@ -204,18 +210,25 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
 /* ─── FILE TABS (card bottom) ──────────────────────────── */
-.fc-files{display:flex;align-items:center;gap:4px;padding:5px 11px 6px;min-height:22px;border-top:1px solid var(--line);flex-wrap:nowrap;overflow:hidden;}
-.file-tab{display:inline-flex;align-items:center;height:18px;border-radius:3px;overflow:hidden;flex-shrink:0;
-  text-decoration:none;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.1);transition:box-shadow .12s;}
-.file-tab:hover{box-shadow:0 2px 6px rgba(0,0,0,.18);}
-.ft-abbr{display:flex;align-items:center;justify-content:center;width:22px;height:100%;flex-shrink:0;
-  background:var(--fc,#888);color:#fff;font-family:var(--cond);font-size:.58rem;font-weight:800;letter-spacing:.4px;}
-.ft-name{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;font-family:var(--cond);font-size:.62rem;
-  font-weight:600;color:var(--ink2);padding:0;letter-spacing:.2px;
-  transition:max-width .2s ease,opacity .15s ease,padding .2s ease;}
-.file-tab:hover .ft-name{max-width:110px;opacity:1;padding:0 6px;
-  transition:max-width .2s ease .5s,opacity .15s ease .5s,padding .2s ease .5s;}
-.file-tab-more{font-family:var(--cond);font-size:.6rem;font-weight:700;color:var(--mut2);letter-spacing:.3px;margin-left:2px;}
+.fc-files{display:flex;align-items:center;gap:4px;padding:4px 8px 5px;min-height:22px;
+  background:#f7f7f7;border:1px solid var(--line);border-top:none;
+  border-radius:0 0 2px 2px;overflow:hidden;flex-wrap:nowrap;}
+.file-tab{display:inline-flex;align-items:center;height:18px;border-radius:3px;overflow:hidden;
+  flex-shrink:0;flex-grow:0;max-width:20px;
+  text-decoration:none;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.1);
+  transition:max-width .22s ease,flex-grow .22s ease,box-shadow .12s;}
+.file-tab:hover{max-width:300px;flex-grow:1;box-shadow:0 2px 5px rgba(0,0,0,.18);
+  transition:max-width .22s ease .5s,flex-grow .22s ease .5s,box-shadow .12s;}
+.ft-abbr{display:flex;align-items:center;justify-content:center;width:20px;min-width:20px;height:100%;
+  background:var(--fc,#888);color:#fff;font-family:var(--cond);font-size:.56rem;font-weight:800;letter-spacing:.4px;}
+.ft-name{flex:1;min-width:0;overflow:hidden;white-space:nowrap;font-family:var(--cond);font-size:.6rem;
+  font-weight:600;color:var(--ink2);padding:0 5px;letter-spacing:.2px;opacity:0;
+  transition:opacity .15s ease;}
+.file-tab:hover .ft-name{opacity:1;transition:opacity .15s ease .55s;}
+.ft-scroll{display:inline-block;white-space:nowrap;}
+.file-tab:hover .ft-long{animation:ftMarquee 5s linear infinite;animation-delay:.85s;}
+@keyframes ftMarquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.file-tab-more{font-family:var(--cond);font-size:.6rem;font-weight:700;color:var(--mut2);letter-spacing:.3px;margin-left:2px;flex-shrink:0;}
 .fc-files-scan{font-family:var(--cond);font-size:.6rem;color:var(--mut3);letter-spacing:.5px;animation:tabShimmer 1.4s ease-in-out infinite;}
 .fc-files-empty{font-family:var(--cond);font-size:.6rem;color:var(--mut3);letter-spacing:.3px;}
 @keyframes tabShimmer{0%,100%{opacity:.3}50%{opacity:.8}}
@@ -1929,6 +1942,21 @@ function renderGrid(){
 }
 
 /* ─── FILE TAB HELPERS ──────────────────────────────────── */
+function makeCardNameHtml(name){
+  const words=name.split(' ').filter(Boolean);
+  if(words.length<=1){
+    return`<div class="cname"><span class="cname-r">${esc(name)}</span></div>`;
+  }
+  const mid=Math.ceil(words.length/2);
+  const l1=words.slice(0,mid).join(' ');
+  const l2=words.slice(mid).join(' ');
+  if(!l2)return`<div class="cname"><span class="cname-r">${esc(l1)}</span></div>`;
+  const isLong=l2.length>11;
+  const inner=isLong
+    ?`<span class="cname-r2-inner">${esc(l2)}&nbsp;&nbsp;&nbsp;${esc(l2)}&nbsp;&nbsp;&nbsp;</span>`
+    :`<span class="cname-r2-inner">${esc(l2)}</span>`;
+  return`<div class="cname"><span class="cname-r">${esc(l1)}</span><span class="cname-r2${isLong?' cname-r2--long':''}">${inner}</span></div>`;
+}
 function fileAbbr(name){
   const n=lc(name);
   if(n.includes('26as'))return'26';
@@ -1941,13 +1969,18 @@ function makeFileTabsHtml(c){
   if(!entry)return'<span class="fc-files-scan">···</span>';
   const{files}=entry;
   if(!files.length)return'<span class="fc-files-empty">— no files</span>';
-  const MAX=6;
+  const MAX=4;
   const shown=files.slice(0,MAX);
   const overflow=files.length-MAX;
   const tabs=shown.map(f=>{
     const col=isStdFile(f.name)?'var(--file-std)':'var(--file-add)';
     const abbr=fileAbbr(f.name);
-    return`<a class="file-tab" href="${esc(f.url)}" target="_blank" style="--fc:${col}" onclick="event.stopPropagation()"><span class="ft-abbr">${esc(abbr)}</span><span class="ft-name">${esc(f.name)}</span></a>`;
+    const isLong=f.name.length>13;
+    // Long names use doubled text so the marquee loops seamlessly at -50%
+    const scrollContent=isLong
+      ?`<span class="ft-scroll ft-long">${esc(f.name)}&nbsp;&nbsp;&nbsp;${esc(f.name)}&nbsp;&nbsp;&nbsp;</span>`
+      :`<span class="ft-scroll">${esc(f.name)}</span>`;
+    return`<a class="file-tab" href="${esc(f.url)}" target="_blank" style="--fc:${col}" onclick="event.stopPropagation()"><span class="ft-abbr">${esc(abbr)}</span><span class="ft-name">${scrollContent}</span></a>`;
   }).join('');
   return tabs+(overflow>0?`<span class="file-tab-more">+${overflow}</span>`:'');
 }
@@ -1985,7 +2018,7 @@ function makeClosedCard(c){
     ${c.flagged?'<div class="fbp"></div>':''}
     ${unread?'<div class="unread-badge"></div>':''}
     <div class="cid">${esc(c.id||'—')}</div>
-    <div class="cname">${esc(c.name)}</div>
+    ${makeCardNameHtml(c.name)}
     <div class="cchips">${chipHtml}${issueChip}</div>
     ${reason}
     <div class="cfoot"><div style="display:flex;gap:4px;align-items:center;min-width:0;"><span class="cdate">${footDate}</span>${dueChip(c)}</div>${c.status!=='idle'?`<span class="cst ${c.status}">${SL[c.status]}</span>`:''}</div>
