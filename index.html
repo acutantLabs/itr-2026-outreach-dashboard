@@ -921,6 +921,8 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
         <div id="refineOpts"></div>
         <div class="rf-sec">Narrow by</div>
         <div id="refineSelects"></div>
+        <div class="rf-sec">Files</div>
+        <div id="refineFiles"></div>
       </div>
     </div>
   </div>
@@ -1850,13 +1852,22 @@ const FIELD_FACET_BY_KEY={};FIELD_FACETS.forEach(f=>{FIELD_FACET_BY_KEY[f.key]=f
 /* Refine state — composes (AND) with one another and with the active status tab. */
 const facets=new Set();      // active toggle keys
 let dueFacet=null;           // active DUE_BUCKETS key, or null
+let fileFacet=null;          // 'has-extra' | 'std-only' | 'no-files' | null
 const fieldFacets={};        // {fieldKey: selectedValue}
-function refineCount(){return facets.size+(dueFacet?1:0)+Object.keys(fieldFacets).filter(k=>fieldFacets[k]).length;}
+function clientFileClass(c){
+  const entry=FILE_STORE[c.id];
+  if(!entry)return'unknown';
+  const{files}=entry;
+  if(!files.length)return'no-files';
+  return files.some(f=>!isStdFile(f.name))?'has-extra':'std-only';
+}
+function refineCount(){return facets.size+(dueFacet?1:0)+(fileFacet?1:0)+Object.keys(fieldFacets).filter(k=>fieldFacets[k]).length;}
 function passesRefine(c){
   for(const k of facets){if(!TOGGLE_FACETS[k].test(c))return false;}
   if(dueFacet&&!DUE_BUCKETS[dueFacet].test(c))return false;
   for(const k in fieldFacets){const v=fieldFacets[k];if(!v)continue;
     const f=FIELD_FACET_BY_KEY[k];if(f&&String(f.get(c)||'').trim()!==v)return false;}
+  if(fileFacet&&clientFileClass(c)!==fileFacet)return false;
   return true;
 }
 
@@ -2777,6 +2788,22 @@ function renderRefine(){
   // toggle counts reflect the current time window (visComms), independent of the active tab
   TOGGLE_ORDER.forEach(k=>{const ct=$('rfct-'+k);if(ct)ct.textContent=CLIENTS.filter(TOGGLE_FACETS[k].test).length;
     const opt=$('refineOpts').querySelector(`[data-facet="${k}"]`);if(opt)opt.classList.toggle('on',facets.has(k));});
+  // Files facet
+  const rf=$('refineFiles');
+  if(rf){
+    const FILE_OPTS=[
+      {k:'has-extra',ic:'📁',label:'Has additional files',desc:'Beyond AIS/26AS'},
+      {k:'std-only', ic:'📁',label:'Standard files only', desc:'AIS & 26AS present, nothing else'},
+      {k:'no-files', ic:'📁',label:'No files yet',        desc:'Folder is empty'}
+    ];
+    rf.innerHTML=FILE_OPTS.map(o=>{
+      const ct=CLIENTS.filter(c=>clientFileClass(c)===o.k).length;
+      return`<button class="rf-opt${fileFacet===o.k?' on':''}" data-files="${o.k}">
+        <span class="rf-ic">${o.ic}</span>
+        <span class="rf-tx"><span class="l">${o.label}</span><span class="d">${o.desc}</span></span>
+        <span class="rf-ct">${ct}</span></button>`;
+    }).join('');
+  }
   const n=refineCount(),b=$('refineBadge');
   b.textContent=n;b.hidden=n===0;
   $('refineBtn').classList.toggle('on',n>0);
@@ -2802,9 +2829,15 @@ $('refineSelects').addEventListener('change',e=>{
   else if(val){fieldFacets[key]=val;}else{delete fieldFacets[key];}
   if(deskClient)closeDesk();renderGrid();
 });
+$('refineFiles').addEventListener('click',e=>{
+  const opt=e.target.closest('[data-files]');if(!opt)return;
+  const k=opt.dataset.files;
+  fileFacet=fileFacet===k?null:k;
+  if(deskClient)closeDesk();renderGrid();renderRefine();
+});
 $('refineClear').addEventListener('click',()=>{
   if(!refineCount())return;
-  facets.clear();dueFacet=null;Object.keys(fieldFacets).forEach(k=>delete fieldFacets[k]);
+  facets.clear();dueFacet=null;fileFacet=null;Object.keys(fieldFacets).forEach(k=>delete fieldFacets[k]);
   if(deskClient)closeDesk();renderGrid();
 });
 document.addEventListener('click',e=>{
