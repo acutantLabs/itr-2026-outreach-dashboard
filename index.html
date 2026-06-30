@@ -204,9 +204,17 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
 /* ─── FILE TABS (card bottom) ──────────────────────────── */
-.fc-files{display:flex;align-items:center;gap:3px;padding:5px 11px 6px;min-height:20px;border-top:1px solid var(--line);flex-wrap:nowrap;overflow:hidden;}
-.file-tab{display:inline-block;width:8px;height:14px;border-radius:2px;flex-shrink:0;cursor:pointer;transition:transform .1s,opacity .1s;text-decoration:none;}
-.file-tab:hover{transform:scaleY(1.2);opacity:.85;}
+.fc-files{display:flex;align-items:center;gap:4px;padding:5px 11px 6px;min-height:22px;border-top:1px solid var(--line);flex-wrap:nowrap;overflow:hidden;}
+.file-tab{display:inline-flex;align-items:center;height:18px;border-radius:3px;overflow:hidden;flex-shrink:0;
+  text-decoration:none;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.1);transition:box-shadow .12s;}
+.file-tab:hover{box-shadow:0 2px 6px rgba(0,0,0,.18);}
+.ft-abbr{display:flex;align-items:center;justify-content:center;width:22px;height:100%;flex-shrink:0;
+  background:var(--fc,#888);color:#fff;font-family:var(--cond);font-size:.58rem;font-weight:800;letter-spacing:.4px;}
+.ft-name{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;font-family:var(--cond);font-size:.62rem;
+  font-weight:600;color:var(--ink2);padding:0;letter-spacing:.2px;
+  transition:max-width .2s ease,opacity .15s ease,padding .2s ease;}
+.file-tab:hover .ft-name{max-width:110px;opacity:1;padding:0 6px;
+  transition:max-width .2s ease .5s,opacity .15s ease .5s,padding .2s ease .5s;}
 .file-tab-more{font-family:var(--cond);font-size:.6rem;font-weight:700;color:var(--mut2);letter-spacing:.3px;margin-left:2px;}
 .fc-files-scan{font-family:var(--cond);font-size:.6rem;color:var(--mut3);letter-spacing:.5px;animation:tabShimmer 1.4s ease-in-out infinite;}
 .fc-files-empty{font-family:var(--cond);font-size:.6rem;color:var(--mut3);letter-spacing:.3px;}
@@ -1921,6 +1929,13 @@ function renderGrid(){
 }
 
 /* ─── FILE TAB HELPERS ──────────────────────────────────── */
+function fileAbbr(name){
+  const n=lc(name);
+  if(n.includes('26as'))return'26';
+  if(n.includes('ais'))return'AI';
+  const base=name.replace(/\.[^.]+$/,'').replace(/[^a-zA-Z0-9]/g,'');
+  return(base.slice(0,2)||'??').toUpperCase();
+}
 function makeFileTabsHtml(c){
   const entry=FILE_STORE[c.id];
   if(!entry)return'<span class="fc-files-scan">···</span>';
@@ -1931,7 +1946,8 @@ function makeFileTabsHtml(c){
   const overflow=files.length-MAX;
   const tabs=shown.map(f=>{
     const col=isStdFile(f.name)?'var(--file-std)':'var(--file-add)';
-    return`<a class="file-tab" href="${esc(f.url)}" target="_blank" title="${esc(f.name)}" style="background:${col}" onclick="event.stopPropagation()"></a>`;
+    const abbr=fileAbbr(f.name);
+    return`<a class="file-tab" href="${esc(f.url)}" target="_blank" style="--fc:${col}" onclick="event.stopPropagation()"><span class="ft-abbr">${esc(abbr)}</span><span class="ft-name">${esc(f.name)}</span></a>`;
   }).join('');
   return tabs+(overflow>0?`<span class="file-tab-more">+${overflow}</span>`:'');
 }
