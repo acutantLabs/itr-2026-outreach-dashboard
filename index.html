@@ -983,6 +983,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   </div>
 </div>
 
+<input type="file" id="fileUploadInput" multiple style="display:none">
 <!-- THE DESK -->
 <div class="desk-ov" id="deskOv">
   <div class="desk" id="desk">
@@ -1028,6 +1029,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
       <div class="desk-rail">
         <div class="rail-lbl" style="margin-top:2px;">Contact</div>
         <div class="ccard" id="ccard"></div>
+        <div id="filesPanel" class="files-panel"></div>
         <div class="rail-lbl">Communications</div>
         <div id="deskRail"></div>
       </div>
@@ -2006,6 +2008,15 @@ function openDesk(c){
   $('gridWrap').classList.add('desk-open');
   $('deskOv').classList.add('open');
   renderDeskFrame();
+  if(appState.token){
+    fetchClientFiles(c).then(files=>{
+      FILE_STORE[c.id]={files,loading:false};
+      filesToCache(c.id,files);
+      renderFilesPanel(c);
+      const cardEl=document.querySelector('#grid [data-id="'+c.id+'"]');
+      if(cardEl){const tabsEl=cardEl.querySelector('.fc-files');if(tabsEl)tabsEl.innerHTML=makeFileTabsHtml(c);}
+    }).catch(()=>{});
+  }
   renderDeskRail();
   if(deskComms.length)selectSlip(deskIdx);
   else renderDeskShelfEmpty();
@@ -2044,6 +2055,7 @@ function renderDeskFrame(){
   $('dhStatus').textContent=SL[c.status];
   $('dhMarkAll').style.display=unreadCount?'':'none';
   renderContactCard(c);
+  renderFilesPanel(c);
 }
 /* ── inbound shared-email resolution: explainability + manual review ──
    The backend now records HOW an inbound message was bucketed to a client
@@ -3921,6 +3933,74 @@ async function sendMailReply(container,client,m,btn){
 /* ── contact card (desk rail): glance + inline edit ────────── */
 function phoneIssue(p){if(!p)return'';return String(p).replace(/\D/g,'').length===10?'':'⚠ check';}
 function mailIssue(m){if(!m)return'';return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(m).trim())?'':'⚠ check';}
+/* ─── FILES PANEL ───────────────────────────────────────── */
+function renderFilesPanel(c){
+  const panel=$('filesPanel');if(!panel)return;
+  const entry=FILE_STORE[c.id];
+  if(!entry){
+    panel.innerHTML='<div class="files-spinner">loading files…</div>';
+    return;
+  }
+  const{files}=entry;
+  const std=files.filter(f=>isStdFile(f.name)).length;
+  const add=files.filter(f=>!isStdFile(f.name)).length;
+  const metaParts=[];
+  if(std)metaParts.push(std+' standard');
+  if(add)metaParts.push(add+' additional');
+  const meta=metaParts.length?metaParts.join(' · '):'no files';
+  const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fmtDate(d){if(!d)return'';const[y,m,day]=d.split('-');return day+' '+months[+m];}
+  const rows=files.map(f=>{
+    const col=isStdFile(f.name)?'var(--file-std)':'var(--file-add)';
+    const ext=f.name.split('.').pop().toUpperCase().slice(0,4);
+    return`<div class="file-row">
+      <div class="file-row-dot" style="background:${col}"></div>
+      <span class="file-row-name" title="${esc(f.name)}">${esc(f.name)}</span>
+      <span class="file-row-ext">${esc(ext)}</span>
+      <span class="file-row-date">${fmtDate(f.modified)}</span>
+      <a class="file-row-open" href="${esc(f.url)}" target="_blank" title="Open in SharePoint">↗</a>
+    </div>`;
+  }).join('')||'<div class="files-empty">— no files in folder</div>';
+  panel.innerHTML=`<div class="files-hd">
+    <span class="rail-lbl" style="margin:0">Files</span>
+    <span class="files-hd-meta">${esc(meta)}</span>
+    <button class="files-upload-btn" id="filesUploadBtn">↑ Upload</button>
+  </div>
+  <div class="files-list">${rows}</div>`;
+  const btn=$('filesUploadBtn');
+  if(btn)btn.addEventListener('click',()=>triggerUpload(c));
+}
+
+function triggerUpload(c){
+  const input=$('fileUploadInput');
+  input.value='';
+  input.onchange=async()=>{
+    const files=[...input.files];if(!files.length)return;
+    const btn=$('filesUploadBtn');if(btn){btn.disabled=true;btn.textContent='Uploading…';}
+    let ok=0,fail=0;
+    for(const file of files){
+      try{
+        const path='/sites/'+SITE_ID+'/drive/root:/'+clientFolderPath(c)+'/'+encodeURIComponent(file.name)+':/content';
+        await graphPut(path,file,file.type||'application/octet-stream');
+        ok++;
+      }catch(e){fail++;console.error('[upload]',file.name,e.message);}
+    }
+    try{
+      const fresh=await fetchClientFiles(c);
+      FILE_STORE[c.id]={files:fresh,loading:false};
+      filesToCache(c.id,fresh);
+    }catch{}
+    renderFilesPanel(c);
+    const cardEl=document.querySelector('#grid [data-id="'+c.id+'"]');
+    if(cardEl){
+      const tabsEl=cardEl.querySelector('.fc-files');
+      if(tabsEl)tabsEl.innerHTML=makeFileTabsHtml(c);
+    }
+    toast(fail?`⚠ ${ok} uploaded · ${fail} failed`:`✓ ${ok} file${ok!==1?'s':''} uploaded`);
+  };
+  input.click();
+}
+
 function renderContactCard(c){
   const card=$('ccard');
   if(card.dataset.editing==='1')return;   // don't clobber an edit in progress
