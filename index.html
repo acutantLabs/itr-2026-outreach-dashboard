@@ -2903,6 +2903,7 @@ async function startFilesScan(clients){
   }
   hideScanBar();
   renderRefine(); // update file facet counts now that scan is complete
+  renderGrid();   // repaint so any active file facet now filters complete data
 }
 function toast(msg){const el=$('snack');el.textContent=msg;el.classList.add('show');clearTimeout(_st);_st=setTimeout(()=>el.classList.remove('show'),2200);}
 
@@ -3982,7 +3983,7 @@ function renderFilesPanel(c){
   if(add)metaParts.push(add+' additional');
   const meta=metaParts.length?metaParts.join(' · '):'no files';
   const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  function fmtDate(d){if(!d)return'';const[y,m,day]=d.split('-');return day+' '+months[+m];}
+  function fmtDate(d){if(!d)return'';const[,m,day]=d.split('-');return day+' '+months[+m];}
   const rows=files.map(f=>{
     const col=isStdFile(f.name)?'var(--file-std)':'var(--file-add)';
     const ext=f.name.split('.').pop().toUpperCase().slice(0,4);
