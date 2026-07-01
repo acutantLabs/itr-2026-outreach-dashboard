@@ -1933,9 +1933,17 @@ function getFiltered(){
 
 /* ═══ BADGES ════════════════════════════════════════════════════ */
 function updateBadges(){
-  const newCount=CLIENTS.filter(c=>visComms(c).length&&hasUnread(c)).length;
-  const actCount=CLIENTS.filter(c=>visComms(c).length&&(c.flagged||c.status==='needs')).length;
-  const dueCount=CLIENTS.filter(c=>c.nextActionDue&&c.nextActionDue<=TODAY).length;
+  const baseList=CLIENTS.filter(c=>{
+    const vc=visComms(c);
+    if(timeCap&&vc.length===0)return false;
+    if(!passesRefine(c))return false;
+    if(appState.entityFilter&&appState.entityFilter!=='all'&&c.entity!==appState.entityFilter)return false;
+    if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
+    return true;
+  });
+  const newCount=baseList.filter(c=>visComms(c).length&&hasUnread(c)).length;
+  const actCount=baseList.filter(c=>visComms(c).length&&(c.flagged||c.status==='needs')).length;
+  const dueCount=baseList.filter(c=>c.nextActionDue&&c.nextActionDue<=TODAY).length;
   $('newBadge').textContent=newCount;
   $('actBadge').textContent=actCount;
   $('dueBadge').textContent=dueCount;
