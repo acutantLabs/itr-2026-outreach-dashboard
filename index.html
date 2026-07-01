@@ -52,6 +52,14 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .logo-sub{font-family:var(--cond);font-size:.62rem;color:var(--mut2);letter-spacing:1.2px;text-transform:uppercase;}
 .hd{width:1px;height:24px;background:#3a3637;flex-shrink:0;}
 .filters{display:flex;gap:2px;}
+.entity-toggle{display:flex;gap:2px;margin-left:8px;padding-left:8px;border-left:1px solid #3a3738;}
+.etgl{height:28px;padding:0 10px;border:1px solid transparent;background:transparent;color:var(--mut2);
+  font-family:var(--cond);font-size:.72rem;font-weight:700;cursor:pointer;letter-spacing:.5px;
+  text-transform:uppercase;border-radius:2px;transition:color .15s,border-color .15s,background .15s;}
+.etgl:hover{color:#ddd;border-color:#555;}
+.etgl.on[data-e="AC"]{color:#fff;background:#D4880A;border-color:#D4880A;}
+.etgl.on[data-e="ASI"]{color:#fff;background:#2563EB;border-color:#2563EB;}
+.etgl.on[data-e="all"]{color:#fff;border-color:#888;}
 .flt{height:28px;padding:0 12px;border:none;background:transparent;color:var(--mut2);
   font-family:var(--cond);font-size:.74rem;font-weight:700;cursor:pointer;letter-spacing:.6px;
   text-transform:uppercase;border-bottom:3px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;}
@@ -933,6 +941,11 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
     <button class="flt" data-f="pending">⏳ WAIT</button>
     <button class="flt f-flag" data-f="flagged">⬟ FLAG</button>
   </div>
+  <div class="entity-toggle" id="entityToggle">
+    <button class="etgl on" data-e="all">All</button>
+    <button class="etgl" data-e="ASI">ASI</button>
+    <button class="etgl" data-e="AC">AC</button>
+  </div>
   <div class="refine-wrap">
     <button class="refine-btn" id="refineBtn" title="Stack extra filters on top of the active view">▽ REFINE<span class="badge" id="refineBadge" hidden>0</span><span class="caret">▾</span></button>
     <div class="refine-pop" id="refinePop" hidden>
@@ -1387,6 +1400,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 const FIRST=['Amit','Priya','Rajesh','Sunita','Vikram','Meena','Arun','Deepa','Suresh','Kavita','Ravi','Anita','Mohan','Rekha','Sanjay','Pooja','Ramesh','Geeta','Ashok','Leela','Harish','Usha','Prakash','Nirmala','Vinod','Shobha','Dinesh','Savita','Mahesh','Aarti','Rohit','Shilpa','Kiran','Pallavi','Nitin','Smita','Ajay','Swati','Vivek','Heena','Tarun','Reena','Gaurav','Manju','Alok','Preeti','Pankaj','Lata','Manish','Asha','Neha','Kunal','Ritu','Saurabh','Divya','Abhishek','Nidhi','Varun','Sonali','Rajan'];
 const LAST=['Sharma','Verma','Gupta','Singh','Patel','Rao','Joshi','Nair','Kumar','Mehta','Shah','Mishra','Pandey','Srivastava','Tiwari','Bose','Das','Ghosh','Mukherjee','Iyer','Pillai','Reddy','Naidu','Yadav','Chopra','Malhotra','Kapoor','Chawla','Saxena','Agarwal','Bajaj','Choudhary','Dixit','Khanna','Oberoi','Rastogi','Sinha','Tandon','Walia','Bansal'];
 const TC={email:'#2563EB',whatsapp:'#1FA855',call:'#e07b00',note:'#6D5BD0',flag:'#DA3832'};
+const AC_STRIPE='#D4880A'; // mustard orange — AC entity top-border
 const TI={email:'E',whatsapp:'W',call:'C',note:'N',flag:'!'};
 const TL_={email:'EMAIL',whatsapp:'WHATSAPP',call:'CALL',note:'NOTE',flag:'FLAG'};
 const EML=['ITR Filing Season – Action Required','Documents Checklist for FY 2025–26','Tax Summary Ready for Review','Reminder: Filing Deadline Approaching','Updated Form 16 Received','Investment Declaration Pending','Consultation Slot Confirmed','Advance Tax Computation Enclosed'];
@@ -1516,7 +1530,7 @@ async function fetchClientFiles(c){
     throw e;
   }
 }
-const appState={msalApp:null,token:null,user:null,isSonia:false};
+const appState={msalApp:null,token:null,user:null,isSonia:false,entityFilter:localStorage.getItem('itr_entityFilter')||'all'};
 
 function spBool(v){return v===true||v==='true'||v==='Yes'||v===1||v==='1';}
 function lc(v){return String(v==null?'':v).trim().toLowerCase();}
@@ -1904,6 +1918,7 @@ function getFiltered(){
     if(activeFilter==='action'&&!(c.flagged||c.status==='needs'))return false;
     if(activeFilter==='due'&&!(c.nextActionDue&&c.nextActionDue<=TODAY))return false;
     if(!passesRefine(c))return false;
+    if(appState.entityFilter&&appState.entityFilter!=='all'&&c.entity!==appState.entityFilter)return false;
     if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
     return true;
   }).sort((a,b)=>{
@@ -2013,7 +2028,8 @@ function makeClosedCard(c){
   const issueChip=c.activeIssueCount?`<div class="cchip issues">⚠ ${c.activeIssueCount}</div>`:'';
   const reason=(!comms.length&&(c.outreachReason||c.outreachRequired))?`<div class="card-reason">${esc(c.outreachReason||'Outreach required')}</div>`:'';
   const footDate=comms.length?fmt(comms[comms.length-1].date):(c.lastContactDate?fmt(c.lastContactDate):'–');
-  el.innerHTML=`<div class="fc-face" style="--stripe:${latestColor}">
+  const stripeColor=c.entity==='AC'?AC_STRIPE:latestColor;
+  el.innerHTML=`<div class="fc-face" style="--stripe:${stripeColor}">
     ${selectMode?`<div class="selchk">${SEL.has(c.id)?'✓':''}</div>`:''}
     ${c.flagged?'<div class="fbp"></div>':''}
     ${unread?'<div class="unread-badge"></div>':''}
@@ -2425,7 +2441,12 @@ function buildCommBody(client,m){
       </div>
       ${summary?`<div class="next-lbl" style="margin-top:12px">Summary</div><div class="email-body">${esc(summary)}</div>`:''}
       ${fullBody?`<details style="margin-top:12px"><summary style="cursor:pointer;font-family:var(--cond);font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink);">Full email</summary><div class="email-body" style="margin-top:8px">${esc(fullBody)}</div></details>`:`<div class="email-body">${fallback}</div>`}
-    </div>${extras}${resP}`;
+    </div>
+<div class="act-row" style="margin-top:10px;">
+  <button class="act-b" onclick="deskClient&&actEmail([deskClient])" type="button">✉ Compose Reply</button>
+  <button class="act-b" onclick="deskClient&&openComposer([deskClient])" type="button">+ Log Contact</button>
+</div>
+${extras}${resP}`;
   }
   if(m.type==='whatsapp'){
     const isSent=m.dir==='out';
@@ -2792,6 +2813,18 @@ $('filters').addEventListener('click',e=>{
   activeFilter=btn.dataset.f;if(deskClient)closeDesk();
   document.querySelectorAll('.flt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
   renderGrid();
+});
+
+// Entity toggle
+document.querySelectorAll('#entityToggle .etgl').forEach(btn=>{
+  btn.classList.toggle('on', btn.dataset.e===appState.entityFilter);
+  btn.addEventListener('click',()=>{
+    appState.entityFilter=btn.dataset.e;
+    localStorage.setItem('itr_entityFilter', btn.dataset.e);
+    document.querySelectorAll('#entityToggle .etgl').forEach(b=>b.classList.toggle('on',b.dataset.e===btn.dataset.e));
+    renderGrid();
+    updateBadges();
+  });
 });
 
 /* ── Refine facets popover ───────────────────────────────────── */
@@ -3943,6 +3976,7 @@ function replyToastMsg(na,due,after){
   return '↩ Reply sent from '+TEAM_MAILBOX+' & logged';
 }
 function wireMailControls(container,client,m){
+  wireReplyLogControls(container);
   if(!m||!m._mail)return;
   const lf=container.querySelector('[data-mailact="full"]');
   if(lf)lf.addEventListener('click',async()=>{
@@ -3956,7 +3990,6 @@ function wireMailControls(container,client,m){
   });
   const rs=container.querySelector('[data-mailact="reply"]');
   if(rs)rs.addEventListener('click',()=>sendMailReply(container,client,m,rs));
-  wireReplyLogControls(container);
 }
 async function sendMailReply(container,client,m,btn){
   const ta=container.querySelector('.reply-ta');
