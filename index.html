@@ -35,7 +35,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14p
 /* ─── HEADER ───────────────────────────────────────────── */
 header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   background:var(--ink);flex-shrink:0;z-index:50;}
-.red-rule{height:3px;background:var(--red);flex-shrink:0;z-index:50;}
+.red-rule{height:3px;background:var(--red);flex-shrink:0;z-index:1;}
 
 /* ─── FILE SCAN PROGRESS BAR ───────────────────────────── */
 .scan-wrap{height:14px;background:transparent;flex-shrink:0;display:flex;flex-direction:column;
@@ -52,7 +52,6 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .logo-sub{font-family:var(--cond);font-size:.62rem;color:var(--mut2);letter-spacing:1.2px;text-transform:uppercase;}
 .hd{width:1px;height:24px;background:#3a3637;flex-shrink:0;}
 .filters{display:flex;gap:2px;}
-.entity-toggle{display:flex;gap:2px;margin-left:8px;padding-left:8px;border-left:1px solid #3a3738;}
 .etgl{height:28px;padding:0 10px;border:1px solid transparent;background:transparent;color:var(--mut2);
   font-family:var(--cond);font-size:.72rem;font-weight:700;cursor:pointer;letter-spacing:.5px;
   text-transform:uppercase;border-radius:2px;transition:color .15s,border-color .15s,background .15s;}
@@ -60,6 +59,28 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .etgl.on[data-e="AC"]{color:#fff;background:#D4880A;border-color:#D4880A;}
 .etgl.on[data-e="ASI"]{color:#fff;background:#2563EB;border-color:#2563EB;}
 .etgl.on[data-e="all"]{color:#fff;border-color:#888;}
+/* ─── VIEW GROUP DROPDOWN (entity + My Clients) ───────── */
+.vw-grp{position:relative;display:flex;flex-shrink:0;margin-left:8px;padding-left:8px;border-left:1px solid #3a3738;}
+.vw-grp-btn{height:28px;padding:0 11px;border:none;border-bottom:2px solid transparent;
+  background:transparent;color:var(--mut2);font-family:var(--cond);font-size:.78rem;
+  font-weight:700;letter-spacing:.5px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:3px;}
+.vw-grp:hover .vw-grp-btn,.vw-grp-btn:hover{color:#ddd;}
+.vw-grp-btn.on{color:#fff;border-bottom-color:var(--vw-accent,var(--red));}
+.vw-grp-caret{font-size:.6rem;opacity:.6;}
+.vw-grp-panel{display:none;position:absolute;top:calc(100% + 2px);left:0;flex-direction:column;
+  background:#1e1b1c;border:1px solid #444;border-radius:2px;z-index:200;padding:6px;min-width:150px;}
+.vw-grp:hover .vw-grp-panel{display:flex;}
+.vw-grp-row{display:flex;gap:2px;}
+.vw-grp-sep{height:1px;background:#3a3738;margin:6px 0;}
+.vw-mine-tgl{display:flex;align-items:center;gap:7px;height:28px;padding:0 6px;border:none;background:transparent;
+  color:var(--mut2);font-family:var(--cond);font-size:.68rem;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;cursor:pointer;border-radius:2px;width:100%;text-align:left;}
+.vw-mine-tgl:hover{color:#ddd;background:#2c2829;}
+.vw-mine-tgl .chk{width:14px;height:14px;border-radius:2px;border:1px solid #555;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.6rem;color:transparent;}
+.vw-mine-tgl.on{color:#fff;}
+.vw-mine-tgl.on .chk{background:var(--red);border-color:var(--red);color:#fff;}
+.vw-mine-tgl[hidden]{display:none;}
 .flt{height:28px;padding:0 12px;border:none;background:transparent;color:var(--mut2);
   font-family:var(--cond);font-size:.74rem;font-weight:700;cursor:pointer;letter-spacing:.6px;
   text-transform:uppercase;border-bottom:3px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;}
@@ -130,22 +151,21 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .mode-btn.on{background:var(--red);border-color:var(--red);color:#fff;}
 .vinyl-btn.on{background:var(--amber);border-color:var(--amber);color:#fff;}
 .grow{flex:1;}
-.stats{display:flex;gap:16px;align-items:center;flex-shrink:0;}
+.stats{display:flex;gap:13px;align-items:center;flex-shrink:0;}
 .stat{text-align:right;line-height:1;}
-.stat-n{font-family:var(--cond);font-size:1.15rem;font-weight:800;color:#fff;}
-.stat-n.r{color:#f08a86;} .stat-n.g{color:#6fcf97;} .stat-n.a{color:#f2b06a;} .stat-n.p{color:#b6a8ee;}
-.stat-l{font-family:var(--cond);font-size:.56rem;color:var(--mut2);text-transform:uppercase;letter-spacing:.8px;margin-top:1px;}
+.stat-n{font-family:var(--cond);font-size:1rem;font-weight:800;color:var(--ink);}
+.stat-n.r{color:var(--red);} .stat-n.g{color:#2f9e63;} .stat-n.a{color:#c97a1f;} .stat-n.p{color:#7c65c9;}
+.stat-l{font-family:var(--cond);font-size:.54rem;color:var(--mut2);text-transform:uppercase;letter-spacing:.7px;margin-top:1px;}
 .sw{position:relative;flex-shrink:0;}
 .si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--mut2);font-size:.8rem;pointer-events:none;}
 .search{height:30px;padding:0 10px 0 26px;background:#2c2829;border:1px solid #4a4647;border-radius:2px;
-  color:#fff;font-family:var(--body);font-size:.82rem;width:140px;outline:none;transition:border-color .15s,width .2s,background .15s;}
-.search:focus{border-color:var(--red);width:180px;background:#332f30;}
+  color:#fff;font-family:var(--body);font-size:.82rem;width:170px;outline:none;transition:border-color .15s,width .2s,background .15s;}
+.search:focus{border-color:var(--red);width:190px;background:#332f30;}
 .search::placeholder{color:var(--mut2);}
 
 /* ─── TOOLBAR ───────────────────────────────────────────── */
 .toolbar{display:flex;align-items:center;gap:6px;padding:0 22px;height:42px;
-  background:var(--surface);border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto;box-shadow:var(--sh1);}
-.toolbar::-webkit-scrollbar{display:none;}
+  background:var(--surface);border-bottom:1px solid var(--line);flex-shrink:0;overflow:visible;box-shadow:var(--sh1);}
 .tb-sep{width:1px;height:20px;background:var(--line2);margin:0 5px;flex-shrink:0;}
 .tb-lbl{font-family:var(--cond);font-size:.68rem;font-weight:700;color:var(--mut);letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;}
 .tb-btn{height:27px;padding:0 12px;border-radius:2px;border:1px solid var(--line2);background:var(--surface);
@@ -213,6 +233,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .cst.needs{background:rgba(218,56,50,.12);color:var(--red);}
 .cst.responded{background:rgba(45,106,79,.14);color:var(--green);}
 .cst.pending{background:rgba(224,123,0,.14);color:var(--amber);}
+.stk-chip{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:15px;padding:0 4px;border-radius:2px;color:#fff;font-family:var(--cond);font-size:.6rem;font-weight:700;letter-spacing:.5px;}
 .card-detail{font-family:var(--cond);font-size:.62rem;font-weight:600;color:var(--mut2);letter-spacing:.3px;text-transform:uppercase;}
 .card-reason{font-size:.66rem;color:var(--mut);line-height:1.35;margin-bottom:8px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
@@ -285,7 +306,10 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   box-shadow:var(--sh3);animation:deskRise .22s var(--ease);}
 @keyframes deskRise{from{opacity:0;transform:translateY(18px) scale(.985);}to{opacity:1;transform:none;}}
 /* desk header — charcoal bar + red rule, mirrors the Hub header */
-.desk-head{background:var(--ink);padding:13px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-shrink:0;}
+.desk-head{background:var(--ink);padding:13px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-shrink:0;position:relative;}
+.dh-seal{position:absolute;top:14px;right:220px;transform:rotate(-8deg);width:86px;height:86px;border:3px double var(--seal);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.85;}
+.dh-seal .seal-inner{color:var(--seal);font-family:var(--cond);font-weight:800;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;text-align:center;border-top:1px solid var(--seal);border-bottom:1px solid var(--seal);padding:3px 0;}
+@media (max-width:1100px){.dh-seal{display:none}}
 .desk-rule{height:3px;background:var(--red);flex-shrink:0;}
 .dh-info{min-width:0;}
 .dh-id{font-family:var(--cond);font-size:.64rem;color:var(--mut2);letter-spacing:1px;text-transform:uppercase;margin-bottom:1px;}
@@ -575,6 +599,48 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .tb-date-in:focus{border-color:var(--red);}
 .flt.on.f-due{border-bottom-color:var(--amber);color:#fff;}
 .flt.on.f-due .badge{background:var(--amber);}
+/* ─── TOOLBAR GROUP DROPDOWN (light) ──────────────────── */
+.tb-grp{position:relative;display:flex;flex-shrink:0;}
+.tb-grp-btn{height:27px;padding:0 11px;border-radius:2px;border:1px solid var(--line2);background:var(--surface);
+  color:var(--ink);font-family:var(--cond);font-size:.72rem;font-weight:700;letter-spacing:.4px;
+  text-transform:uppercase;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;transition:all .13s;}
+.tb-grp-btn:hover{border-color:var(--ink);background:#fafafa;}
+.tb-grp-btn.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+.tb-grp-caret{font-size:.6rem;opacity:.65;}
+.tb-grp-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;flex-direction:column;
+  background:var(--surface);border:1px solid var(--line);border-radius:2px;z-index:200;padding:6px;min-width:150px;
+  box-shadow:var(--sh2);}
+.tb-grp:hover .tb-grp-panel{display:flex;}
+.tb-grp.open .tb-grp-panel{display:flex;}
+.tb-grp-panel .tb-btn{width:100%;justify-content:flex-start;margin-bottom:3px;}
+.tb-grp-panel .tb-btn:last-child{margin-bottom:0;}
+.tb-grp-panel-row{display:flex;align-items:center;gap:5px;margin-bottom:6px;}
+.tb-grp-panel-row:last-child{margin-bottom:0;}
+.tb-grp-panel .qd{flex:1;}
+.tb-grp-sep{height:1px;background:var(--line);margin:6px 0;}
+/* ─── STATUS GROUP DROPDOWN ─────────────────────────── */
+.flt-grp{position:relative;display:flex;flex-shrink:0;}
+.flt-grp-btn{height:28px;padding:0 11px;border:none;border-bottom:2px solid transparent;
+  background:transparent;color:var(--mut2);font-family:var(--cond);font-size:.78rem;
+  font-weight:700;letter-spacing:.5px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:3px;}
+.flt-grp:hover .flt-grp-btn,.flt-grp-btn:hover{color:#ddd;}
+.flt-grp-btn.on{color:#fff;border-bottom-color:var(--red);}
+.flt-grp-caret{font-size:.6rem;opacity:.6;}
+.flt-grp-panel{display:none;position:absolute;top:calc(100% + 2px);left:0;flex-direction:column;
+  background:#1e1b1c;border:1px solid #444;border-radius:2px;z-index:200;padding:4px 0;
+  box-shadow:0 4px 14px rgba(0,0,0,.55);}
+.flt-grp:hover .flt-grp-panel{display:flex;}
+.flt-grp-panel .flt{text-align:left;padding:5px 16px;white-space:nowrap;border-bottom:none !important;border-top:none;}
+.flt-grp-panel .flt:hover{background:#2c2829;color:#ddd;}
+.flt-grp-panel .flt.on{color:#fff;background:#2c2829;}
+/* ─── FILES AGE INDICATOR ───────────────────────────── */
+.files-age{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.files-age-lbl{font-family:var(--cond);font-size:.6rem;color:var(--mut3);letter-spacing:.5px;white-space:nowrap;text-transform:uppercase;}
+.files-refresh-btn{height:20px;padding:0 7px;border:1px solid #3a3637;border-radius:2px;
+  background:transparent;color:var(--mut2);font-size:.68rem;cursor:pointer;font-family:var(--cond);line-height:1;}
+.files-refresh-btn:hover{color:#ddd;border-color:#666;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.files-refresh-btn.spinning{animation:spin .7s linear infinite;}
 /* bulk action bar */
 .bulkbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(90px);display:flex;align-items:center;gap:7px;
   background:var(--ink);padding:9px 14px;border-radius:3px;box-shadow:var(--sh3);z-index:550;
@@ -928,7 +994,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 <header>
   <div class="logo">
     <div class="logo-mark">A</div>
-    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.7.0</span></div></div>
+    <div><div class="logo-name"><em>SONIA</em> · OUTREACH</div><div class="logo-sub">Acutant · ITR 2026 · <span id="appVer">v1.8.0</span></div></div>
   </div>
   <div class="hd"></div>
   <div class="filters" id="filters">
@@ -936,15 +1002,27 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
     <button class="flt f-new" data-f="new">● NEW <span class="badge" id="newBadge">0</span></button>
     <button class="flt f-action" data-f="action">⚡ ACTION <span class="badge" id="actBadge">0</span></button>
     <button class="flt f-due" data-f="due">⏰ DUE <span class="badge" id="dueBadge">0</span></button>
-    <button class="flt" data-f="needs">↩ REPLY</button>
-    <button class="flt" data-f="responded">✓ DONE</button>
-    <button class="flt" data-f="pending">⏳ WAIT</button>
-    <button class="flt f-flag" data-f="flagged">⬟ FLAG</button>
+    <div class="flt-grp" id="fltGrp">
+      <button class="flt-grp-btn" id="fltGrpBtn"><span class="grp-lbl">STATUS</span><span class="flt-grp-caret">▾</span></button>
+      <div class="flt-grp-panel">
+        <button class="flt flt-opt" data-f="needs">↩ REPLY</button>
+        <button class="flt flt-opt" data-f="responded">✓ DONE</button>
+        <button class="flt flt-opt" data-f="pending">⏳ WAIT</button>
+        <button class="flt f-flag flt-opt" data-f="flagged">⬟ FLAG</button>
+      </div>
+    </div>
   </div>
-  <div class="entity-toggle" id="entityToggle">
-    <button class="etgl on" data-e="all">All</button>
-    <button class="etgl" data-e="ASI">ASI</button>
-    <button class="etgl" data-e="AC">AC</button>
+  <div class="vw-grp" id="viewGrp">
+    <button class="vw-grp-btn" id="viewGrpBtn"><span class="grp-lbl">ALL</span><span class="vw-grp-caret">▾</span></button>
+    <div class="vw-grp-panel">
+      <div class="vw-grp-row" id="entityToggle">
+        <button class="etgl on" data-e="all">All</button>
+        <button class="etgl" data-e="ASI">ASI</button>
+        <button class="etgl" data-e="AC">AC</button>
+      </div>
+      <div class="vw-grp-sep"></div>
+      <button class="vw-mine-tgl" id="myClientsTgl" hidden><span class="chk">✓</span>My Clients Only</button>
+    </div>
   </div>
   <div class="refine-wrap">
     <button class="refine-btn" id="refineBtn" title="Stack extra filters on top of the active view">▽ REFINE<span class="badge" id="refineBadge" hidden>0</span><span class="caret">▾</span></button>
@@ -964,7 +1042,10 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   <button class="mode-btn" id="modeBtn">◫ OPEN FILES</button>
   <button class="vinyl-btn" id="vinylBtn">◈ GALLERY</button>
   <div class="grow"></div>
-  <div class="stats" id="stats"></div>
+  <div class="files-age" id="filesAge" hidden>
+    <span class="files-age-lbl" id="filesAgeLabel">FILES: --</span>
+    <button class="files-refresh-btn" id="filesRefresh" title="Refresh files data">↺</button>
+  </div>
   <div class="hd"></div>
   <div class="user-chip" id="userChip">
     <span class="urole" id="userRole"></span>
@@ -986,25 +1067,44 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   <button class="tb-btn" id="tbWa"><div class="tb-dot" style="background:var(--wa)"></div>WhatsApp</button>
   <button class="tb-btn" id="tbLog">+ Log Contact</button>
   <div class="tb-sep"></div>
-  <span class="tb-lbl">Status:</span>
-  <button class="tb-btn" id="tbNeeds">↩ Needs Reply</button>
-  <button class="tb-btn" id="tbWait">⏳ Waiting</button>
-  <button class="tb-btn" id="tbDone">✓ Done</button>
+  <div class="tb-grp" id="tbStatusGrp">
+    <button class="tb-grp-btn" id="tbStatusGrpBtn">Status<span class="tb-grp-caret">▾</span></button>
+    <div class="tb-grp-panel">
+      <button class="tb-btn" id="tbNeeds">↩ Needs Reply</button>
+      <button class="tb-btn" id="tbWait">⏳ Waiting</button>
+      <button class="tb-btn" id="tbDone">✓ Done</button>
+    </div>
+  </div>
   <div class="tb-sep"></div>
-  <span class="tb-lbl">Follow-up:</span>
-  <input type="date" class="tb-date-in" id="tbFollowDate">
-  <button type="button" class="qd" data-qd="tbFollowDate" data-d="1">+1d</button>
-  <button type="button" class="qd" data-qd="tbFollowDate" data-d="3">+3d</button>
-  <button type="button" class="qd" data-qd="tbFollowDate" data-d="7">+1w</button>
-  <button type="button" class="qd" data-qd="tbFollowDate" data-d="14">+2w</button>
-  <button class="tb-btn" id="tbFollowSet">⏰ Set</button>
+  <div class="tb-grp" id="tbFollowGrp">
+    <button class="tb-grp-btn" id="tbFollowGrpBtn" type="button">Follow-up<span class="tb-grp-caret">▾</span></button>
+    <div class="tb-grp-panel">
+      <div class="tb-grp-panel-row">
+        <input type="date" class="tb-date-in" id="tbFollowDate">
+        <button class="tb-btn" id="tbFollowSet">⏰ Set</button>
+      </div>
+      <div class="tb-grp-panel-row">
+        <button type="button" class="qd" data-qd="tbFollowDate" data-d="1">+1d</button>
+        <button type="button" class="qd" data-qd="tbFollowDate" data-d="3">+3d</button>
+        <button type="button" class="qd" data-qd="tbFollowDate" data-d="7">+1w</button>
+        <button type="button" class="qd" data-qd="tbFollowDate" data-d="14">+2w</button>
+      </div>
+    </div>
+  </div>
   <div class="tb-sep"></div>
-  <button class="tb-btn" id="tbSelect">☐ Select</button>
-  <button class="tb-btn" id="tbSelectAll">☑ All</button>
-  <button class="tb-btn" id="tbExport">↓ Export</button>
-  <button class="tb-btn" onclick="markAllRead()">✓✓ Mark All Read</button>
+  <div class="tb-grp" id="tbBulkGrp">
+    <button class="tb-grp-btn" id="tbBulkGrpBtn">Bulk<span class="tb-grp-caret">▾</span></button>
+    <div class="tb-grp-panel">
+      <button class="tb-btn" id="tbSelect">☐ Select</button>
+      <button class="tb-btn" id="tbSelectAll">☑ All</button>
+      <button class="tb-btn" id="tbExport">↓ Export</button>
+      <button class="tb-btn" onclick="markAllRead()">✓✓ Mark All Read</button>
+    </div>
+  </div>
   <div class="tb-sep"></div>
   <span class="tb-lbl">Date:</span><span class="tb-date" id="tbDate"></span><span class="tb-floor" id="tbFloor" title="Communications before this date are hidden (season start)"></span>
+  <div class="grow"></div>
+  <div class="stats" id="stats"></div>
 </div>
 
 <div class="main">
@@ -1030,6 +1130,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
         <div class="dh-sub" id="dhSub"></div>
         <div id="dhFlag"></div>
       </div>
+      <div class="dh-seal" id="dhSeal" hidden><span class="seal-inner"></span></div>
       <div class="dh-controls">
         <div class="dh-nav-group">
           <button class="dh-btn mark-all" id="dhMarkAll">✓ Mark All Read</button>
@@ -1445,7 +1546,7 @@ function buildClients(n){
     }
     return{id:`ITR26-${String(i+1).padStart(4,'0')}`,name,status,flagged,flagReason,comms,
       _sp:null,contactName:name,phone:'9'+String(rnd(100000000,999999999)),mail:name.toLowerCase().replace(/ /g,'.')+'@gmail.com',
-      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['AR','Aio','Jathin']),
+      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['Praveen','Amala','Vidya','Chitra','Lavanya','Sriram','']),
       entity:pick(['AC','ASI']),applicability:pick(['Salary','House Property','Business Income','Capital Gain','Tax Audit','Trust','NA']),
       constitution:pick(['Individual','HUF','Firm','Company','Trust']),serviceCategory:pick(['ITR Only','Tax Audit','10B (Trust)','Stat Audit']),
       outreachRequired:status==='needs',outreachReason:flagged?flagReason:'',
@@ -1530,11 +1631,24 @@ async function fetchClientFiles(c){
     throw e;
   }
 }
-const appState={msalApp:null,token:null,user:null,isSonia:false,entityFilter:localStorage.getItem('itr_entityFilter')||'all'};
+const appState={msalApp:null,token:null,user:null,isSonia:false,entityFilter:localStorage.getItem('itr_entityFilter')||'all',
+  myClients:localStorage.getItem('itr_myClients')==='1',myStakeholderKey:null};
 
 function spBool(v){return v===true||v==='true'||v==='Yes'||v===1||v==='1';}
 function lc(v){return String(v==null?'':v).trim().toLowerCase();}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* ═══ STAKEHOLDERS ═══ team identity: SharePoint Stakeholder text → UPN + stamp colour */
+const STAKEHOLDERS={
+  praveen:{label:'Praveen',upn:'praveen@acutant.com',   color:'#5FBF9E'},  /* mint green */
+  amala:  {label:'Amala',  upn:'amala@acutant.com',     color:'#8A8A8A'},  /* grey */
+  vidya:  {label:'Vidya',  upn:'vidyashree@acutant.com',color:'#DA3832'},  /* red */
+  chitra: {label:'Chitra', upn:'chitra@acutant.com',    color:'#B695D6'},  /* lilac */
+  lavanya:{label:'Lavanya',upn:'lavanya@acutant.com',   color:'#3B82C4'},  /* blue */
+  sriram: {label:'Sriram', upn:'sriram@acutant.com',    color:'#4CAF3C'}   /* kawasaki green */
+};
+function stakeholderOf(c){return STAKEHOLDERS[lc(c.stakeholder)]||null;}
+function stakeholderInitials(s){return s.label.slice(0,2).toUpperCase();}
 
 async function graphGet(path,extraHeaders){
   if(!appState.token)throw new Error('Not signed in');
@@ -1775,7 +1889,8 @@ async function signIn(){
 async function onToken(r){
   appState.token=r.accessToken;appState.user=r.account;
   appState.isSonia=lc(r.account&&r.account.username)===SONIA_UPN;
-  hideAuth();updateUserChip();
+  appState.myStakeholderKey=Object.keys(STAKEHOLDERS).find(k=>STAKEHOLDERS[k].upn===lc(r.account&&r.account.username))||null;
+  hideAuth();updateUserChip();updateViewGrp();
   await loadLive();
 }
 async function loadLive(){
@@ -1806,6 +1921,8 @@ async function loadLive(){
 function bootDemo(){
   hideAuth();
   appState.isSonia=true;                       // demo: allow read-state toggling locally
+  appState.myStakeholderKey='praveen';         // demo: exercise the My Clients toggle
+  updateViewGrp();
   EMAIL_TEMPLATES=DEMO_EMAIL_TEMPLATES.slice();
   CLIENTS=buildClients(375);rebuildDates();renderGrid();renderTimeline();
   showStatus(CLIENTS.length+' files · DEMO · '+EMAIL_TEMPLATES.length+' templates');
@@ -1822,7 +1939,7 @@ async function signOut(){
    scope across cards, desk, timeline and counts. Override via localStorage
    'itr_commFloor' (YYYY-MM-DD); set to '' to disable the floor entirely. */
 const COMM_FLOOR=(localStorage.getItem('itr_commFloor')??'2026-06-15');
-let mode='closed',activeFilter='all',searchQ='',timeCap=null;
+let mode='closed',activeFilter='all',searchQ='',timeCap=null,filesScannedAt=null;
 let typeAheadQ='',halfSelIdx=-1,lastMouseX=window.innerWidth/2,lastMouseY=window.innerHeight/2;
 let vinylList=[],vinylIdx=0,vinylDragging=false,vinylStartX=0;
 // Desk state
@@ -1919,6 +2036,7 @@ function getFiltered(){
     if(activeFilter==='due'&&!(c.nextActionDue&&c.nextActionDue<=TODAY))return false;
     if(!passesRefine(c))return false;
     if(appState.entityFilter&&appState.entityFilter!=='all'&&c.entity!==appState.entityFilter)return false;
+    if(appState.myClients&&appState.myStakeholderKey&&lc(c.stakeholder)!==appState.myStakeholderKey)return false;
     if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
     return true;
   }).sort((a,b)=>{
@@ -1938,6 +2056,7 @@ function updateBadges(){
     if(timeCap&&vc.length===0)return false;
     if(!passesRefine(c))return false;
     if(appState.entityFilter&&appState.entityFilter!=='all'&&c.entity!==appState.entityFilter)return false;
+    if(appState.myClients&&appState.myStakeholderKey&&lc(c.stakeholder)!==appState.myStakeholderKey)return false;
     if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
     return true;
   });
@@ -2022,6 +2141,7 @@ function makeFileBadgeHtml(c){
 
 /* ─── CLOSED CARD ───────────────────────────────────────────── */
 function makeClosedCard(c){
+  const stk=stakeholderOf(c);
   const comms=visComms(c);const counts={};
   comms.forEach(m=>{if(m.type!=='flag')counts[m.type]=(counts[m.type]||0)+1;});
   const latestColor=comms.length?TC[comms[comms.length-1].type]:TC.email;
@@ -2045,7 +2165,7 @@ function makeClosedCard(c){
     ${makeCardNameHtml(c.name)}
     <div class="cchips">${chipHtml}${issueChip}</div>
     ${reason}
-    <div class="cfoot"><div style="display:flex;gap:4px;align-items:center;min-width:0;"><span class="cdate">${footDate}</span>${dueChip(c)}</div>${c.status!=='idle'?`<span class="cst ${c.status}">${SL[c.status]}</span>`:''}</div>
+    <div class="cfoot"><div style="display:flex;gap:4px;align-items:center;min-width:0;"><span class="cdate">${footDate}</span>${dueChip(c)}</div><div style="display:flex;gap:4px;align-items:center;">${stk?`<span class="stk-chip" style="background:${stk.color}" title="${esc(stk.label)}">${stakeholderInitials(stk)}</span>`:''}${c.status!=='idle'?`<span class="cst ${c.status}">${SL[c.status]}</span>`:''}</div></div>
   </div><div class="fc-files">${makeFileTabsHtml(c)}</div>`;
   el.addEventListener('click',()=>{if(selectMode)toggleSel(c,el);else openDesk(c);});
   return el;
@@ -2059,6 +2179,7 @@ function dueChip(c){
 
 /* ─── OPEN STACK CARD ───────────────────────────────────────── */
 function makeOpenCard(c){
+  const stk=stakeholderOf(c);
   const comms=visComms(c);const sheets=comms.filter(m=>m.type!=='flag');
   const el=document.createElement('div');
   el.className='sc'+(selectMode?' selmode':'')+(SEL.has(c.id)?' sel':'');el.dataset.id=c.id;
@@ -2073,7 +2194,7 @@ function makeOpenCard(c){
   el.innerHTML=`${selectMode?`<div class="selchk">${SEL.has(c.id)?'✓':''}</div>`:''}<div class="sc-tray">
     <div class="sheets">${sheetHtml}</div>
     <div class="sname">${esc(c.name)}</div>
-    <div class="smeta"><span class="scnt">${comms.length} SLIP${comms.length!==1?'S':''}</span>${unreadCount?`<span class="sunread">${unreadCount} NEW</span>`:''}${dueChip(c)}<div class="sdot" style="background:${statusCol[c.status]}"></div><span class="sc-file-badge">${makeFileBadgeHtml(c)}</span></div>
+    <div class="smeta"><span class="scnt">${comms.length} SLIP${comms.length!==1?'S':''}</span>${unreadCount?`<span class="sunread">${unreadCount} NEW</span>`:''}${dueChip(c)}<div class="sdot" style="background:${statusCol[c.status]}"></div><span class="sc-file-badge">${makeFileBadgeHtml(c)}</span>${stk?`<span class="stk-chip" style="background:${stk.color}" title="${esc(stk.label)}">${stakeholderInitials(stk)}</span>`:''}</div>
   </div>`;
   el.addEventListener('click',()=>{if(selectMode)toggleSel(c,el);else openDesk(c);});
   return el;
@@ -2120,6 +2241,15 @@ function renderDeskFrame(){
   const unreadCount=deskComms.filter((_,i)=>!isRead(c.id,i)).length;
   $('dhId').textContent=c.id;
   $('dhName').textContent=c.name;
+  const stk=stakeholderOf(c);
+  const dhSeal=$('dhSeal');
+  if(stk){
+    dhSeal.hidden=false;
+    dhSeal.style.setProperty('--seal',stk.color);
+    dhSeal.querySelector('.seal-inner').textContent=stk.label.toUpperCase();
+  }else{
+    dhSeal.hidden=true;
+  }
   const ctx=[
     `${deskComms.length} SLIP${deskComms.length!==1?'S':''}${unreadCount?` · <span class="u">${unreadCount} UNREAD</span>`:''}`,
     c.dataStatus?'DATA: '+esc(c.dataStatus):'',
@@ -2796,6 +2926,9 @@ document.addEventListener('keydown',e=>{
     if(e.key==='Enter')openCommModalForClient(deskClient,deskIdx);
     return;
   }
+  if(e.key==='Escape'&&searchQ){
+    searchQ='';$('search').value='';renderGrid();e.preventDefault();return;
+  }
   if(isGridKeyboardActive()&&!isTypingTarget(e.target)){
     if(e.code==='Backquote'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
       e.preventDefault();
@@ -2812,6 +2945,15 @@ document.addEventListener('keydown',e=>{
     if(handleTypeAheadKey(e))return;
   }
   if(e.key==='Escape'&&selectMode)toggleSelectMode(false);
+  if(e.key==='Escape'){
+    const hasFilters=activeFilter!=='all'||facets.size>0||dueFacet||fileFacet||Object.keys(fieldFacets).length>0;
+    if(hasFilters){
+      activeFilter='all';facets.clear();dueFacet=null;fileFacet=null;
+      Object.keys(fieldFacets).forEach(k=>delete fieldFacets[k]);
+      document.querySelectorAll('.flt').forEach(b=>b.classList.toggle('on',b.dataset.f==='all'));
+      syncDropLabel();renderRefine();renderGrid();e.preventDefault();
+    }
+  }
   if(selectMode&&(e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'&&!/^(INPUT|TEXTAREA)$/.test((e.target&&e.target.tagName)||'')){e.preventDefault();selectAllShownForce();}
 });
 
@@ -2820,10 +2962,10 @@ $('filters').addEventListener('click',e=>{
   const btn=e.target.closest('.flt');if(!btn)return;
   activeFilter=btn.dataset.f;if(deskClient)closeDesk();
   document.querySelectorAll('.flt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
-  renderGrid();
+  syncDropLabel();renderGrid();
 });
 
-// Entity toggle
+// View group: entity toggle + My Clients
 document.querySelectorAll('#entityToggle .etgl').forEach(btn=>{
   btn.classList.toggle('on', btn.dataset.e===appState.entityFilter);
   btn.addEventListener('click',()=>{
@@ -2832,8 +2974,42 @@ document.querySelectorAll('#entityToggle .etgl').forEach(btn=>{
     document.querySelectorAll('#entityToggle .etgl').forEach(b=>b.classList.toggle('on',b.dataset.e===btn.dataset.e));
     renderGrid();
     updateBadges();
+    updateViewGrp();
   });
 });
+$('myClientsTgl').addEventListener('click',()=>{
+  appState.myClients=!appState.myClients;
+  localStorage.setItem('itr_myClients', appState.myClients?'1':'0');
+  renderGrid();
+  updateBadges();
+  updateViewGrp();
+});
+/* ─── VIEW GROUP LABEL SYNC ─────────────────────────── */
+function updateViewGrp(){
+  const mineTgl=$('myClientsTgl');if(!mineTgl)return;
+  const hasStakeholder=!!appState.myStakeholderKey;
+  mineTgl.hidden=!hasStakeholder;
+  const mine=hasStakeholder&&appState.myClients;
+  mineTgl.classList.toggle('on',mine);
+  // Note: do NOT reset appState.myClients/localStorage here when hasStakeholder is false.
+  // This runs once at parse time (before onToken resolves myStakeholderKey) and again after.
+  // The filter is already inert without a stakeholder key (see getFiltered/updateBadges),
+  // so we only affect display (hide row, keep label as ALL/entity) and leave the persisted
+  // preference untouched until the key resolves and the real state can be reflected.
+  const btn=$('viewGrpBtn');if(!btn)return;
+  const ent=appState.entityFilter;
+  const entOn=ent&&ent!=='all';
+  let lbl='ALL',accent='var(--red)';
+  if(mine&&entOn){lbl='MINE·'+ent;}
+  else if(mine){lbl='MINE';}
+  else if(entOn){lbl=ent;}
+  btn.querySelector('.grp-lbl').textContent=lbl;
+  btn.classList.toggle('on', mine||entOn);
+  if(entOn)accent=ent==='AC'?'#D4880A':'#2563EB';
+  else if(mine)accent=(STAKEHOLDERS[appState.myStakeholderKey]&&STAKEHOLDERS[appState.myStakeholderKey].color)||'var(--red)';
+  btn.style.setProperty('--vw-accent',accent);
+}
+updateViewGrp();
 
 /* ── Refine facets popover ───────────────────────────────────── */
 function buildRefinePop(){
@@ -2935,6 +3111,35 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('.refine-wrap'))toggleRefinePop(false);
 });
 $('search').addEventListener('input',e=>{searchQ=e.target.value.trim();if(deskClient)closeDesk();renderGrid();});
+
+/* ─── DROP LABEL SYNC ───────────────────────────────── */
+function syncDropLabel(){
+  const labels={needs:'↩ REPLY',responded:'✓ DONE',pending:'⏳ WAIT',flagged:'⬟ FLAG'};
+  const btn=$('fltGrpBtn');if(!btn)return;
+  const lbl=labels[activeFilter];
+  btn.querySelector('.grp-lbl').textContent=lbl||'STATUS';
+  btn.classList.toggle('on',!!lbl);
+}
+
+/* ─── FILES AGE ─────────────────────────────────────── */
+function updateFilesAge(){
+  const wrap=$('filesAge'),lbl=$('filesAgeLabel');if(!wrap||!lbl)return;
+  if(!filesScannedAt){wrap.hidden=true;return;}
+  wrap.hidden=false;
+  const mins=Math.round((Date.now()-filesScannedAt)/60000);
+  lbl.textContent='FILES: '+(mins<1?'just now':mins+'m ago');
+}
+setInterval(updateFilesAge,30000);
+$('filesRefresh').addEventListener('click',async()=>{
+  if(!appState.token||!CLIENTS.length)return;
+  CLIENTS.forEach(c=>localStorage.removeItem('itr_files_'+c.id));
+  Object.keys(FILE_STORE).forEach(k=>delete FILE_STORE[k]);
+  filesScannedAt=null;updateFilesAge();
+  const btn=$('filesRefresh');
+  btn.classList.add('spinning');
+  await startFilesScan(CLIENTS).catch(e=>console.warn('[files refresh]',e));
+  btn.classList.remove('spinning');
+});
 $('modeBtn').addEventListener('click',()=>{
   mode=mode==='closed'?'open':'closed';if(deskClient)closeDesk();
   $('modeBtn').classList.toggle('on',mode==='open');
@@ -2994,6 +3199,7 @@ async function startFilesScan(clients){
   hideScanBar();
   renderRefine(); // update file facet counts now that scan is complete
   renderGrid();   // repaint so any active file facet now filters complete data
+  filesScannedAt=Date.now();updateFilesAge();
 }
 function toast(msg){const el=$('snack');el.textContent=msg;el.classList.add('show');clearTimeout(_st);_st=setTimeout(()=>el.classList.remove('show'),2200);}
 
@@ -3032,8 +3238,14 @@ function toggleSelectMode(force){
   if(!selectMode)SEL.clear();
   $('tbSelect').classList.toggle('tb-on',selectMode);
   $('tbSelect').textContent=selectMode?'☑ Selecting…':'☐ Select';
-  renderGrid();updateBulkbar();
+  renderGrid();updateBulkbar();updateBulkGrpBtn();
   if(selectMode)toast('Click cards · or “All shown” to select everything · Esc to exit');
+}
+/* keep the BULK ▾ toolbar group button in sync with select-mode + selection count */
+function updateBulkGrpBtn(){
+  const btn=$('tbBulkGrpBtn');if(!btn)return;
+  btn.innerHTML=(SEL.size?`Bulk · ${SEL.size}`:'Bulk')+'<span class="tb-grp-caret">▾</span>';
+  btn.classList.toggle('on',selectMode||SEL.size>0);
 }
 /* One-click select-all: ensure select mode, then select every shown card. */
 function selectAllShownForce(){
@@ -3058,6 +3270,7 @@ function updateBulkbar(){
   $('bulkbar').classList.toggle('show',selectMode||SEL.size>0);
   const shown=getFiltered(),allSel=shown.length>0&&shown.every(c=>SEL.has(c.id)),ab=$('bbAll');
   if(ab){ab.textContent=(allSel?'Clear shown':'All shown')+' ('+shown.length+')';ab.classList.toggle('bb-on',allSel);}
+  updateBulkGrpBtn();
 }
 function clearSel(){SEL.clear();updateBulkbar();if(selectMode)renderGrid();}
 /* toolbar actions target the selection, else the open desk file */
@@ -4330,6 +4543,19 @@ document.addEventListener('click',e=>{
   inp.value=b.dataset.d==='clear'?'':addDays(TODAY,parseInt(b.dataset.d,10));
   inp.dispatchEvent(new Event('change'));
   b.classList.add('qd-hit');setTimeout(()=>b.classList.remove('qd-hit'),220);
+});
+
+/* FOLLOW-UP toolbar group: click-toggled (not hover) so the native date picker
+   doesn't collapse it when opened. Opening one .tb-grp closes any other open one. */
+$('tbFollowGrpBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  const grp=$('tbFollowGrp'),wasOpen=grp.classList.contains('open');
+  document.querySelectorAll('.tb-grp.open').forEach(g=>g.classList.remove('open'));
+  grp.classList.toggle('open',!wasOpen);
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.tb-grp')) return;
+  document.querySelectorAll('.tb-grp.open').forEach(g=>g.classList.remove('open'));
 });
 
 /* ═══ AUTH UI WIRING ════════════════════════════════════════════ */
