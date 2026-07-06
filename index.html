@@ -81,6 +81,14 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .vw-mine-tgl.on{color:#fff;}
 .vw-mine-tgl.on .chk{background:var(--red);border-color:var(--red);color:#fff;}
 .vw-mine-tgl[hidden]{display:none;}
+.vw-grp-lbl{font-family:var(--cond);font-size:.58rem;font-weight:700;color:var(--mut3);letter-spacing:1px;text-transform:uppercase;padding:0 2px 4px;}
+.vw-stk-row{flex-wrap:wrap;gap:3px;max-width:190px;}
+.stgl{height:24px;padding:0 8px;border:1px solid transparent;background:transparent;color:var(--mut2);
+  font-family:var(--cond);font-size:.66rem;font-weight:700;cursor:pointer;letter-spacing:.4px;
+  text-transform:uppercase;border-radius:2px;transition:color .15s,border-color .15s,background .15s;}
+.stgl:hover{color:#ddd;border-color:#555;}
+.stgl.on{color:#fff;background:var(--sc,#888);border-color:var(--sc,#888);}
+.stgl.on[data-s="all"]{color:#fff;background:transparent;border-color:#888;}
 .flt{height:28px;padding:0 12px;border:none;background:transparent;color:var(--mut2);
   font-family:var(--cond);font-size:.74rem;font-weight:700;cursor:pointer;letter-spacing:.6px;
   text-transform:uppercase;border-bottom:3px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;}
@@ -242,6 +250,10 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .fc-files{display:flex;align-items:center;gap:4px;padding:4px 8px 5px;min-height:22px;
   background:#f7f7f7;border:1px solid var(--line);border-top:none;
   border-radius:0 0 2px 2px;overflow:hidden;flex-wrap:nowrap;}
+/* stakeholder-tinted band: bold colored left accent + faint color wash, tabs inside stay legible */
+.fc-files[style*="--stk"]{background:color-mix(in srgb, var(--stk) 14%, #f7f7f7);
+  border-left:3px solid var(--stk);border-top:1px solid color-mix(in srgb, var(--stk) 40%, var(--line));
+  padding-left:6px;}
 .file-tab{display:inline-flex;align-items:center;height:18px;border-radius:3px;overflow:hidden;
   flex-shrink:0;flex-grow:0;max-width:20px;
   text-decoration:none;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.1);
@@ -307,9 +319,11 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 @keyframes deskRise{from{opacity:0;transform:translateY(18px) scale(.985);}to{opacity:1;transform:none;}}
 /* desk header — charcoal bar + red rule, mirrors the Hub header */
 .desk-head{background:var(--ink);padding:13px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-shrink:0;position:relative;}
-.dh-seal{position:absolute;top:14px;right:220px;transform:rotate(-8deg);width:86px;height:86px;border:3px double var(--seal);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.85;}
-.dh-seal .seal-inner{color:var(--seal);font-family:var(--cond);font-weight:800;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;text-align:center;border-top:1px solid var(--seal);border-bottom:1px solid var(--seal);padding:3px 0;}
-@media (max-width:1100px){.dh-seal{display:none}}
+.dh-nameRow{display:flex;align-items:center;gap:14px;min-width:0;}
+.dh-nameRow .dh-name{min-width:0;overflow:hidden;text-overflow:ellipsis;}
+.dh-seal{position:static;flex:0 0 auto;transform:rotate(-8deg);width:58px;height:58px;border:3px double var(--seal);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.85;}
+.dh-seal .seal-inner{color:var(--seal);font-family:var(--cond);font-weight:800;font-size:.52rem;letter-spacing:1px;text-transform:uppercase;text-align:center;border-top:1px solid var(--seal);border-bottom:1px solid var(--seal);padding:2px 0;}
+@media (max-width:640px){.dh-seal{display:none}}
 .desk-rule{height:3px;background:var(--red);flex-shrink:0;}
 .dh-info{min-width:0;}
 .dh-id{font-family:var(--cond);font-size:.64rem;color:var(--mut2);letter-spacing:1px;text-transform:uppercase;margin-bottom:1px;}
@@ -1022,6 +1036,9 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
       </div>
       <div class="vw-grp-sep"></div>
       <button class="vw-mine-tgl" id="myClientsTgl" hidden><span class="chk">✓</span>My Clients Only</button>
+      <div class="vw-grp-sep"></div>
+      <div class="vw-grp-lbl">Stakeholder</div>
+      <div class="vw-grp-row vw-stk-row" id="stakeholderToggle"></div>
     </div>
   </div>
   <div class="refine-wrap">
@@ -1126,11 +1143,10 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
     <div class="desk-head">
       <div class="dh-info">
         <div class="dh-id" id="dhId"></div>
-        <div class="dh-name" id="dhName"></div>
+        <div class="dh-nameRow"><div class="dh-name" id="dhName"></div><div class="dh-seal" id="dhSeal" hidden><span class="seal-inner"></span></div></div>
         <div class="dh-sub" id="dhSub"></div>
         <div id="dhFlag"></div>
       </div>
-      <div class="dh-seal" id="dhSeal" hidden><span class="seal-inner"></span></div>
       <div class="dh-controls">
         <div class="dh-nav-group">
           <button class="dh-btn mark-all" id="dhMarkAll">✓ Mark All Read</button>
@@ -1632,7 +1648,8 @@ async function fetchClientFiles(c){
   }
 }
 const appState={msalApp:null,token:null,user:null,isSonia:false,entityFilter:localStorage.getItem('itr_entityFilter')||'all',
-  myClients:localStorage.getItem('itr_myClients')==='1',myStakeholderKey:null};
+  myClients:localStorage.getItem('itr_myClients')==='1',myStakeholderKey:null,
+  stakeholderFilter:localStorage.getItem('itr_stakeholderFilter')||'all'};
 
 function spBool(v){return v===true||v==='true'||v==='Yes'||v===1||v==='1';}
 function lc(v){return String(v==null?'':v).trim().toLowerCase();}
@@ -1640,12 +1657,12 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;',
 
 /* ═══ STAKEHOLDERS ═══ team identity: SharePoint Stakeholder text → UPN + stamp colour */
 const STAKEHOLDERS={
-  praveen:{label:'Praveen',upn:'praveen@acutant.com',   color:'#5FBF9E'},  /* mint green */
-  amala:  {label:'Amala',  upn:'amala@acutant.com',     color:'#8A8A8A'},  /* grey */
+  praveen:{label:'Praveen',upn:'praveen@acutant.com',   color:'#16A89A'},  /* teal */
+  amala:  {label:'Amala',  upn:'amala@acutant.com',     color:'#C64D8E'},  /* magenta */
   vidya:  {label:'Vidya',  upn:'vidyashree@acutant.com',color:'#DA3832'},  /* red */
-  chitra: {label:'Chitra', upn:'chitra@acutant.com',    color:'#B695D6'},  /* lilac */
+  chitra: {label:'Chitra', upn:'chitra@acutant.com',    color:'#9B6FD4'},  /* purple */
   lavanya:{label:'Lavanya',upn:'lavanya@acutant.com',   color:'#3B82C4'},  /* blue */
-  sriram: {label:'Sriram', upn:'sriram@acutant.com',    color:'#4CAF3C'}   /* kawasaki green */
+  sriram: {label:'Sriram', upn:'sriram@acutant.com',    color:'#4CAF3C'}   /* green */
 };
 function stakeholderOf(c){return STAKEHOLDERS[lc(c.stakeholder)]||null;}
 function stakeholderInitials(s){return s.label.slice(0,2).toUpperCase();}
@@ -2037,6 +2054,7 @@ function getFiltered(){
     if(!passesRefine(c))return false;
     if(appState.entityFilter&&appState.entityFilter!=='all'&&c.entity!==appState.entityFilter)return false;
     if(appState.myClients&&appState.myStakeholderKey&&lc(c.stakeholder)!==appState.myStakeholderKey)return false;
+    if(appState.stakeholderFilter&&appState.stakeholderFilter!=='all'&&lc(c.stakeholder)!==appState.stakeholderFilter)return false;
     if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
     return true;
   }).sort((a,b)=>{
@@ -2057,6 +2075,7 @@ function updateBadges(){
     if(!passesRefine(c))return false;
     if(appState.entityFilter&&appState.entityFilter!=='all'&&c.entity!==appState.entityFilter)return false;
     if(appState.myClients&&appState.myStakeholderKey&&lc(c.stakeholder)!==appState.myStakeholderKey)return false;
+    if(appState.stakeholderFilter&&appState.stakeholderFilter!=='all'&&lc(c.stakeholder)!==appState.stakeholderFilter)return false;
     if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
     return true;
   });
@@ -2166,7 +2185,7 @@ function makeClosedCard(c){
     <div class="cchips">${chipHtml}${issueChip}</div>
     ${reason}
     <div class="cfoot"><div style="display:flex;gap:4px;align-items:center;min-width:0;"><span class="cdate">${footDate}</span>${dueChip(c)}</div><div style="display:flex;gap:4px;align-items:center;">${stk?`<span class="stk-chip" style="background:${stk.color}" title="${esc(stk.label)}">${stakeholderInitials(stk)}</span>`:''}${c.status!=='idle'?`<span class="cst ${c.status}">${SL[c.status]}</span>`:''}</div></div>
-  </div><div class="fc-files">${makeFileTabsHtml(c)}</div>`;
+  </div><div class="fc-files"${stk?` style="--stk:${stk.color}"`:''}>${makeFileTabsHtml(c)}</div>`;
   el.addEventListener('click',()=>{if(selectMode)toggleSel(c,el);else openDesk(c);});
   return el;
 }
@@ -2980,10 +2999,44 @@ document.querySelectorAll('#entityToggle .etgl').forEach(btn=>{
 $('myClientsTgl').addEventListener('click',()=>{
   appState.myClients=!appState.myClients;
   localStorage.setItem('itr_myClients', appState.myClients?'1':'0');
+  // Enabling My Clients narrows by stakeholder too — clear any specific stakeholder filter to avoid empty sets.
+  if(appState.myClients&&appState.stakeholderFilter!=='all'){
+    appState.stakeholderFilter='all';
+    localStorage.setItem('itr_stakeholderFilter','all');
+    syncStakeholderToggle();
+  }
   renderGrid();
   updateBadges();
   updateViewGrp();
 });
+/* ─── STAKEHOLDER FILTER (dynamic, mirrors entity toggle) ─────── */
+function syncStakeholderToggle(){
+  document.querySelectorAll('#stakeholderToggle .stgl').forEach(b=>b.classList.toggle('on',b.dataset.s===appState.stakeholderFilter));
+}
+(function buildStakeholderToggle(){
+  const row=$('stakeholderToggle');if(!row)return;
+  const btns=['<button class="stgl'+(appState.stakeholderFilter==='all'?' on':'')+'" data-s="all">All</button>'];
+  Object.keys(STAKEHOLDERS).forEach(k=>{
+    const s=STAKEHOLDERS[k];
+    btns.push('<button class="stgl'+(appState.stakeholderFilter===k?' on':'')+'" data-s="'+k+'" style="--sc:'+s.color+'" title="'+esc(s.label)+'">'+stakeholderInitials(s)+'</button>');
+  });
+  row.innerHTML=btns.join('');
+  row.querySelectorAll('.stgl').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      appState.stakeholderFilter=btn.dataset.s;
+      localStorage.setItem('itr_stakeholderFilter', btn.dataset.s);
+      // Selecting a specific stakeholder turns off My Clients (both narrow by stakeholder).
+      if(btn.dataset.s!=='all'&&appState.myClients){
+        appState.myClients=false;
+        localStorage.setItem('itr_myClients','0');
+      }
+      syncStakeholderToggle();
+      renderGrid();
+      updateBadges();
+      updateViewGrp();
+    });
+  });
+})();
 /* ─── VIEW GROUP LABEL SYNC ─────────────────────────── */
 function updateViewGrp(){
   const mineTgl=$('myClientsTgl');if(!mineTgl)return;
@@ -2999,13 +3052,19 @@ function updateViewGrp(){
   const btn=$('viewGrpBtn');if(!btn)return;
   const ent=appState.entityFilter;
   const entOn=ent&&ent!=='all';
+  const stkKey=appState.stakeholderFilter;
+  const stkOn=stkKey&&stkKey!=='all'&&STAKEHOLDERS[stkKey];
   let lbl='ALL',accent='var(--red)';
-  if(mine&&entOn){lbl='MINE·'+ent;}
-  else if(mine){lbl='MINE';}
-  else if(entOn){lbl=ent;}
+  const parts=[];
+  if(stkOn)parts.push(STAKEHOLDERS[stkKey].label.toUpperCase());
+  else if(mine)parts.push('MINE');
+  if(entOn)parts.push(ent);
+  if(parts.length)lbl=parts.join('·');
   btn.querySelector('.grp-lbl').textContent=lbl;
-  btn.classList.toggle('on', mine||entOn);
-  if(entOn)accent=ent==='AC'?'#D4880A':'#2563EB';
+  btn.classList.toggle('on', mine||entOn||!!stkOn);
+  // Accent priority: stakeholder colour, then entity, then MINE stakeholder colour.
+  if(stkOn)accent=STAKEHOLDERS[stkKey].color;
+  else if(entOn)accent=ent==='AC'?'#D4880A':'#2563EB';
   else if(mine)accent=(STAKEHOLDERS[appState.myStakeholderKey]&&STAKEHOLDERS[appState.myStakeholderKey].color)||'var(--red)';
   btn.style.setProperty('--vw-accent',accent);
 }
