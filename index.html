@@ -375,8 +375,11 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 /* ─── FILES PANEL (desk rail) ──────────────────────────── */
 .files-panel{margin-bottom:10px;}
 .files-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.files-hd-left{display:flex;align-items:baseline;gap:6px;min-width:0;}
 .files-hd-lbl{font-family:var(--cond);font-size:.64rem;font-weight:700;color:var(--mut);letter-spacing:1px;text-transform:uppercase;}
 .files-hd-meta{font-family:var(--cond);font-size:.6rem;color:var(--mut2);letter-spacing:.3px;}
+.files-hd-link{color:inherit;text-decoration:none;cursor:pointer;transition:color .12s;}
+.files-hd-link:hover{color:var(--email);}
 .files-upload-btn{border:none;background:transparent;color:var(--email);font-family:var(--cond);font-size:.66rem;
   font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;padding:2px 4px;border-radius:2px;
   transition:background .12s;}
@@ -1625,7 +1628,7 @@ const INBOUND_OUTCOMES=['info received','doc shared','received','docs received',
 /* ═══ FILE STORE ════════════════════════════════════════════
    FILE_STORE is the in-memory source of truth for client folder contents.
    Populated by the background scanner; updated on desk open (force-refresh).
-   { clientId: { files: [{name,url,modified}], loading: bool } }               */
+   { clientId: { files: [{name,url,modified}], folderUrl, loading: bool } }               */
 const FILE_STORE={};
 const FILE_CACHE_TTL=4*60*60*1000; // 4 hours
 function isStdFile(name){const n=lc(name);return n.includes('ais')||n.includes('26as');}
@@ -1639,27 +1642,35 @@ function filesFromCache(clientId){
     if(!raw)return null;
     const e=JSON.parse(raw);
     if(Date.now()-e.ts>FILE_CACHE_TTL)return null;
-    return e.files;
+    return{files:e.files||[],folderUrl:e.folderUrl||''};
   }catch{return null;}
 }
-function filesToCache(clientId,files){
-  try{localStorage.setItem('itr_files_'+clientId,JSON.stringify({ts:Date.now(),files}));}
+function filesToCache(clientId,files,folderUrl){
+  try{localStorage.setItem('itr_files_'+clientId,JSON.stringify({ts:Date.now(),files,folderUrl:folderUrl||''}));}
   catch{}
 }
 async function fetchClientFiles(c){
-  const path='/sites/'+SITE_ID+'/drive/root:/'+clientFolderPath(c)+':/children?$select=name,webUrl,lastModifiedDateTime,file';
+  const base='/sites/'+SITE_ID+'/drive/root:/'+clientFolderPath(c);
+  let folderUrl='';
   try{
-    const data=await graphGet(path);
-    return(data.value||[])
+    const folder=await graphGet(base+'?$select=webUrl');
+    folderUrl=folder.webUrl||'';
+  }catch(e){
+    if(!String(e.message).includes('404'))throw e;
+  }
+  try{
+    const data=await graphGet(base+':/children?$select=name,webUrl,lastModifiedDateTime,file');
+    const files=(data.value||[])
       .filter(item=>item.file) // files only, skip subfolders
       .map(item=>({
         name:item.name,
         url:item.webUrl,
         modified:item.lastModifiedDateTime?item.lastModifiedDateTime.split('T')[0]:''
       }));
+    return{files,folderUrl};
   }catch(e){
     // 404 = folder doesn't exist yet; treat as empty rather than error
-    if(String(e.message).includes('404'))return[];
+    if(String(e.message).includes('404'))return{files:[],folderUrl};
     throw e;
   }
 }
@@ -2298,9 +2309,9 @@ function openDesk(c){
   $('deskOv').classList.add('open');
   renderDeskFrame();
   if(appState.token){
-    fetchClientFiles(c).then(files=>{
-      FILE_STORE[c.id]={files,loading:false};
-      filesToCache(c.id,files);
+    fetchClientFiles(c).then(({files,folderUrl})=>{
+      FILE_STORE[c.id]={files,folderUrl,loading:false};
+      filesToCache(c.id,files,folderUrl);
       renderFilesPanel(c);
       const cardEl=document.querySelector('#grid [data-id="'+c.id+'"]');
       if(cardEl){const tabsEl=cardEl.querySelector('.fc-files');if(tabsEl)tabsEl.innerHTML=makeFileTabsHtml(c);}
@@ -3307,7 +3318,7 @@ async function startFilesScan(clients){
   // Seed FILE_STORE from cache immediately so cards render on first paint
   clients.forEach(c=>{
     const cached=filesFromCache(c.id);
-    if(cached)FILE_STORE[c.id]={files:cached,loading:false};
+    if(cached)FILE_STORE[c.id]={files:cached.files,folderUrl:cached.folderUrl,loading:false};
   });
   const toFetch=clients.filter(c=>!FILE_STORE[c.id]);
   if(!toFetch.length){hideScanBar();renderRefine();return;}
@@ -3318,10 +3329,10 @@ async function startFilesScan(clients){
     const batch=toFetch.slice(i,i+BATCH);
     await Promise.all(batch.map(async c=>{
       try{
-        const files=await fetchClientFiles(c);
-        FILE_STORE[c.id]={files,loading:false};
-        filesToCache(c.id,files);
-      }catch{FILE_STORE[c.id]={files:[],loading:false};}
+        const{files,folderUrl}=await fetchClientFiles(c);
+        FILE_STORE[c.id]={files,folderUrl,loading:false};
+        filesToCache(c.id,files,folderUrl);
+      }catch{FILE_STORE[c.id]={files:[],folderUrl:'',loading:false};}
       done++;
       updateScanBar(done,toFetch.length);
       // Update existing card in-place — no full grid re-render
@@ -4416,13 +4427,17 @@ function renderFilesPanel(c){
     panel.innerHTML='<div class="files-spinner">loading files…</div>';
     return;
   }
-  const{files}=entry;
-  const std=files.filter(f=>isStdFile(f.name)).length;
-  const add=files.filter(f=>!isStdFile(f.name)).length;
-  const metaParts=[];
-  if(std)metaParts.push(std+' standard');
-  if(add)metaParts.push(add+' additional');
-  const meta=metaParts.length?metaParts.join(' · '):'no files';
+  const{files,folderUrl}=entry;
+  const total=files.length;
+  const folderLink=folderUrl||'';
+  const folderTitle=folderLink?'Open client folder in SharePoint':'';
+  const titleHtml=folderLink
+    ?`<a class="files-hd-link rail-lbl" style="margin:0;text-transform:none" href="${esc(folderLink)}" target="_blank" rel="noopener" title="${esc(folderTitle)}">Client folder</a>`
+    :`<span class="rail-lbl" style="margin:0;text-transform:none">Client folder</span>`;
+  const countLabel=total===1?'1 File available':total+' Files available';
+  const countHtml=total?(folderLink
+    ?`<a class="files-hd-link files-hd-meta" href="${esc(folderLink)}" target="_blank" rel="noopener" title="${esc(folderTitle)}">${esc(countLabel)}</a>`
+    :`<span class="files-hd-meta">${esc(countLabel)}</span>`):'';
   const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function fmtDate(d){if(!d)return'';const[,m,day]=d.split('-');return day+' '+months[+m];}
   const rows=files.map(f=>{
@@ -4437,8 +4452,7 @@ function renderFilesPanel(c){
     </div>`;
   }).join('')||'<div class="files-empty">— no files in folder</div>';
   panel.innerHTML=`<div class="files-hd">
-    <span class="rail-lbl" style="margin:0">Files</span>
-    <span class="files-hd-meta">${esc(meta)}</span>
+    <div class="files-hd-left">${titleHtml}${countHtml}</div>
     <button class="files-upload-btn" id="filesUploadBtn">↑ Upload</button>
   </div>
   <div class="files-list">${rows}</div>`;
@@ -4461,9 +4475,9 @@ function triggerUpload(c){
       }catch(e){fail++;console.error('[upload]',file.name,e.message);}
     }
     try{
-      const fresh=await fetchClientFiles(c);
-      FILE_STORE[c.id]={files:fresh,loading:false};
-      filesToCache(c.id,fresh);
+      const{files:fresh,folderUrl}=await fetchClientFiles(c);
+      FILE_STORE[c.id]={files:fresh,folderUrl,loading:false};
+      filesToCache(c.id,fresh,folderUrl);
     }catch{}
     renderFilesPanel(c);
     const cardEl=document.querySelector('#grid [data-id="'+c.id+'"]');
