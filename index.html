@@ -66,10 +66,11 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   font-weight:700;letter-spacing:.5px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:3px;}
 .vw-grp:hover .vw-grp-btn,.vw-grp-btn:hover{color:#ddd;}
 .vw-grp-btn.on{color:#fff;border-bottom-color:var(--vw-accent,var(--red));}
-.vw-grp-caret{font-size:.6rem;opacity:.6;}
+.vw-grp-caret{font-size:.6rem;opacity:.6;transition:transform .15s;}
+.vw-grp.open .vw-grp-caret{transform:rotate(180deg);}
 .vw-grp-panel{display:none;position:absolute;top:calc(100% + 2px);left:0;flex-direction:column;
   background:#1e1b1c;border:1px solid #444;border-radius:2px;z-index:200;padding:6px;min-width:150px;}
-.vw-grp:hover .vw-grp-panel{display:flex;}
+.vw-grp.open .vw-grp-panel{display:flex;}
 .vw-grp-row{display:flex;gap:2px;}
 .vw-grp-sep{height:1px;background:#3a3738;margin:6px 0;}
 .vw-mine-tgl{display:flex;align-items:center;gap:7px;height:28px;padding:0 6px;border:none;background:transparent;
@@ -81,8 +82,16 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .vw-mine-tgl.on{color:#fff;}
 .vw-mine-tgl.on .chk{background:var(--red);border-color:var(--red);color:#fff;}
 .vw-mine-tgl[hidden]{display:none;}
+/* "Assigned Only" — a larger, centred toggle that shows only clients who have a
+   stakeholder assigned. Reuses the My Clients toggle look, but bigger/centred. */
+.vw-assigned-tgl{justify-content:center;height:32px;font-size:.72rem;letter-spacing:.7px;}
+.vw-assigned-tgl.on .chk{background:var(--red);border-color:var(--red);color:#fff;}
 .vw-grp-lbl{font-family:var(--cond);font-size:.58rem;font-weight:700;color:var(--mut3);letter-spacing:1px;text-transform:uppercase;padding:0 2px 4px;}
-.vw-stk-row{flex-wrap:wrap;gap:3px;max-width:190px;}
+/* Stakeholder chips laid out on an even grid so every chip is the same size and the
+   columns always line up regardless of how many stakeholders exist. 3 per row keeps
+   the columns wide enough for longer chip codes like 'A.A.J.' and stays aligned as
+   more stakeholders are added. */
+.vw-stk-row{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;min-width:186px;}
 /* Inactive stakeholder chips carry a thin frame in their own colour (--sc, set inline
    per button) so the colour association is reinforced without selecting the user. The
    active chip fills solid; the "All" chip has no --sc so it stays neutral. */
@@ -643,11 +652,12 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   font-weight:700;letter-spacing:.5px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:3px;}
 .flt-grp:hover .flt-grp-btn,.flt-grp-btn:hover{color:#ddd;}
 .flt-grp-btn.on{color:#fff;border-bottom-color:var(--red);}
-.flt-grp-caret{font-size:.6rem;opacity:.6;}
+.flt-grp-caret{font-size:.6rem;opacity:.6;transition:transform .15s;}
+.flt-grp.open .flt-grp-caret{transform:rotate(180deg);}
 .flt-grp-panel{display:none;position:absolute;top:calc(100% + 2px);left:0;flex-direction:column;
   background:#1e1b1c;border:1px solid #444;border-radius:2px;z-index:200;padding:4px 0;
   box-shadow:0 4px 14px rgba(0,0,0,.55);}
-.flt-grp:hover .flt-grp-panel{display:flex;}
+.flt-grp.open .flt-grp-panel{display:flex;}
 .flt-grp-panel .flt{text-align:left;padding:5px 16px;white-space:nowrap;border-bottom:none !important;border-top:none;}
 .flt-grp-panel .flt:hover{background:#2c2829;color:#ddd;}
 .flt-grp-panel .flt.on{color:#fff;background:#2c2829;}
@@ -1043,6 +1053,8 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
       <div class="vw-grp-sep"></div>
       <div class="vw-grp-lbl">Stakeholder</div>
       <div class="vw-grp-row vw-stk-row" id="stakeholderToggle"></div>
+      <div class="vw-grp-sep"></div>
+      <button class="vw-mine-tgl vw-assigned-tgl" id="assignedTgl"><span class="chk">✓</span>Assigned Only</button>
     </div>
   </div>
   <div class="refine-wrap">
@@ -1566,7 +1578,7 @@ function buildClients(n){
     }
     return{id:`ITR26-${String(i+1).padStart(4,'0')}`,name,status,flagged,flagReason,comms,
       _sp:null,contactName:name,phone:'9'+String(rnd(100000000,999999999)),mail:name.toLowerCase().replace(/ /g,'.')+'@gmail.com',
-      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['Praveen','Amala','Vidya','Chitra','Lavanya','Sriram','Anusha','']),
+      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['Praveen','Amala','Vidya','Chitra','Lavanya','Sriram','Anusha','AR/AIO/JATHIN','AR/AIO/JATHIN','AR/AIO/JATHIN','']),
       entity:pick(['AC','ASI']),applicability:pick(['Salary','House Property','Business Income','Capital Gain','Tax Audit','Trust','NA']),
       constitution:pick(['Individual','HUF','Firm','Company','Trust']),serviceCategory:pick(['ITR Only','Tax Audit','10B (Trust)','Stat Audit']),
       outreachRequired:status==='needs',outreachReason:flagged?flagReason:'',
@@ -1653,7 +1665,8 @@ async function fetchClientFiles(c){
 }
 const appState={msalApp:null,token:null,user:null,isSonia:false,entityFilter:localStorage.getItem('itr_entityFilter')||'all',
   myClients:localStorage.getItem('itr_myClients')==='1',myStakeholderKey:null,
-  stakeholderFilter:localStorage.getItem('itr_stakeholderFilter')||'all'};
+  stakeholderFilter:localStorage.getItem('itr_stakeholderFilter')||'all',
+  assignedOnly:localStorage.getItem('itr_assignedOnly')==='1'};
 
 function spBool(v){return v===true||v==='true'||v==='Yes'||v===1||v==='1';}
 function lc(v){return String(v==null?'':v).trim().toLowerCase();}
@@ -1672,10 +1685,21 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;',
  *   3. Nothing else to touch. The filter buttons, card chips, Desk seal and all
  *      filtering read straight from this object and update automatically.
  *
- *   ⚠ CHIP CODE: the 2-letter chip is auto-derived from the first 2 letters of
- *      `label` (see stakeholderInitials). Make sure those 2 letters are unique
- *      across the team, e.g. Amala→AM vs Anusha→AN. If two names collide, tweak
- *      the label (or extend stakeholderInitials with a manual override).
+ *   ⚠ CHIP CODE: by default the 2-letter chip is auto-derived from the first 2
+ *      letters of `label` (see stakeholderInitials). Make sure those 2 letters are
+ *      unique across the team, e.g. Amala→AM vs Anusha→AN.
+ *
+ *   OPTIONAL FIELDS (only when a plain name isn't enough — see the `aaj` entry):
+ *        chip    : override the auto chip text (e.g. 'A.A.J.') when the label
+ *                  wouldn't give a clean/unique code, or when a short in-app name
+ *                  should differ from the stamp. This is what shows on the filter
+ *                  button and the small card chip.
+ *        aliases : array of alternate SharePoint "Stakeholder" text values that all
+ *                  map to this same stakeholder (e.g. a shared bucket whose raw text
+ *                  is messy like 'AR/AIO/JATHIN'). Matching is case-insensitive.
+ *        upns    : array of extra sign-in addresses (for a bucket shared by several
+ *                  people) so "My Clients Only" works for any of them.
+ *      `label` is always the full name shown on the Desk stamp/seal.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 const STAKEHOLDERS={
@@ -1685,10 +1709,25 @@ const STAKEHOLDERS={
   chitra: {label:'Chitra', upn:'chitra@acutant.com',    color:'#9B6FD4'},  /* purple */
   lavanya:{label:'Lavanya',upn:'lavanya@acutant.com',   color:'#3B82C4'},  /* blue */
   sriram: {label:'Sriram', upn:'sriram@acutant.com',    color:'#4CAF3C'},  /* green */
-  anusha: {label:'Anusha', upn:'anusha@acutant.com',    color:'#E8873A'}   /* orange */
+  anusha: {label:'Anusha', upn:'anusha@acutant.com',    color:'#E8873A'},  /* orange */
+  /* Shared bucket (largest). In-app chip 'A.A.J.'; stamp + tooltip read 'AR/Jathin'.
+     aliases catch the raw SharePoint text so those clients resolve here. */
+  aaj:    {label:'AR/Jathin', chip:'A.A.J.', color:'#64748B',              /* slate */
+           aliases:['AR/AIO/JATHIN','AR/AIO/Jathin','AR','AIO','Jathin','Ananth','AR/Ananth'],
+           upn:'ananth@acutant.com', upns:['ananth@acutant.com']}
 };
-function stakeholderOf(c){return STAKEHOLDERS[lc(c.stakeholder)]||null;}
-function stakeholderInitials(s){return s.label.slice(0,2).toUpperCase();}
+/* Alias index: any SharePoint Stakeholder text (canonical key, label, or a listed
+   alias) → canonical key. Rebuild automatically from STAKEHOLDERS above. */
+const STK_INDEX={};
+Object.keys(STAKEHOLDERS).forEach(k=>{
+  const s=STAKEHOLDERS[k];
+  STK_INDEX[k]=k;
+  STK_INDEX[lc(s.label)]=k;
+  (s.aliases||[]).forEach(a=>{STK_INDEX[lc(a)]=k;});
+});
+function stakeholderKeyOf(c){return STK_INDEX[lc(c.stakeholder)]||null;}
+function stakeholderOf(c){const k=stakeholderKeyOf(c);return k?STAKEHOLDERS[k]:null;}
+function stakeholderInitials(s){return s.chip||s.label.slice(0,2).toUpperCase();}
 
 async function graphGet(path,extraHeaders){
   if(!appState.token)throw new Error('Not signed in');
@@ -1929,7 +1968,8 @@ async function signIn(){
 async function onToken(r){
   appState.token=r.accessToken;appState.user=r.account;
   appState.isSonia=lc(r.account&&r.account.username)===SONIA_UPN;
-  appState.myStakeholderKey=Object.keys(STAKEHOLDERS).find(k=>STAKEHOLDERS[k].upn===lc(r.account&&r.account.username))||null;
+  const _uname=lc(r.account&&r.account.username);
+  appState.myStakeholderKey=Object.keys(STAKEHOLDERS).find(k=>{const s=STAKEHOLDERS[k];return s.upn===_uname||(s.upns&&s.upns.some(u=>lc(u)===_uname));})||null;
   hideAuth();updateUserChip();updateViewGrp();
   await loadLive();
 }
@@ -2076,8 +2116,9 @@ function getFiltered(){
     if(activeFilter==='due'&&!(c.nextActionDue&&c.nextActionDue<=TODAY))return false;
     if(!passesRefine(c))return false;
     if(appState.entityFilter&&appState.entityFilter!=='all'&&c.entity!==appState.entityFilter)return false;
-    if(appState.myClients&&appState.myStakeholderKey&&lc(c.stakeholder)!==appState.myStakeholderKey)return false;
-    if(appState.stakeholderFilter&&appState.stakeholderFilter!=='all'&&lc(c.stakeholder)!==appState.stakeholderFilter)return false;
+    if(appState.myClients&&appState.myStakeholderKey&&stakeholderKeyOf(c)!==appState.myStakeholderKey)return false;
+    if(appState.stakeholderFilter&&appState.stakeholderFilter!=='all'&&stakeholderKeyOf(c)!==appState.stakeholderFilter)return false;
+    if(appState.assignedOnly&&!lc(c.stakeholder))return false;   // Assigned Only: must have a stakeholder
     if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
     return true;
   }).sort((a,b)=>{
@@ -2097,8 +2138,9 @@ function updateBadges(){
     if(timeCap&&vc.length===0)return false;
     if(!passesRefine(c))return false;
     if(appState.entityFilter&&appState.entityFilter!=='all'&&c.entity!==appState.entityFilter)return false;
-    if(appState.myClients&&appState.myStakeholderKey&&lc(c.stakeholder)!==appState.myStakeholderKey)return false;
-    if(appState.stakeholderFilter&&appState.stakeholderFilter!=='all'&&lc(c.stakeholder)!==appState.stakeholderFilter)return false;
+    if(appState.myClients&&appState.myStakeholderKey&&stakeholderKeyOf(c)!==appState.myStakeholderKey)return false;
+    if(appState.stakeholderFilter&&appState.stakeholderFilter!=='all'&&stakeholderKeyOf(c)!==appState.stakeholderFilter)return false;
+    if(appState.assignedOnly&&!lc(c.stakeholder))return false;   // Assigned Only: must have a stakeholder
     if(searchQ){const q=searchQ.toLowerCase();if(!c.name.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q))return false;}
     return true;
   });
@@ -3005,6 +3047,7 @@ $('filters').addEventListener('click',e=>{
   activeFilter=btn.dataset.f;if(deskClient)closeDesk();
   document.querySelectorAll('.flt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
   syncDropLabel();renderGrid();
+  if(btn.classList.contains('flt-opt'))$('fltGrp').classList.remove('open');
 });
 
 // View group: entity toggle + My Clients
@@ -3028,6 +3071,17 @@ $('myClientsTgl').addEventListener('click',()=>{
     localStorage.setItem('itr_stakeholderFilter','all');
     syncStakeholderToggle();
   }
+  renderGrid();
+  updateBadges();
+  updateViewGrp();
+});
+/* ─── ASSIGNED ONLY toggle ───────────────────────────── */
+function syncAssignedToggle(){const b=$('assignedTgl');if(b)b.classList.toggle('on',appState.assignedOnly);}
+syncAssignedToggle();
+$('assignedTgl').addEventListener('click',()=>{
+  appState.assignedOnly=!appState.assignedOnly;
+  localStorage.setItem('itr_assignedOnly', appState.assignedOnly?'1':'0');
+  syncAssignedToggle();
   renderGrid();
   updateBadges();
   updateViewGrp();
@@ -3077,14 +3131,16 @@ function updateViewGrp(){
   const entOn=ent&&ent!=='all';
   const stkKey=appState.stakeholderFilter;
   const stkOn=stkKey&&stkKey!=='all'&&STAKEHOLDERS[stkKey];
+  const assignedOn=appState.assignedOnly;
   let lbl='ALL',accent='var(--red)';
   const parts=[];
   if(stkOn)parts.push(STAKEHOLDERS[stkKey].label.toUpperCase());
   else if(mine)parts.push('MINE');
+  else if(assignedOn)parts.push('ASSIGNED');
   if(entOn)parts.push(ent);
   if(parts.length)lbl=parts.join('·');
   btn.querySelector('.grp-lbl').textContent=lbl;
-  btn.classList.toggle('on', mine||entOn||!!stkOn);
+  btn.classList.toggle('on', mine||entOn||!!stkOn||assignedOn);
   // Accent priority: stakeholder colour, then entity, then MINE stakeholder colour.
   if(stkOn)accent=STAKEHOLDERS[stkKey].color;
   else if(entOn)accent=ent==='AC'?'#D4880A':'#2563EB';
@@ -3161,7 +3217,7 @@ function toggleRefinePop(open){
   const pop=$('refinePop'),btn=$('refineBtn');
   const show=open===undefined?pop.hidden:open;
   pop.hidden=!show;btn.classList.toggle('open',show);
-  if(show)renderRefine();
+  if(show){closeHeaderDrops();renderRefine();}
 }
 buildRefinePop();
 $('refineBtn').addEventListener('click',e=>{e.stopPropagation();toggleRefinePop();});
@@ -4430,7 +4486,7 @@ function renderContactCard(c){
     row('Name',c.contactName||c.name)+
     row('Phone',c.phone,phoneIssue(c.phone),c.phone?('tel:+'+waPhone(c.phone)):null)+
     row('Mail',c.mail,mailIssue(c.mail),c.mail?('mailto:'+c.mail):null)+
-    `<div class="cc-foot"><span class="cc-meta">${esc([c.coordinator,c.stakeholder].filter(Boolean).join(' · '))||'&nbsp;'}</span>`+
+    `<div class="cc-foot"><span class="cc-meta">${esc([c.coordinator,(stakeholderOf(c)||{}).label||c.stakeholder].filter(Boolean).join(' · '))||'&nbsp;'}</span>`+
     (c._sp||isDemo()?'<button class="cc-edit" id="ccEdit">✎ Edit</button>':'')+`</div>`;
   const eb=$('ccEdit');if(eb)eb.addEventListener('click',()=>editContactCard(c));
 }
@@ -4625,6 +4681,24 @@ document.addEventListener('click',e=>{
   inp.value=b.dataset.d==='clear'?'':addDays(TODAY,parseInt(b.dataset.d,10));
   inp.dispatchEvent(new Event('change'));
   b.classList.add('qd-hit');setTimeout(()=>b.classList.remove('qd-hit'),220);
+});
+
+/* Header filter drawers: click-toggled (same model as REFINE). Only one open at a time;
+   click outside to dismiss. STATUS drawer also closes after picking an option. */
+function closeHeaderDrops(except){
+  document.querySelectorAll('.vw-grp,.flt-grp').forEach(g=>{if(g!==except)g.classList.remove('open');});
+}
+function toggleHeaderDrop(grp){
+  const wasOpen=grp.classList.contains('open');
+  closeHeaderDrops(grp);
+  grp.classList.toggle('open',!wasOpen);
+  if(!wasOpen)toggleRefinePop(false);
+}
+$('viewGrpBtn').addEventListener('click',e=>{e.stopPropagation();toggleHeaderDrop($('viewGrp'));});
+$('fltGrpBtn').addEventListener('click',e=>{e.stopPropagation();toggleHeaderDrop($('fltGrp'));});
+document.addEventListener('click',e=>{
+  if(e.target.closest('.vw-grp')||e.target.closest('.flt-grp'))return;
+  closeHeaderDrops();
 });
 
 /* FOLLOW-UP toolbar group: click-toggled (not hover) so the native date picker
