@@ -83,10 +83,14 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .vw-mine-tgl[hidden]{display:none;}
 .vw-grp-lbl{font-family:var(--cond);font-size:.58rem;font-weight:700;color:var(--mut3);letter-spacing:1px;text-transform:uppercase;padding:0 2px 4px;}
 .vw-stk-row{flex-wrap:wrap;gap:3px;max-width:190px;}
-.stgl{height:24px;padding:0 8px;border:1px solid transparent;background:transparent;color:var(--mut2);
+/* Inactive stakeholder chips carry a thin frame in their own colour (--sc, set inline
+   per button) so the colour association is reinforced without selecting the user. The
+   active chip fills solid; the "All" chip has no --sc so it stays neutral. */
+.stgl{height:24px;padding:0 8px;border:1px solid var(--sc,transparent);background:transparent;color:var(--mut2);
   font-family:var(--cond);font-size:.66rem;font-weight:700;cursor:pointer;letter-spacing:.4px;
   text-transform:uppercase;border-radius:2px;transition:color .15s,border-color .15s,background .15s;}
-.stgl:hover{color:#ddd;border-color:#555;}
+.stgl:hover{color:#ddd;}
+.stgl[data-s="all"]:hover{border-color:#555;}
 .stgl.on{color:#fff;background:var(--sc,#888);border-color:var(--sc,#888);}
 .stgl.on[data-s="all"]{color:#fff;background:transparent;border-color:#888;}
 .flt{height:28px;padding:0 12px;border:none;background:transparent;color:var(--mut2);
@@ -1562,7 +1566,7 @@ function buildClients(n){
     }
     return{id:`ITR26-${String(i+1).padStart(4,'0')}`,name,status,flagged,flagReason,comms,
       _sp:null,contactName:name,phone:'9'+String(rnd(100000000,999999999)),mail:name.toLowerCase().replace(/ /g,'.')+'@gmail.com',
-      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['Praveen','Amala','Vidya','Chitra','Lavanya','Sriram','']),
+      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['Praveen','Amala','Vidya','Chitra','Lavanya','Sriram','Anusha','']),
       entity:pick(['AC','ASI']),applicability:pick(['Salary','House Property','Business Income','Capital Gain','Tax Audit','Trust','NA']),
       constitution:pick(['Individual','HUF','Firm','Company','Trust']),serviceCategory:pick(['ITR Only','Tax Audit','10B (Trust)','Stat Audit']),
       outreachRequired:status==='needs',outreachReason:flagged?flagReason:'',
@@ -1655,14 +1659,33 @@ function spBool(v){return v===true||v==='true'||v==='Yes'||v===1||v==='1';}
 function lc(v){return String(v==null?'':v).trim().toLowerCase();}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-/* ═══ STAKEHOLDERS ═══ team identity: SharePoint Stakeholder text → UPN + stamp colour */
+/* ═══ STAKEHOLDERS ═══ team identity: SharePoint Stakeholder text → UPN + stamp colour
+ *
+ * ─── HOW TO ADD A NEW STAKEHOLDER (do this + nothing else) ───────────────────
+ *   1. Add one line below. The KEY must be the person's first name, lowercase,
+ *      and must match the SharePoint "Stakeholder" field text (matching is
+ *      case-insensitive, so "Anusha" in SharePoint → key `anusha`).
+ *   2. Give them:
+ *        label : display name (proper case)
+ *        upn   : their Microsoft sign-in address (powers "My Clients Only")
+ *        color : a hex colour distinct from every other stakeholder below
+ *   3. Nothing else to touch. The filter buttons, card chips, Desk seal and all
+ *      filtering read straight from this object and update automatically.
+ *
+ *   ⚠ CHIP CODE: the 2-letter chip is auto-derived from the first 2 letters of
+ *      `label` (see stakeholderInitials). Make sure those 2 letters are unique
+ *      across the team, e.g. Amala→AM vs Anusha→AN. If two names collide, tweak
+ *      the label (or extend stakeholderInitials with a manual override).
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 const STAKEHOLDERS={
   praveen:{label:'Praveen',upn:'praveen@acutant.com',   color:'#16A89A'},  /* teal */
   amala:  {label:'Amala',  upn:'amala@acutant.com',     color:'#C64D8E'},  /* magenta */
   vidya:  {label:'Vidya',  upn:'vidyashree@acutant.com',color:'#DA3832'},  /* red */
   chitra: {label:'Chitra', upn:'chitra@acutant.com',    color:'#9B6FD4'},  /* purple */
   lavanya:{label:'Lavanya',upn:'lavanya@acutant.com',   color:'#3B82C4'},  /* blue */
-  sriram: {label:'Sriram', upn:'sriram@acutant.com',    color:'#4CAF3C'}   /* green */
+  sriram: {label:'Sriram', upn:'sriram@acutant.com',    color:'#4CAF3C'},  /* green */
+  anusha: {label:'Anusha', upn:'anusha@acutant.com',    color:'#E8873A'}   /* orange */
 };
 function stakeholderOf(c){return STAKEHOLDERS[lc(c.stakeholder)]||null;}
 function stakeholderInitials(s){return s.label.slice(0,2).toUpperCase();}
