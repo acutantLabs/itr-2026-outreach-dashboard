@@ -985,6 +985,33 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .tag-status.ok{color:var(--green);}
 .tag-status.err{color:var(--red-dk);}
 .tag-status.warn{color:var(--amber);}
+/* Email attachments (SharePoint + local) */
+.em-att-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.em-att-chips:empty{display:none;}
+.em-att-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;height:26px;padding:0 6px 0 8px;
+  border:1px solid var(--line2);border-radius:3px;background:var(--surface);font-family:var(--body);font-size:.74rem;color:var(--ink);}
+.em-att-chip .src{font-family:var(--cond);font-size:.58rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--mut2);flex-shrink:0;}
+.em-att-chip .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px;}
+.em-att-chip .sz{color:var(--mut2);font-size:.68rem;flex-shrink:0;}
+.em-att-chip .rm{border:none;background:none;cursor:pointer;color:var(--mut2);font-size:.8rem;line-height:1;padding:2px;flex-shrink:0;}
+.em-att-chip .rm:hover{color:var(--red-dk);}
+.em-att-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.em-att-btn{height:26px;padding:0 10px;border:1px solid var(--line2);border-radius:3px;background:var(--surface);cursor:pointer;
+  font-family:var(--cond);font-size:.64rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--mut);
+  display:inline-flex;align-items:center;gap:5px;transition:all .12s;}
+.em-att-btn:hover:not(:disabled){border-color:var(--ink);color:var(--ink);}
+.em-att-btn:disabled{opacity:.5;cursor:default;}
+.em-att-sp{margin-top:6px;border:1px solid var(--line2);border-radius:4px;background:var(--surface);max-height:180px;overflow:auto;}
+.em-att-sp-row{display:flex;align-items:center;gap:7px;width:100%;padding:6px 9px;border:none;border-bottom:1px solid var(--line);
+  background:none;cursor:pointer;text-align:left;font-family:var(--body);font-size:.76rem;color:var(--ink);}
+.em-att-sp-row:last-child{border-bottom:none;}
+.em-att-sp-row:hover{background:#F6F6F7;}
+.em-att-sp-row .n{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.em-att-sp-row .d{color:var(--mut2);font-size:.66rem;flex-shrink:0;}
+.em-att-sp-row.added{opacity:.45;cursor:default;}
+.em-att-sp-empty{padding:9px;font-family:var(--body);font-size:.74rem;color:var(--mut2);}
+.em-att-note{font-family:var(--body);font-size:.7rem;color:var(--mut2);margin-top:4px;min-height:13px;}
+.em-att-note.warn{color:var(--amber);}
 /* WYSIWYG rich-text editor (sends HTML); {tags} coloured in place, screen-only */
 .rt-wrap{border:1px solid var(--line2);border-radius:4px;overflow:hidden;background:var(--surface);}
 .rt-wrap:focus-within{border-color:var(--red);}
@@ -1458,6 +1485,15 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
       </div>
       <div class="tag-chips" id="emTagChips"></div>
       <div class="tag-status" id="emTagStatus"></div>
+      <div class="cf-lbl">Attachments <span class="em-hint" id="emAttHint">— max 3 MB per file</span></div>
+      <div class="em-att-chips" id="emAttChips"></div>
+      <div class="em-att-btns">
+        <button type="button" class="em-att-btn" id="emAttPc">+ From this PC</button>
+        <button type="button" class="em-att-btn" id="emAttSp">+ From SharePoint folder</button>
+      </div>
+      <div class="em-att-sp" id="emAttSpPick" hidden></div>
+      <div class="em-att-note" id="emAttNote"></div>
+      <input type="file" id="emAttInput" multiple style="display:none">
       <div class="cf-lbl">Log with — next action &amp; follow-up date</div>
       <div class="cf-row">
         <input type="text" id="emNext" placeholder="Next action…">
@@ -3901,19 +3937,48 @@ $('compSave').addEventListener('click',saveComposer);
    Returns {msgId, convId, viaFallback}. On total failure throws the clear
    Mail.Send.Shared + Send As explanation. */
 let emTargets=[],emRawTargets=[],emAfter='',emSentVia='',emSelectedTpl='',emTplHi=-1;
+/* ── email attachments (SharePoint client folder + local PC) ───
+   emAttachments holds prepared, already-base64-encoded files so a bulk run
+   never re-downloads per recipient. SharePoint picking is only offered for
+   single-client sends (cross-client data-seepage guard); bulk = local only. */
+let emAttachments=[],emAttSeq=0;
+const MAX_ATTACH_BYTES=3*1024*1024; // Graph inline fileAttachment limit
+function fmtBytes(n){return n<1024?n+' B':n<1024*1024?(n/1024).toFixed(0)+' KB':(n/1024/1024).toFixed(1)+' MB';}
+async function blobToBase64(blob){
+  const bytes=new Uint8Array(await blob.arrayBuffer());
+  let bin='';const CH=0x8000;
+  for(let i=0;i<bytes.length;i+=CH)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));
+  return btoa(bin);
+}
+async function graphGetBlob(path){
+  if(!appState.token)throw new Error('Not signed in');
+  const r=await fetch(GRAPH_BASE+path,{headers:{Authorization:'Bearer '+appState.token}});
+  if(!r.ok)throw new Error('GET '+path.split('?')[0]+' → '+r.status+' '+(await r.text()).slice(0,180));
+  return r.blob();
+}
+async function fetchSharePointFileBytes(c,fileName){
+  // Same drive-path convention as triggerUpload, inverted to a content read.
+  return graphGetBlob('/sites/'+SITE_ID+'/drive/root:/'+clientFolderPath(c)+'/'+encodeURIComponent(fileName)+':/content');
+}
+function toGraphAttachments(list){
+  return list.map(a=>({'@odata.type':'#microsoft.graph.fileAttachment',
+    name:a.name,contentType:a.contentType||'application/octet-stream',contentBytes:a.contentBytes}));
+}
 const isAuthErr=e=>/403|404|ErrorAccessDenied|ErrorItemNotFound|Authorization_RequestDenied/i.test(e&&e.message||'');
 const isTransient=e=>/\b(429|500|502|503|504)\b|TooManyRequests|ServiceUnavailable|Failed to fetch|NetworkError|timeout/i.test(e&&e.message||'');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const PERM_MSG='<strong>Sending as '+esc(TEAM_MAILBOX)+' is not enabled yet.</strong> All mail goes out from the team mailbox — never your personal account. The Entra app needs delegated <strong>Mail.Send.Shared</strong> (admin-consented), plus Exchange <em>Send As</em> rights on '+esc(TEAM_MAILBOX)+'. Until then, use <em>Open in Mail App Instead</em> below.';
-function emMsg(to,subject,body,isHtml){
+function emMsg(to,subject,body,isHtml,attachments){
   // From/Sender pinned to the team mailbox so the message is sent AS team@.
-  return {subject:subject,body:{contentType:isHtml?'HTML':'Text',content:body},
+  const m={subject:subject,body:{contentType:isHtml?'HTML':'Text',content:body},
     from:{emailAddress:{address:TEAM_MAILBOX}},
     sender:{emailAddress:{address:TEAM_MAILBOX}},
     toRecipients:[{emailAddress:{address:to}}]};
+  if(attachments&&attachments.length)m.attachments=attachments;
+  return m;
 }
-async function graphSendMail(to,subject,body,isHtml){
-  const msg=emMsg(to,subject,body,isHtml);
+async function graphSendMail(to,subject,body,isHtml,attachments){
+  const msg=emMsg(to,subject,body,isHtml,attachments);
   let draft=null;
   try{draft=await graphPost(mailboxBase()+'/messages',msg);}
   catch(e){
@@ -4036,11 +4101,101 @@ function openEmail(targets){
   empIdx=0;
   $('emDue').value='';
   $('emErr').classList.remove('show');
+  emAttachments=[];$('emAttSpPick').hidden=true;
+  // SharePoint attach is single-client only: bulk must never carry one
+  // client's folder files to another client's mailbox.
+  $('emAttSp').style.display=single?'inline-flex':'none';
+  $('emAttHint').textContent=single?'— max 3 MB per file':'— bulk send: local files only, attached to every email';
+  renderEmAtts();
   const btn=$('emSend');btn.disabled=false;btn.textContent='Send as '+TEAM_MAILBOX+(single?'':' ('+t.length+')');
   $('emOv').classList.add('open');
   setTimeout(()=>$('emBody').focus(),60);
 }
-function closeEmail(){closeTplDrop();$('emOv').classList.remove('open');}
+function closeEmail(){closeTplDrop();emAttachments=[];$('emAttSpPick').hidden=true;renderEmAtts();$('emOv').classList.remove('open');}
+/* ── attachment UI ─────────────────────────────────────────────*/
+function renderEmAtts(){
+  const box=$('emAttChips');if(!box)return;
+  box.innerHTML=emAttachments.map(a=>
+    `<span class="em-att-chip"><span class="src">${a.source==='sharepoint'?'SP':'PC'}</span>`+
+    `<span class="nm" title="${esc(a.name)}">${esc(a.name)}</span><span class="sz">${fmtBytes(a.size)}</span>`+
+    `<button type="button" class="rm" data-att="${a.id}" title="Remove">✕</button></span>`).join('');
+  const note=$('emAttNote'),total=emAttachments.reduce((s,a)=>s+a.size,0);
+  if(!emAttachments.length){note.textContent='';note.className='em-att-note';}
+  else{
+    note.textContent=emAttachments.length+' file'+(emAttachments.length>1?'s':'')+' · '+fmtBytes(total)+' total';
+    note.className='em-att-note'+(total>MAX_ATTACH_BYTES?' warn':'');
+    if(total>MAX_ATTACH_BYTES)note.textContent+=' — large total; Graph may reject the send';
+  }
+  // keep the SharePoint picker's added-state in sync
+  document.querySelectorAll('#emAttSpPick .em-att-sp-row').forEach(r=>{
+    r.classList.toggle('added',emAttachments.some(a=>a.source==='sharepoint'&&a.name===r.dataset.name));
+  });
+}
+function addEmAttachment(att){
+  if(att.size>MAX_ATTACH_BYTES){toast('⚠ '+att.name+' is '+fmtBytes(att.size)+' — over the 3 MB attachment limit');return false;}
+  if(emAttachments.some(a=>a.source===att.source&&a.name===att.name)){toast('Already attached: '+att.name);return false;}
+  emAttachments.push({id:'att'+(++emAttSeq),...att});
+  renderEmAtts();
+  return true;
+}
+$('emAttChips').addEventListener('click',e=>{
+  const b=e.target.closest('.rm');if(!b)return;
+  emAttachments=emAttachments.filter(a=>a.id!==b.dataset.att);
+  renderEmAtts();
+});
+$('emAttPc').addEventListener('click',()=>{
+  const input=$('emAttInput');input.value='';
+  input.onchange=async()=>{
+    const files=[...input.files];if(!files.length)return;
+    for(const f of files){
+      if(f.size>MAX_ATTACH_BYTES){toast('⚠ '+f.name+' is '+fmtBytes(f.size)+' — over the 3 MB attachment limit');continue;}
+      try{
+        const contentBytes=await blobToBase64(f);
+        addEmAttachment({name:f.name,size:f.size,contentType:f.type||'application/octet-stream',contentBytes,source:'local'});
+      }catch(e){toast('⚠ Could not read '+f.name);console.error('[attach]',f.name,e);}
+    }
+  };
+  input.click();
+});
+async function toggleSpPicker(){
+  const box=$('emAttSpPick');
+  if(!box.hidden){box.hidden=true;return;}
+  if(emTargets.length!==1)return;
+  const c=emTargets[0];
+  box.hidden=false;box.innerHTML='<div class="em-att-sp-empty">Loading folder…</div>';
+  let entry=FILE_STORE[c.id];
+  if(!entry||entry.loading||!entry.files){
+    try{
+      const{files,folderUrl}=await fetchClientFiles(c);
+      entry={files,folderUrl,loading:false};FILE_STORE[c.id]=entry;filesToCache(c.id,files,folderUrl);
+    }catch(e){box.innerHTML='<div class="em-att-sp-empty">⚠ Could not list folder: '+esc(String(e.message||e).slice(0,90))+'</div>';return;}
+  }
+  if(!entry.files.length){box.innerHTML='<div class="em-att-sp-empty">— no files in this client\'s folder</div>';return;}
+  box.innerHTML=entry.files.map(f=>
+    `<button type="button" class="em-att-sp-row" data-name="${esc(f.name)}" data-url="${esc(f.url||'')}">📄 <span class="n">${esc(f.name)}</span><span class="d">${esc(f.modified||'')}</span></button>`).join('');
+  renderEmAtts();
+}
+$('emAttSp').addEventListener('click',toggleSpPicker);
+$('emAttSpPick').addEventListener('click',async e=>{
+  const row=e.target.closest('.em-att-sp-row');
+  if(!row||row.classList.contains('added')||row.dataset.busy)return;
+  const c=emTargets[0];if(!c)return;
+  const name=row.dataset.name,url=row.dataset.url;
+  row.dataset.busy='1';const n=row.querySelector('.n'),orig=n.textContent;n.textContent=orig+' — fetching…';
+  try{
+    const blob=await fetchSharePointFileBytes(c,name);
+    if(blob.size>MAX_ATTACH_BYTES){toast('⚠ '+name+' is '+fmtBytes(blob.size)+' — over the 3 MB attachment limit');}
+    else{
+      const contentBytes=await blobToBase64(blob);
+      addEmAttachment({name,size:blob.size,contentType:blob.type||'application/octet-stream',contentBytes,source:'sharepoint',url});
+    }
+  }catch(err){
+    console.error('[attach:sp]',name,err);
+    if(isAuthErr(err)){$('emErr').innerHTML='<strong>Cannot read files from SharePoint.</strong> The Entra app needs delegated file/site read access (e.g. Files.Read.All) to attach folder documents. ('+esc(String(err.message||'').slice(0,90))+')';$('emErr').classList.add('show');}
+    else toast('⚠ Could not fetch '+name+' ('+String(err.message||'').slice(0,50)+')');
+  }
+  delete row.dataset.busy;n.textContent=orig;
+});
 /* ── conditional-section editor wiring ─────────────────────────
    Live backdrop highlight + a chip per taggable field that wraps the
    current selection in {Field:Value}…{/Field}. Highlight never leaves
@@ -4284,7 +4439,7 @@ async function deliverEmail(c,ctx){
   let msgId=null,convId=null,internetMsgId=null;
   // THE SEND. Only this may throw out of deliverEmail — so a retry never
   // re-sends an email that already went out (post-send logging is guarded).
-  if(appState.token){const ids=await graphSendMail(to,subj,body,true);msgId=ids.msgId||null;convId=ids.convId||null;internetMsgId=ids.internetMsgId||null;}
+  if(appState.token){const ids=await graphSendMail(to,subj,body,true,ctx.attachments);msgId=ids.msgId||null;convId=ids.convId||null;internetMsgId=ids.internetMsgId||null;}
   // Mail is now sent. Logging/tracker writes must NOT propagate (a SoniaLog
   // hiccup must not trigger a resend) — record a warning instead.
   let spId=null,logWarn='';
@@ -4298,6 +4453,8 @@ async function deliverEmail(c,ctx){
         OutcomeType:'Sent',ContactOwner:'Sonia',NeedsEscalation:false,
         SenderEmail:TEAM_MAILBOX,RecipientEmail:to,SourceMailbox:TEAM_MAILBOX};
       if(c._sp)fields.RelatedClientTrackerId=String(c._sp);
+      if(ctx.attNames)fields.DocName=ctx.attNames;
+      if(ctx.attUrl)fields.DocUrl=ctx.attUrl;
       if(msgId)fields.MessageId=msgId;
       if(convId)fields.ConversationId=convId;
       if(internetMsgId)fields.InternetMessageId=internetMsgId;
@@ -4310,7 +4467,7 @@ async function deliverEmail(c,ctx){
   }
   c.comms.push({_sp:spId,type:'email',date:today,dir:'out',content:subj,read:true,
     outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+textBody,subject:subj,nextAction:na,outcomeType:'Sent',
-    docName:'',docUrl:'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:due,escalation:false,
+    docName:ctx.attNames||'',docUrl:ctx.attUrl||'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:due,escalation:false,
     msgId:msgId,convId:convId});
   c.lastContactDate=today;c.lastContactOutcome='Email sent: '+subj;
   c.nextActionSummary=patch.NextActionSummary||na;c.nextActionDue=due||'';
@@ -4322,7 +4479,10 @@ async function sendEmails(){
   const subjT=$('emSubj').value.trim(),bodyHtmlT=emBodyHtml(),bodyTextT=emBodyText(),na=$('emNext').value.trim(),due=$('emDue').value;
   if(!subjT){toast('Subject is required');$('emSubj').focus();return;}
   if(!bodyTextT.trim()){toast('Write the message first');$('emBody').focus();return;}
-  const ctx={subjT,bodyHtmlT,bodyTextT,na,due,after:emAfter};
+  const ctx={subjT,bodyHtmlT,bodyTextT,na,due,after:emAfter,
+    attachments:toGraphAttachments(emAttachments),
+    attNames:emAttachments.map(a=>a.name).join('; '),
+    attUrl:(emAttachments.find(a=>a.url)||{}).url||''};
   // bulk → hand off to the confirmation + live-progress flow
   if(emTargets.length>1||emRawTargets.length>1){openBulkConfirm(ctx);return;}
   // single send
@@ -4344,6 +4504,7 @@ $('emSend').addEventListener('click',sendEmails);
 $('emClose').addEventListener('click',closeEmail);
 onBackdrop($('emOv'),closeEmail);
 $('emFallback').addEventListener('click',()=>{
+  if(emAttachments.length&&!confirm('Attachments cannot be carried into the mail app — the '+emAttachments.length+' selected file(s) will be dropped. Continue?'))return;
   const single=emTargets.length===1;
   const subj=$('emSubj').value.trim()||MAIL_SUBJ;
   const url=single
@@ -4380,7 +4541,8 @@ function openBulkConfirm(ctx){
   $('blkSkipLbl').style.display=skipped.length?'block':'none';
   $('blkSkipList').innerHTML=skipped.map(i=>`<div class="blk-skip-row"><span>${esc(i.name)} <span style="color:var(--mut3)">${esc(i.to||'—')}</span></span><span class="r">${esc(i.reason)}</span></div>`).join('');
   const sample=items.find(i=>i.state==='queued')||items[0], pc=sample&&sample.c;
-  $('blkPrev').innerHTML=pc?`<span class="s">${esc(personalize(ctx.subjT,pc))}</span>${esc(personalize(ctx.bodyTextT,pc))}`:'<em>No eligible recipients</em>';
+  const attLine=(ctx.attachments&&ctx.attachments.length)?`<div style="margin-bottom:6px;color:var(--mut);">📎 ${esc(ctx.attNames)} — attached to every email</div>`:'';
+  $('blkPrev').innerHTML=pc?attLine+`<span class="s">${esc(personalize(ctx.subjT,pc))}</span>${esc(personalize(ctx.bodyTextT,pc))}`:'<em>No eligible recipients</em>';
   $('blkPrevHint').textContent=pc?('— resolved for '+pc.name+' · shaded sections vary per client'):'— {name}/{first} personalised per client';
   // section coverage: for each distinct conditional tag, how many eligible recipients it applies to
   const eligibleC=items.filter(i=>i.state==='queued').map(i=>i.c);
