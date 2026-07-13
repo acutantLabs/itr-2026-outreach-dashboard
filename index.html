@@ -1745,13 +1745,18 @@ const INBOUND_OUTCOMES=['info received','doc shared','received','docs received',
 const FILE_STORE={};
 const FILE_CACHE_TTL=4*60*60*1000; // 4 hours
 function isStdFile(name){const n=lc(name);return n.includes('ais')||n.includes('26as');}
+function clientParentFolder(c){
+  // ASI clients live under "Client Folders"; AC clients under "AC client folders".
+  return String(c.entity||'').toUpperCase()==='AC'?'AC client folders':'Client Folders';
+}
 function clientFolderPath(c){
   // Returns a Graph-API-ready path string: each segment individually encoded.
-  return ['ITR 2026','Client Folders',c.id+' - '+c.name].map(encodeURIComponent).join('/');
+  return ['ITR 2026',clientParentFolder(c),c.id+' - '+c.name].map(encodeURIComponent).join('/');
 }
 function filesFromCache(clientId){
   try{
-    const raw=localStorage.getItem('itr_files_'+clientId);
+    // v2: path is entity-aware (AC → "AC client folders"); old caches may be empty 404s.
+    const raw=localStorage.getItem('itr_files_v2_'+clientId);
     if(!raw)return null;
     const e=JSON.parse(raw);
     if(Date.now()-e.ts>FILE_CACHE_TTL)return null;
@@ -1759,7 +1764,7 @@ function filesFromCache(clientId){
   }catch{return null;}
 }
 function filesToCache(clientId,files,folderUrl){
-  try{localStorage.setItem('itr_files_'+clientId,JSON.stringify({ts:Date.now(),files,folderUrl:folderUrl||''}));}
+  try{localStorage.setItem('itr_files_v2_'+clientId,JSON.stringify({ts:Date.now(),files,folderUrl:folderUrl||''}));}
   catch{}
 }
 async function fetchClientFiles(c){
@@ -3554,7 +3559,10 @@ function updateFilesAge(){
 setInterval(updateFilesAge,30000);
 $('filesRefresh').addEventListener('click',async()=>{
   if(!appState.token||!CLIENTS.length)return;
-  CLIENTS.forEach(c=>localStorage.removeItem('itr_files_'+c.id));
+  CLIENTS.forEach(c=>{
+    localStorage.removeItem('itr_files_'+c.id);
+    localStorage.removeItem('itr_files_v2_'+c.id);
+  });
   Object.keys(FILE_STORE).forEach(k=>delete FILE_STORE[k]);
   filesScannedAt=null;updateFilesAge();
   const btn=$('filesRefresh');
