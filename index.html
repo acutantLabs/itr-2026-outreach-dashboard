@@ -408,7 +408,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .dh-nameRow{display:flex;align-items:center;gap:14px;min-width:0;}
 .dh-nameRow .dh-name{min-width:0;overflow:hidden;text-overflow:ellipsis;}
 .dh-seal{position:static;flex:0 0 auto;transform:rotate(-8deg);width:58px;height:58px;border:3px double var(--seal);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.85;}
-.dh-seal .seal-inner{color:var(--seal);font-family:var(--cond);font-weight:800;font-size:.52rem;letter-spacing:1px;text-transform:uppercase;text-align:center;border-top:1px solid var(--seal);border-bottom:1px solid var(--seal);padding:2px 0;}
+.dh-seal .seal-inner{color:var(--seal);font-family:var(--cond);font-weight:800;font-size:1.04rem;letter-spacing:.5px;text-transform:uppercase;text-align:center;border-top:1px solid var(--seal);border-bottom:1px solid var(--seal);padding:2px 0;line-height:1.05;}
 @media (max-width:640px){.dh-seal{display:none}}
 .desk-rule{height:3px;background:var(--red);flex-shrink:0;}
 .dh-info{min-width:0;}
@@ -1694,7 +1694,7 @@ function buildClients(n){
     }
     return{id:`ITR26-${String(i+1).padStart(4,'0')}`,name,status,flagged,flagReason,comms,
       _sp:null,contactName:name,phone:'9'+String(rnd(100000000,999999999)),mail:name.toLowerCase().replace(/ /g,'.')+'@gmail.com',
-      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['Praveen','Amala','Vidya','Chitra','Lavanya','Sriram','Anusha','AR/AIO/JATHIN','AR/AIO/JATHIN','AR/AIO/JATHIN','']),
+      coordinator:pick(['Sonia','Meera','Arjun','Farah']),stakeholder:pick(['Praveen','Amala','Vidya','Chitra','Lavanya','Sriram','Anusha','Renuka','AR/AIO/JATHIN','AR/AIO/JATHIN','AR/AIO/JATHIN','']),
       entity:pick(['AC','ASI']),applicability:pick(['Salary','House Property','Business Income','Capital Gain','Tax Audit','Trust','NA']),
       constitution:pick(['Individual','HUF','Firm','Company','Trust']),serviceCategory:pick(['ITR Only','Tax Audit','10B (Trust)','Stat Audit']),
       outreachRequired:status==='needs',outreachReason:flagged?flagReason:'',
@@ -1832,16 +1832,18 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;',
  * ─────────────────────────────────────────────────────────────────────────────
  */
 const STAKEHOLDERS={
-  praveen:{label:'Praveen',upn:'praveen@acutant.com',   color:'#16A89A'},  /* teal */
-  amala:  {label:'Amala',  upn:'amala@acutant.com',     color:'#C64D8E'},  /* magenta */
-  vidya:  {label:'Vidya',  upn:'vidyashree@acutant.com',color:'#DA3832'},  /* red */
-  chitra: {label:'Chitra', upn:'chitra@acutant.com',    color:'#9B6FD4'},  /* purple */
-  lavanya:{label:'Lavanya',upn:'lavanya@acutant.com',   color:'#3B82C4'},  /* blue */
-  sriram: {label:'Sriram', upn:'sriram@acutant.com',    color:'#4CAF3C'},  /* green */
-  anusha: {label:'Anusha', upn:'anusha@acutant.com',    color:'#E8873A'},  /* orange */
+  praveen:{label:'Praveen',upn:'praveen@acutant.com',   color:'#0DBFBF'},  /* cyan — clear of green */
+  amala:  {label:'Amala',  upn:'amala@acutant.com',     color:'#E11D8A'},  /* hot magenta */
+  vidya:  {label:'Vidya',  upn:'vidyashree@acutant.com',color:'#EF4444'},  /* vivid red */
+  chitra: {label:'Chitra', upn:'chitra@acutant.com',    color:'#A855F7'},  /* electric violet */
+  lavanya:{label:'Lavanya',upn:'lavanya@acutant.com',   color:'#2563EB'},  /* royal blue */
+  sriram: {label:'Sriram', upn:'sriram@acutant.com',    color:'#22C55E'},  /* emerald — clear of cyan */
+  anusha: {label:'Anusha', upn:'anusha@acutant.com',    color:'#F59E0B'},  /* amber — clear of red */
+  renuka: {label:'Renuka', upn:'jayarama@acutant.com',  color:'#4338CA',  /* deep indigo — clear of violet */
+           aliases:['Jayarama']},
   /* Shared bucket (largest). In-app chip 'A.A.J.'; stamp + tooltip read 'AR/Jathin'.
      aliases catch the raw SharePoint text so those clients resolve here. */
-  aaj:    {label:'AR/Jathin', chip:'A.A.J.', color:'#64748B',              /* slate */
+  aaj:    {label:'AR/Jathin', chip:'A.A.J.', color:'#78716C',              /* warm stone — not blue-gray */
            aliases:['AR/AIO/JATHIN','AR/AIO/Jathin','AR','AIO','Jathin','Ananth','AR/Ananth'],
            upn:'ananth@acutant.com', upns:['ananth@acutant.com']}
 };
