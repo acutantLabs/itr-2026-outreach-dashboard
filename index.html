@@ -88,9 +88,9 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .vw-assigned-tgl.on .chk{background:var(--red);border-color:var(--red);color:#fff;}
 .vw-grp-lbl{font-family:var(--cond);font-size:.58rem;font-weight:700;color:var(--mut3);letter-spacing:1px;text-transform:uppercase;padding:0 2px 4px;}
 /* Stakeholder chips laid out on an even grid so every chip is the same size and the
-   columns always line up regardless of how many stakeholders exist. 3 per row keeps
-   the columns wide enough for longer chip codes like 'A.A.J.' and stays aligned as
-   more stakeholders are added. */
+   columns always line up regardless of how many stakeholders exist. "All" spans the
+   full first row; the nine named stakeholders then form a clean 3×3 matrix below.
+   3 per row keeps columns wide enough for longer chip codes like 'A.A.J.'. */
 .vw-stk-row{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;min-width:186px;}
 /* Inactive stakeholder chips carry a thin frame in their own colour (--sc, set inline
    per button) so the colour association is reinforced without selecting the user. The
@@ -99,6 +99,7 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
   font-family:var(--cond);font-size:.66rem;font-weight:700;cursor:pointer;letter-spacing:.4px;
   text-transform:uppercase;border-radius:2px;transition:color .15s,border-color .15s,background .15s;}
 .stgl:hover{color:#ddd;}
+.stgl[data-s="all"]{grid-column:1/-1;}
 .stgl[data-s="all"]:hover{border-color:#555;}
 .stgl.on{color:#fff;background:var(--sc,#888);border-color:var(--sc,#888);}
 .stgl.on[data-s="all"]{color:#fff;background:transparent;border-color:#888;}
