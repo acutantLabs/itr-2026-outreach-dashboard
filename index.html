@@ -878,8 +878,10 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .reply-log-summary{font-size:.76rem;color:var(--mut);margin-left:8px;align-self:center;}
 /* email modal extras */
 .em-hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--mut3);font-size:.62rem;}
+#emSubj.em-subj-locked{background:#F4F4F4;color:var(--ink2);cursor:default;}
 /* template picker — button shows selection; filter lives inside dropdown only */
-.tpl-picker{position:relative;}
+.tpl-picker{position:relative;z-index:0;}
+.tpl-picker.open{z-index:30;position:relative;}
 .tpl-sel{display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 10px;border:1px solid var(--line2);border-radius:2px;
   background:var(--surface);cursor:pointer;text-align:left;font-family:var(--body);font-size:.86rem;color:var(--ink);}
 .tpl-sel:hover{border-color:var(--ink);}
@@ -887,12 +889,12 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
 .tpl-sel-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .tpl-sel-label.mut{color:var(--mut2);}
 .tpl-sel-chev{flex:none;color:var(--mut);font-size:.78rem;line-height:1;}
-.tpl-drop{position:fixed;z-index:620;background:var(--surface);border:1px solid var(--line2);
+.tpl-drop{width:100%;margin-top:2px;background:var(--surface);border:1px solid var(--line2);
   border-radius:2px;box-shadow:var(--sh3);max-height:min(280px,44vh);display:flex;flex-direction:column;overflow:hidden;}
-.tpl-drop[hidden]{display:none;}
-.tpl-filter-wrap{padding:7px 8px 6px;border-bottom:1px solid var(--line);background:#FAFAFA;flex-shrink:0;}
+.tpl-drop[hidden]{display:none!important;}
+.tpl-filter-wrap{padding:7px 8px 6px;border-bottom:1px solid var(--line);background:#FAFAFA;flex-shrink:0;position:relative;z-index:1;}
 .tpl-filter-wrap input{width:100%;height:28px;border:1px solid var(--line2);border-radius:2px;padding:0 8px;
-  font-family:var(--body);font-size:.82rem;background:var(--surface);}
+  font-family:var(--body);font-size:.82rem;background:var(--surface);pointer-events:auto;position:relative;z-index:2;}
 .tpl-filter-wrap input:focus{border-color:var(--red);outline:none;}
 .tpl-list{overflow-y:auto;flex:1 1 auto;min-height:0;}
 .tpl-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:8px 10px;border:none;
@@ -1450,14 +1452,14 @@ header{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;
           <span class="tpl-sel-label mut" id="emTplLabel">Choose a template…</span>
           <span class="tpl-sel-chev">▾</span>
         </button>
-        <div class="tpl-drop" id="emTplDrop" hidden role="dialog" aria-label="Email templates">
+        <div class="tpl-drop" id="emTplDrop" hidden aria-label="Email templates">
           <div class="tpl-filter-wrap">
             <input type="text" id="emTplFilter" autocomplete="off" placeholder="Filter templates…">
           </div>
           <div class="tpl-list" id="emTplList" role="listbox"></div>
         </div>
       </div>
-      <div class="cf-lbl">Subject <span class="em-hint">— editable; [CID:id] appended on send</span></div>
+      <div class="cf-lbl">Subject <span class="em-hint" id="emSubjHint">— editable; [CID:id] appended on send</span></div>
       <input type="text" id="emSubj" autocomplete="off">
       <div class="cf-lbl">Message <span class="em-hint">— {name}/{first} personalised per recipient</span></div>
       <div class="rt-wrap">
@@ -2803,7 +2805,7 @@ function buildCommBody(client,m){
       ${fullBody?`<details style="margin-top:12px"><summary style="cursor:pointer;font-family:var(--cond);font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink);">Full email</summary><div class="email-body" style="margin-top:8px">${esc(fullBody)}</div></details>`:`<div class="email-body">${fallback}</div>`}
     </div>
 <div class="act-row" style="margin-top:10px;">
-  <button class="act-b" onclick="deskClient&&actEmail([deskClient])" type="button">✉ Compose Reply</button>
+  <button class="act-b" data-mailact="compose-reply" type="button">✉ Compose Reply</button>
   <button class="act-b" onclick="deskClient&&openComposer([deskClient])" type="button">+ Log Contact</button>
 </div>
 ${extras}${resP}`;
@@ -3272,7 +3274,13 @@ function handleTypeAheadKey(e){
 /* ═══ KEYBOARD ══════════════════════════════════════════════════ */
 document.addEventListener('keydown',e=>{
   if($('blkOv').classList.contains('open')){if(e.key==='Escape'&&!bulkRunning)$('blkClose').click();return;}
-  if($('emOv').classList.contains('open')){if(e.key==='Escape')closeEmail();return;}
+  if($('emOv').classList.contains('open')){
+    if(e.key==='Escape'){
+      if(tplDropIsOpen()){closeTplDrop();$('emTplBtn').focus();e.preventDefault();}
+      else closeEmail();
+    }
+    return;
+  }
   if($('compOv').classList.contains('open')){if(e.key==='Escape')closeComposer();return;}
   if($('flagOv').classList.contains('open')){if(e.key==='Escape')closeFlagModal();return;}
   if($('authOv').classList.contains('open'))return;
@@ -3948,6 +3956,10 @@ $('compSave').addEventListener('click',saveComposer);
    Returns {msgId, convId, viaFallback}. On total failure throws the clear
    Mail.Send.Shared + Send As explanation. */
 let emTargets=[],emRawTargets=[],emAfter='',emSentVia='',emSelectedTpl='',emTplHi=-1;
+/* When set, the composer is a reply: template swaps must not change the
+   subject, and send goes through Graph createReply so Outlook keeps the
+   message in the same conversation thread. */
+let emReplyCtx=null;
 /* ── email attachments (SharePoint client folder + local PC) ───
    emAttachments holds prepared, already-base64-encoded files so a bulk run
    never re-downloads per recipient. SharePoint picking is only offered for
@@ -4015,6 +4027,30 @@ async function graphSendMail(to,subject,body,isHtml,attachments){
   emSentVia=TEAM_MAILBOX;
   return {msgId:draft.id||null,convId:draft.conversationId||null,internetMsgId:draft.internetMessageId||null,viaFallback:false};
 }
+/* Threaded reply: createReply keeps Outlook's conversationId / In-Reply-To /
+   subject. We only replace the draft body (and attachments), never the subject. */
+async function graphReplyMail(replyToId,body,isHtml,attachments){
+  if(!replyToId)throw new Error('No message id to reply to');
+  let draft=null;
+  try{draft=await graphPost(mailPath(replyToId)+'/createReply',{});}
+  catch(e){
+    if(isAuthErr(e))throw new Error('Cannot reply as '+TEAM_MAILBOX+': the signed-in user needs Exchange "Send As" rights on '+TEAM_MAILBOX+' and the Entra app needs delegated Mail.Send.Shared. ('+e.message+')');
+    throw e;
+  }
+  try{
+    await graphPatch(mailPath(draft.id),{body:{contentType:isHtml?'HTML':'Text',content:body}});
+    if(attachments&&attachments.length){
+      for(const a of attachments)await graphPost(mailPath(draft.id)+'/attachments',a);
+    }
+    await graphPost(mailPath(draft.id)+'/send',{});
+  }catch(e){
+    try{await fetch(GRAPH_BASE+mailPath(draft.id),{method:'DELETE',headers:{Authorization:'Bearer '+appState.token}});}catch(_){}
+    if(isAuthErr(e))throw new Error('Cannot reply as '+TEAM_MAILBOX+': the signed-in user needs Exchange "Send As" rights on '+TEAM_MAILBOX+' and the Entra app needs delegated Mail.Send.Shared. ('+e.message+')');
+    throw e;
+  }
+  emSentVia=TEAM_MAILBOX;
+  return {msgId:draft.id||null,convId:draft.conversationId||null,internetMsgId:draft.internetMessageId||null,viaFallback:false};
+}
 /* ── email template picker (ITR_EmailTemplates) ──────────────── */
 function updateTplButton(){
   const lbl=$('emTplLabel');if(!lbl)return;
@@ -4022,31 +4058,34 @@ function updateTplButton(){
   if(tpl){lbl.textContent=tpl.title+(tpl.category?' · '+tpl.category:'');lbl.classList.remove('mut');}
   else{lbl.textContent='Choose a template…';lbl.classList.add('mut');}
 }
-function positionTplDrop(){
-  const picker=$('emTplPicker'),drop=$('emTplDrop'),btn=$('emTplBtn');
-  if(!picker||!drop||drop.hidden||!btn)return;
-  const r=btn.getBoundingClientRect();
-  drop.style.left=r.left+'px';
-  drop.style.top=(r.bottom+2)+'px';
-  drop.style.width=r.width+'px';
-}
 function setTplDropOpen(on){
   const picker=$('emTplPicker'),drop=$('emTplDrop'),btn=$('emTplBtn');
   if(!drop)return;
-  if(on){drop.hidden=false;picker.classList.add('open');if(btn)btn.setAttribute('aria-expanded','true');positionTplDrop();}
-  else{drop.hidden=true;picker.classList.remove('open');if(btn)btn.setAttribute('aria-expanded','false');emTplHi=-1;}
+  if(on){
+    drop.hidden=false;
+    picker.classList.add('open');
+    if(btn)btn.setAttribute('aria-expanded','true');
+    focusTplFilter();
+    requestAnimationFrame(focusTplFilter);
+  }else{
+    drop.hidden=true;
+    picker.classList.remove('open');
+    if(btn)btn.setAttribute('aria-expanded','false');
+    emTplHi=-1;
+  }
 }
 function applyEmailTemplate(tpl,animate){
   let body;
   if(!tpl){
     emSelectedTpl='';
-    $('emSubj').value=MAIL_SUBJ;
+    if(!emReplyCtx)$('emSubj').value=MAIL_SUBJ;
     body=MAIL_BODY;
     $('emNext').value='Wait for documents';
     emAfter='pending';
   }else{
     emSelectedTpl=tpl.templateKey;
-    $('emSubj').value=tpl.subject;
+    // Reply mode keeps the thread subject — template subject would start a new conversation.
+    if(!emReplyCtx)$('emSubj').value=tpl.subject;
     body=tpl.body;
     $('emNext').value=tpl.defaultNextAction||'';
     emAfter=tpl.afterStatus||'';
@@ -4069,6 +4108,7 @@ function filterEmailTemplates(q){
   return list.filter(t=>t.title.toLowerCase().includes(qq)||t.category.toLowerCase().includes(qq)||
     t.subject.toLowerCase().includes(qq)||t.templateKey.toLowerCase().includes(qq));
 }
+function tplDropIsOpen(){const d=$('emTplDrop');return d&&!d.hidden;}
 function closeTplDrop(){setTplDropOpen(false);}
 function renderTplList(q){
   const listEl=$('emTplList');if(!listEl)return;
@@ -4081,34 +4121,80 @@ function renderTplList(q){
     (t.category?'<span class="tpl-opt-cat">'+esc(t.category)+'</span>':'')+
     '<span class="tpl-opt-subj">'+esc(t.subject)+'</span></button>').join('');
 }
+function focusTplFilter(){
+  const f=$('emTplFilter');
+  if(!f||$('emTplDrop').hidden)return;
+  f.focus({preventScroll:true});
+}
 function openTplDrop(){
   const f=$('emTplFilter');if(f)f.value='';
   emTplHi=-1;
   renderTplList('');
   setTplDropOpen(true);
-  setTimeout(()=>{if(f){f.focus();f.select();}},20);
+  requestAnimationFrame(()=>requestAnimationFrame(focusTplFilter));
 }
-function toggleTplDrop(){const drop=$('emTplDrop');if(drop&&!drop.hidden)closeTplDrop();else openTplDrop();}
+function toggleTplDrop(){if(tplDropIsOpen())closeTplDrop();else openTplDrop();}
 function pickEmailTemplate(tpl){
   if(!tpl)return;
   applyEmailTemplate(tpl,true);
   closeTplDrop();
-  setTimeout(()=>$('emSubj').focus(),30);
+  setTimeout(()=>(emReplyCtx?$('emBody'):$('emSubj')).focus(),30);
 }
-function openEmail(targets){
+function normalizeReplySubject(subj){
+  let s=String(subj||'').replace(/\s*\[CID:[^\]]*\]/gi,'').trim();
+  if(!s)return 'Re:';
+  s=s.replace(/^((re|fw|fwd):\s*)+/i,'').trim();
+  return 'Re: '+s;
+}
+function resolveReplyTarget(m,client){
+  if(!m)return null;
+  const subject=normalizeReplySubject(m.subject||m.content||'');
+  let graphId=(m._mail&&m._mail.id)||m.msgId||null;
+  let convId=(m._mail&&m._mail.conv)||m.convId||null;
+  const internetMsgId=m.internetMsgId||null;
+  // Prefer a live mailbox message in the same thread — SoniaLog Graph ids can go stale.
+  if(client&&client.comms){
+    const live=client.comms.filter(x=>x.live&&x._mail&&x._mail.id);
+    const norm=s=>lc(s).replace(/^((re|fw|fwd):\s*)+/,'').replace(/\s*\[cid:[^\]]*\]/gi,'').trim();
+    let hit=null;
+    if(convId)hit=live.find(x=>x._mail.conv===convId);
+    if(!hit&&graphId)hit=live.find(x=>x._mail.id===graphId);
+    if(!hit){
+      const want=norm(m.subject||m.content||'');
+      if(want)hit=[...live].reverse().find(x=>norm(x.content)===want);
+    }
+    if(hit){graphId=hit._mail.id;convId=hit._mail.conv||convId;}
+  }
+  return {graphId,convId,internetMsgId,subject};
+}
+function setComposerReplyMode(on){
+  const subj=$('emSubj'),hint=$('emSubjHint');
+  if(subj){subj.readOnly=!!on;subj.classList.toggle('em-subj-locked',!!on);}
+  if(hint)hint.textContent=on
+    ?'— locked to keep this reply in the existing thread'
+    :'— editable; [CID:id] appended on send';
+}
+function openEmail(targets,replyMsg){
   const raw=(targets||[]);
   const t=raw.filter(c=>c.mail);
   if(!t.length){toast('No mail ID on file for the selected file(s)');return;}
   emRawTargets=raw;emTargets=t;
-  const single=t.length===1,c=t[0];
-  $('emTitle').textContent=single?c.name:t.length+' clients — bulk send';
-  $('emSub').textContent=(single?(c.id+' · '+c.mail):'One personalised email per client, each logged separately')+' · sends as '+TEAM_MAILBOX;
+  emReplyCtx=replyMsg?resolveReplyTarget(replyMsg,t[0]):null;
+  const single=t.length===1,c=t[0],isReply=!!emReplyCtx;
+  $('emTitle').textContent=isReply
+    ?(single?('Reply — '+c.name):'Reply')
+    :(single?c.name:t.length+' clients — bulk send');
+  $('emSub').textContent=isReply
+    ?((single?(c.id+' · '+c.mail):'')+' · stays in thread · sends as '+TEAM_MAILBOX).replace(/^ · /,'')
+    :((single?(c.id+' · '+c.mail):'One personalised email per client, each logged separately')+' · sends as '+TEAM_MAILBOX);
   $('emTo').value=single?c.mail:t.map(x=>x.mail).join('; ');
   $('emTo').disabled=!single;
   closeTplDrop();
+  setComposerReplyMode(isReply);
   const def=defaultEmailTemplate();
   if(def)applyEmailTemplate(def);
   else{applyEmailTemplate(null);if(!EMAIL_TEMPLATES.length)toast('Templates unavailable — using built-in default');}
+  if(isReply)$('emSubj').value=emReplyCtx.subject;
   empIdx=0;
   $('emDue').value='';
   $('emErr').classList.remove('show');
@@ -4118,11 +4204,11 @@ function openEmail(targets){
   $('emAttSp').style.display=single?'inline-flex':'none';
   $('emAttHint').textContent=single?'— max 3 MB per file':'— bulk send: local files only, attached to every email';
   renderEmAtts();
-  const btn=$('emSend');btn.disabled=false;btn.textContent='Send as '+TEAM_MAILBOX+(single?'':' ('+t.length+')');
+  const btn=$('emSend');btn.disabled=false;btn.textContent=(isReply?'Send reply as ':'Send as ')+TEAM_MAILBOX+(single?'':' ('+t.length+')');
   $('emOv').classList.add('open');
   setTimeout(()=>$('emBody').focus(),60);
 }
-function closeEmail(){closeTplDrop();emAttachments=[];$('emAttSpPick').hidden=true;renderEmAtts();$('emOv').classList.remove('open');}
+function closeEmail(){closeTplDrop();emAttachments=[];emReplyCtx=null;setComposerReplyMode(false);$('emAttSpPick').hidden=true;renderEmAtts();$('emOv').classList.remove('open');}
 /* ── attachment UI ─────────────────────────────────────────────*/
 function renderEmAtts(){
   const box=$('emAttChips');if(!box)return;
@@ -4274,7 +4360,12 @@ function _setCaret(ed,off){const w=document.createTreeWalker(ed,NodeFilter.SHOW_
    Caret is preserved by character offset (decoration adds no characters). */
 const EM_TAG_RE=/\{(\/?)([A-Za-z][A-Za-z ]*?)(?::([^{}]*))?\}/g;
 function decorateTags(){
-  const ed=$('emBody');if(!ed)return;const off=_caretOffset(ed);
+  const ed=$('emBody');if(!ed)return;
+  // Only restore caret while the editor is focused. Setting a selection in a
+  // contenteditable re-focuses it, which stole focus from the template filter
+  // whenever emBody blurred into emRefresh().
+  const keepCaret=document.activeElement===ed;
+  const off=keepCaret?_caretOffset(ed):-1;
   ed.querySelectorAll('span.em-tag,span.em-zone').forEach(s=>s.replaceWith(...s.childNodes));ed.normalize();
   const w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT,null),nodes=[];let n;
   while((n=w.nextNode()))nodes.push(n);
@@ -4296,7 +4387,7 @@ function decorateTags(){
     if(any)node.replaceWith(frag);
     else if(stack.length)node.replaceWith(zoneSpan(text));
   });
-  if(off>=0)_setCaret(ed,off);
+  if(off>=0&&document.activeElement===ed)_setCaret(ed,off);
 }
 /* Template status line (errs/warns/valid count) — same logic as old syncTagHL,
    now driven by the editor's plain text. */
@@ -4374,7 +4465,17 @@ let _emDeco;
 $('emTagChips').addEventListener('mousedown',e=>{const b=e.target.closest('.tag-chip');if(b){e.preventDefault();insertTag(b.dataset.tag);}});
 $('emBody').addEventListener('input',()=>{clearTimeout(_emDeco);_emDeco=setTimeout(emRefresh,180);});
 $('emBody').addEventListener('blur',emRefresh);
-$('emTplBtn').addEventListener('click',e=>{e.stopPropagation();toggleTplDrop();});
+$('emTplBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  const opening=!tplDropIsOpen();
+  toggleTplDrop();
+  if(opening){
+    focusTplFilter();
+    requestAnimationFrame(()=>requestAnimationFrame(focusTplFilter));
+  }
+});
+$('emTplFilter').addEventListener('mousedown',e=>e.stopPropagation());
+$('emTplFilter').addEventListener('click',e=>{e.stopPropagation();focusTplFilter();});
 $('emTplFilter').addEventListener('input',()=>{emTplHi=-1;renderTplList($('emTplFilter').value);});
 $('emTplFilter').addEventListener('keydown',e=>{
   e.stopPropagation();
@@ -4393,10 +4494,10 @@ $('emTplList').addEventListener('mousedown',e=>{
 });
 $('emSubj').addEventListener('input',()=>{if($('emCard').classList.contains('expanded'))renderPreview();});
 document.addEventListener('click',e=>{
-  if($('emOv').classList.contains('open')&&!e.target.closest('#emTplPicker'))closeTplDrop();
+  if(!$('emOv').classList.contains('open')||!tplDropIsOpen())return;
+  if(e.target.closest('#emTplPicker'))return;
+  closeTplDrop();
 });
-window.addEventListener('resize',positionTplDrop);
-$('emCard').querySelector('.comp-bd').addEventListener('scroll',positionTplDrop,{passive:true});
 $('emExpand').addEventListener('click',()=>setExpanded(!$('emCard').classList.contains('expanded')));
 $('empPrev').addEventListener('click',()=>empNav(-1));
 $('empNext').addEventListener('click',()=>empNav(1));
@@ -4418,10 +4519,15 @@ $('segEmAfter').addEventListener('click',e=>{
    re-injects the CORRECT id rather than stacking duplicates. If the operator
    deleted the marker on purpose it's simply re-applied for the matching
    client — the only way to truly suppress it is to not have a ClientID. */
-function injectCID(subject,body,cid,isHtml){
+function injectCID(subject,body,cid,isHtml,opts){
   if(!cid)return {subject:String(subject||''),body:String(body||'')};
-  let s=String(subject||'').replace(/\s*\[CID:[^\]]*\]/gi,'').replace(/\s+$/,'');
-  s=s+' [CID:'+cid+']';
+  const lockSubject=!!(opts&&opts.lockSubject);
+  let s=String(subject||'');
+  // Replies must keep the thread subject unchanged — do not append [CID:].
+  if(!lockSubject){
+    s=s.replace(/\s*\[CID:[^\]]*\]/gi,'').replace(/\s+$/,'');
+    s=s+' [CID:'+cid+']';
+  }
   let b=String(body||'');
   if(isHtml){b=b.replace(/(?:<br\s*\/?>\s*){0,2}ClientRef:[^<\n]*/gi,'').replace(/\s+$/,'');b=b+'<br><br>ClientRef: '+cid;}
   else{b=b.replace(/(^|\n)[ \t]*ClientRef:[^\n]*(?=\n|$)/gi,'').replace(/\s+$/,'');b=b+'\n\nClientRef: '+cid;}
@@ -4442,25 +4548,43 @@ function buildFollowUpPatch(na,due,after,basePatch,applyFollowUp){
 async function deliverEmail(c,ctx){
   const now=new Date().toISOString(),today=now.split('T')[0];
   const to=(ctx.toOverride||c.mail||'').trim();
+  const replyToId=ctx.replyToId||(emReplyCtx&&emReplyCtx.graphId)||null;
+  const replyConvId=ctx.replyConvId||(emReplyCtx&&emReplyCtx.convId)||null;
+  const isReply=!!replyToId||!!(ctx.lockSubject)||!!emReplyCtx;
   const subjP=personalize(ctx.subjT,c);
-  const inj=injectCID(subjP,personalize(ctx.bodyHtmlT,c),c.id,true);
+  const inj=injectCID(subjP,personalize(ctx.bodyHtmlT,c),c.id,true,{lockSubject:isReply});
   const subj=inj.subject,body=inj.body;
-  const textBody=injectCID(subjP,personalize(ctx.bodyTextT,c),c.id,false).body;
+  const textBody=injectCID(subjP,personalize(ctx.bodyTextT,c),c.id,false,{lockSubject:isReply}).body;
   const na=ctx.na||'',due=ctx.due||'',after=ctx.after||'';
   let msgId=null,convId=null,internetMsgId=null;
   // THE SEND. Only this may throw out of deliverEmail — so a retry never
   // re-sends an email that already went out (post-send logging is guarded).
-  if(appState.token){const ids=await graphSendMail(to,subj,body,true,ctx.attachments);msgId=ids.msgId||null;convId=ids.convId||null;internetMsgId=ids.internetMsgId||null;}
+  if(appState.token){
+    let ids;
+    if(replyToId){
+      try{ids=await graphReplyMail(replyToId,body,true,ctx.attachments);}
+      catch(e){
+        // Auth issues won't be fixed by a new send — surface them.
+        if(isAuthErr(e))throw e;
+        // Original may have left the mailbox — keep locked subject, send as new mail.
+        console.warn('[outreach] createReply failed, falling back to new send:',e.message);
+        ids=await graphSendMail(to,subj,body,true,ctx.attachments);
+      }
+    }else{
+      ids=await graphSendMail(to,subj,body,true,ctx.attachments);
+    }
+    msgId=ids.msgId||null;convId=ids.convId||replyConvId||null;internetMsgId=ids.internetMsgId||null;
+  }
   // Mail is now sent. Logging/tracker writes must NOT propagate (a SoniaLog
   // hiccup must not trigger a resend) — record a warning instead.
   let spId=null,logWarn='';
-  const patch=buildFollowUpPatch(na,due,after,{LastContactDate:now,LastContactOutcome:'Email sent: '+subj,LastUpdated:now},true);
+  const patch=buildFollowUpPatch(na,due,after,{LastContactDate:now,LastContactOutcome:(isReply?'Replied: ':'Email sent: ')+subj,LastUpdated:now},true);
   if(appState.token){
     try{
       // log the full email; if the Outcome column rejects long text, retry with subject only
       const fields={ClientID:c.id,ClientName:c.name,ContactDate:now,Channel:'Email',
         Direction:'Outbound',SoniaRead:true,
-        Outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+textBody,Subject:subj,NextAction:na,LoggedBy:loggedByName(),
+        Outcome:(isReply?'EMAIL REPLY — ':'EMAIL — ')+subj+'\nTo: '+to+'\n\n'+textBody,Subject:subj,NextAction:na,LoggedBy:loggedByName(),
         OutcomeType:'Sent',ContactOwner:'Sonia',NeedsEscalation:false,
         SenderEmail:TEAM_MAILBOX,RecipientEmail:to,SourceMailbox:TEAM_MAILBOX};
       if(c._sp)fields.RelatedClientTrackerId=String(c._sp);
@@ -4471,16 +4595,16 @@ async function deliverEmail(c,ctx){
       if(internetMsgId)fields.InternetMessageId=internetMsgId;
       if(due)fields.NextActionDue=due;
       try{const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
-      catch(e){fields.Outcome='Email sent: '+subj;
+      catch(e){fields.Outcome=(isReply?'Email reply sent: ':'Email sent: ')+subj;
         const r=await graphPost('/sites/'+SITE_ID+'/lists/'+LIST_IDS.soniaLog+'/items',{fields:fields});spId=r&&r.id;}
       if(c._sp)await graphPatch(trackerPath(c),patch);
     }catch(e){logWarn=e.message||String(e);console.warn('[outreach] sent OK but log/patch failed for',c.id,e);}
   }
   c.comms.push({_sp:spId,type:'email',date:today,dir:'out',content:subj,read:true,
-    outcome:'EMAIL — '+subj+'\nTo: '+to+'\n\n'+textBody,subject:subj,nextAction:na,outcomeType:'Sent',
+    outcome:(isReply?'EMAIL REPLY — ':'EMAIL — ')+subj+'\nTo: '+to+'\n\n'+textBody,subject:subj,nextAction:na,outcomeType:'Sent',
     docName:ctx.attNames||'',docUrl:ctx.attUrl||'',loggedBy:loggedByName(),contactOwner:'Sonia',nextActionDue:due,escalation:false,
     msgId:msgId,convId:convId});
-  c.lastContactDate=today;c.lastContactOutcome='Email sent: '+subj;
+  c.lastContactDate=today;c.lastContactOutcome=(isReply?'Replied: ':'Email sent: ')+subj;
   c.nextActionSummary=patch.NextActionSummary||na;c.nextActionDue=due||'';
   if(after==='needs')c.outreachRequired=true;else if(after)c.outreachRequired=false;
   rederive(c);
@@ -4493,23 +4617,32 @@ async function sendEmails(){
   const ctx={subjT,bodyHtmlT,bodyTextT,na,due,after:emAfter,
     attachments:toGraphAttachments(emAttachments),
     attNames:emAttachments.map(a=>a.name).join('; '),
-    attUrl:(emAttachments.find(a=>a.url)||{}).url||''};
+    attUrl:(emAttachments.find(a=>a.url)||{}).url||'',
+    replyToId:emReplyCtx&&emReplyCtx.graphId||null,
+    replyConvId:emReplyCtx&&emReplyCtx.convId||null,
+    lockSubject:!!emReplyCtx};
   // bulk → hand off to the confirmation + live-progress flow
-  if(emTargets.length>1||emRawTargets.length>1){openBulkConfirm(ctx);return;}
+  if(emTargets.length>1||emRawTargets.length>1){
+    if(emReplyCtx){toast('Reply is single-client only');return;}
+    openBulkConfirm(ctx);return;
+  }
   // single send
   const btn=$('emSend');btn.disabled=true;btn.textContent='Sending…';
   $('emErr').classList.remove('show');
   const c=emTargets[0];
   try{
     await deliverEmail(c,{...ctx,toOverride:$('emTo').value.trim()});
+    const wasReply=!!emReplyCtx;
     closeEmail();clearSel();refreshAfterWrite();
-    toast(`✉ Sent & logged 1 email from ${TEAM_MAILBOX}${demoSuffix()}`);
+    toast(wasReply
+      ?`↩ Reply sent & logged from ${TEAM_MAILBOX}${demoSuffix()}`
+      :`✉ Sent & logged 1 email from ${TEAM_MAILBOX}${demoSuffix()}`);
   }catch(e){
     console.error('[outreach] email failed for',c.id,e);
     if(isAuthErr(e)){$('emErr').innerHTML=PERM_MSG;$('emErr').classList.add('show');}
     else toast('⚠ Send failed ('+(e.message||'').slice(0,60)+')');
   }
-  btn.disabled=false;btn.textContent='Send from team mailbox';
+  btn.disabled=false;btn.textContent=(emReplyCtx?'Send reply as ':'Send as ')+TEAM_MAILBOX;
 }
 $('emSend').addEventListener('click',sendEmails);
 $('emClose').addEventListener('click',closeEmail);
@@ -4759,6 +4892,11 @@ function replyToastMsg(na,due,after){
 }
 function wireMailControls(container,client,m){
   wireReplyLogControls(container);
+  const cr=container.querySelector('[data-mailact="compose-reply"]');
+  if(cr)cr.addEventListener('click',()=>{
+    if(!client){toast('No client selected');return;}
+    openEmail([client],m);
+  });
   if(!m||!m._mail)return;
   const lf=container.querySelector('[data-mailact="full"]');
   if(lf)lf.addEventListener('click',async()=>{
